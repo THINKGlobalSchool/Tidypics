@@ -1,10 +1,12 @@
 <?php
 /**
+ * Tidypics General JS
  *
+ * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2
  */
 
 ?>
-
+//<script>
 elgg.provide('elgg.tidypics');
 
 elgg.tidypics.init = function() {

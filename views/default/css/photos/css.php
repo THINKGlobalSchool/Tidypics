@@ -28,10 +28,11 @@
 }
 
 .tidypics-heading {
-	color: #0054A7;
+
 }
+
 .tidypics-heading:hover {
-	color: #0054A7;
+	color: inherit !important;
 	text-decoration: none;
 }
 

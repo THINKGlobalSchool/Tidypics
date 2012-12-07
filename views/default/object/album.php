@@ -8,7 +8,6 @@
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2
  */
 
-$album = elgg_extract('entity', $vars);
 $full_view = elgg_extract('full_view', $vars, false);
 
 if ($full_view) {

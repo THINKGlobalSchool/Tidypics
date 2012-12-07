@@ -6,7 +6,6 @@
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2
  */
 
-
 // Get input data
 $title = get_input('title');
 $description = get_input('description');
@@ -24,8 +23,10 @@ if (empty($title)) {
 
 if ($guid) {
 	$album = get_entity($guid);
+	$message = elgg_echo("album:saved");
 } else {
 	$album = new TidypicsAlbum();
+	$message = elgg_echo("album:created");
 }
 
 $album->container_guid = $container_guid;
@@ -38,11 +39,12 @@ if ($tags) {
 }
 
 if (!$album->save()) {
-	register_error(elgg_echo("album:error"));
+	register_error(elgg_echo("album:savefailed"));
 	forward(REFERER);
 }
 
 elgg_clear_sticky_form('tidypics');
 
-system_message(elgg_echo("album:created"));
+system_message($message);
+
 forward($album->getURL());

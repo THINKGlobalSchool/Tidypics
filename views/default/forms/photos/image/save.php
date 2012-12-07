@@ -1,6 +1,6 @@
 <?php
 /**
- * Save image form body
+ * Tidyics Save image form body
  *
  * @author Cash Costello
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2
@@ -12,6 +12,8 @@ $tags = elgg_extract('tags', $vars, '');
 $access_id = elgg_extract('access_id', $vars, get_default_access());
 $container_guid = elgg_extract('container_guid', $vars, elgg_get_page_owner_guid());
 $guid = elgg_extract('guid', $vars, 0);
+
+elgg_dump($vars['title']);
 
 ?>
 

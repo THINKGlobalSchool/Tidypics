@@ -1,62 +1,271 @@
 <?php
 /**
- * Elgg tidypics library of common functions
+ * Tidypics Helper Library
  *
- * @package TidypicsCommon
+ * @package TidypicsWatermark
+ * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2
  */
+
+/** CONTENT FUNCTIONS **/
 
 /**
- * Get images for display on front page
+ * Get content for photos listing
  *
- * @param int number of images
- * @param int (optional) guid of owner
- * @return string of html for display
- *
- * To use with the custom index plugin, use something like this:
-	
- if (is_plugin_enabled('tidypics')) {
- ?>
- <!-- display latest photos -->
- <div class="index_box">
-	<h2><a href="<?php echo $vars['url']; ?>pg/photos/world/"><?php echo elgg_echo("tidypics:mostrecent"); ?></a></h2>
-	<div class="contentWrapper">
- <?php
- echo tp_get_latest_photos(5);
- ?>
-	</div>
- </div>
- <?php
- }
- ?>
-
- * Good luck
+ * @param $type            what are we listing? either photos or albums
+ * @param $page_type       page type (owner, all, group, etc)
+ * @param $container_guid  container guid for photos (optional)
+ * @return array
  */
-function tp_get_latest_photos($num_images, $owner_guid = 0, $context = 'front') {
-	$prev_context = get_context();
-	set_context($context);
-	$image_html = elgg_list_entities(array(
+function tidypics_get_list_content($type, $page_type, $container_guid = NULL) {
+	$params = array();
+
+	if ($type == 'albums') {
+		$subtype = 'album';
+	} else {
+		$type = 'photos';
+		$subtype = 'image';
+ 	}
+
+	$logged_in_user_guid = elgg_get_logged_in_user_guid();
+
+	// Photo list options
+	$options = array(
 		'type' => 'object',
-		'subtype' => 'image',
-		'owner_guid' => $owner_guid,
-		'limit' => $num_images,
-		'full_view' => false,
-		'pagination' => false,
-	));
-	set_context($prev_context);
-	return $image_html;
+		'subtype' => $subtype,
+		'full_view' => FALSE,
+		'list_type' => 'gallery',
+		'gallery_class' => "tidypics-gallery tidypics-gallery-{$type} tp-jsh-gallery-{$type}",
+		'limit' => 16,
+	);
+
+	if ($page_type == 'owner' && $container_guid)  {
+		$owner = get_entity($container_guid);
+
+		$params['title'] = elgg_echo("{$type}:owner", array($owner->name));
+
+		if (elgg_instanceof($owner, 'group')) {
+			$options['container_guid'] = $container_guid;
+		} else {
+			$options['owner_guid'] = $container_guid;
+		}
+	} else {
+		$params['title'] = elgg_echo("{$type}:all");
+	}
+
+	$content = elgg_list_entities($options);
+
+	if (!$content) {
+		$content = "<center><strong>" . elgg_echo("{$type}:none") . "</strong></center>";
+	}
+
+	$params['content'] = $content;
+
+	return $params;
 }
 
+/**
+ * Build content to view an album
+ *
+ * @param int $album_guid Album guid
+ * @return array
+ */
+function tidypics_get_view_album_content($album_guid) {
+	group_gatekeeper();
+
+	$params['filter'] = ' ';
+
+	// Get the album entity
+	$album = get_entity($album_guid);
+	if (!$album) {
+		register_error(elgg_echo('noaccess'));
+		$_SESSION['last_forward_from'] = current_page_url();
+		forward('');
+	}
+
+	elgg_set_page_owner_guid($album->getContainerGUID());
+
+	$owner = elgg_get_page_owner_entity();
+
+	$params['title'] = elgg_echo($album->getTitle());
+
+	if (elgg_instanceof($owner, 'group')) {
+		//elgg_push_breadcrumb($owner->name, "photos/group/$owner->guid/all");
+	} else {
+		//elgg_push_breadcrumb($owner->name, "photos/owner/$owner->username");
+	}
+
+	elgg_push_breadcrumb($album->getTitle());
+
+	$params['content'] = elgg_view_entity($album, array('full_view' => TRUE));
+
+	if ($album->getContainerEntity()->canWriteToContainer()) {
+		// @todo upload box
+	}
+
+	return $params;
+}
 
 /**
- * Get image directory path
+ * Build content to view an image
  *
- * Each album gets a subdirectory based on its container id
- *
- * @return string	path to image directory
+ * @param int $photo_guid Photo guid
+ * @return array
  */
-function tp_get_img_dir() {
-	$file = new ElggFile();
-	return $file->getFilenameOnFilestore() . 'image/';
+function tidypics_get_view_image_contnet($photo_guid) {
+	group_gatekeeper();
+
+	$params['filter'] = ' ';
+
+	// Get the photo entity
+	$photo = get_entity($photo_guid);
+	if (!$photo) {
+		register_error(elgg_echo('noaccess'));
+		$_SESSION['last_forward_from'] = current_page_url();
+		forward('');
+	}
+
+	// Add view annotation
+	$photo->addView();
+
+	// Load tagging @todo fix or update
+	if (elgg_get_plugin_setting('tagging', 'tidypics')) {
+		elgg_load_js('tidypics:tagging');
+		elgg_load_js('jquery.imgareaselect');
+	}
+
+	// Set page owner based on owner of photo album (shouldn't this always be an album?)
+	$album = $photo->getContainerEntity();
+	if ($album) {
+		elgg_set_page_owner_guid($album->getContainerGUID());
+	}
+	$owner = elgg_get_page_owner_entity();
+
+	$params['title'] = elgg_echo($photo->getTitle());
+
+	if (elgg_instanceof($owner, 'group')) {
+		//elgg_push_breadcrumb($owner->name, "photos/group/$owner->guid/all");
+	} else {
+		//elgg_push_breadcrumb($owner->name, "photos/owner/$owner->username");
+	}
+
+	//elgg_push_breadcrumb($album->getTitle(), $album->getURL());
+	//elgg_push_breadcrumb($params['title']);
+
+	if (elgg_get_plugin_setting('download_link', 'tidypics')) {
+		// add download button to title menu
+		elgg_register_menu_item('title', array(
+			'name' => 'download',
+			'href' => "photos/download/$photo_guid",
+			'text' => elgg_echo('image:download'),
+			'link_class' => 'elgg-button elgg-button-action',
+		));
+	}
+
+	$params['content'] = elgg_view_entity($photo, array('full_view' => TRUE));
+
+	return $params;
+}
+
+/**
+ * Build edit photo content
+ *
+ * @param $photo_guid Photo guid
+ * @return array
+ */
+function tidypics_get_photo_edit_content($photo_guid) {
+	$params['filter'] = ' ';
+
+	$guid = (int) get_input('guid');
+
+	// Get the photo entity
+	$photo = get_entity($photo_guid);
+	if (!$photo) {
+		register_error(elgg_echo('noaccess'));
+		$_SESSION['last_forward_from'] = current_page_url();
+		forward('');
+	}
+
+	// Make sure we can edit the photo
+	if (!$photo->canEdit()) {
+		register_error(elgg_echo('tidypics:nopermission'));
+		forward($photo->getContainerEntity()->getURL());
+	}
+
+	$album = $photo->getContainerEntity();
+
+	elgg_set_page_owner_guid($album->getContainerGUID());
+	$owner = elgg_get_page_owner_entity();
+
+	gatekeeper();
+	group_gatekeeper();
+
+	$params['title'] = elgg_echo('image:edit');
+
+	// Set up breadcrumbs
+	//elgg_push_breadcrumb(elgg_echo('photos'), "photos/all");
+	if (elgg_instanceof($owner, 'user')) {
+		//elgg_push_breadcrumb($owner->name, "photos/owner/$owner->username");
+	} else {
+		//elgg_push_breadcrumb($owner->name, "photos/group/$owner->guid/all");
+	}
+	// elgg_push_breadcrumb($album->getTitle(), $album->getURL());
+	// elgg_push_breadcrumb($photo->getTitle(), $photo->getURL());
+	// elgg_push_breadcrumb($params['title']);
+
+	$vars = tidypics_prepare_form_vars($photo);
+	$params['content'] = elgg_view_form('photos/image/save', array('method' => 'post'), $vars);
+
+	return $params;
+}
+
+/**
+ * Build edit photo content
+ *
+ * @param $album_guid Album guid
+ * @return array
+ */
+function tidypics_get_album_edit_content($album_guid) {
+	$params['filter'] = ' ';
+
+	$guid = (int) get_input('guid');
+
+	// Get the photo entity
+	$album = get_entity($album_guid);
+	if (!$album) {
+		register_error(elgg_echo('noaccess'));
+		$_SESSION['last_forward_from'] = current_page_url();
+		forward('');
+	}
+
+	// Make sure we can edit the photo
+	if (!$album->canEdit()) {
+		register_error(elgg_echo('tidypics:nopermission'));
+		forward($album->getURL());
+	}
+
+	elgg_set_page_owner_guid($album->getContainerGUID());
+	$owner = elgg_get_page_owner_entity();
+
+	gatekeeper(); 
+	group_gatekeeper();
+
+	$title = elgg_echo('album:edit');
+
+	// Set up breadcrumbs
+	//elgg_push_breadcrumb(elgg_echo('photos'), "photos/all");
+	if (elgg_instanceof($owner, 'user')) {
+		//elgg_push_breadcrumb($owner->name, "photos/owner/$owner->username");
+	} else {
+		//elgg_push_breadcrumb($owner->name, "photos/group/$owner->guid/all");
+	}
+	//elgg_push_breadcrumb($album->getTitle(), $album->getURL());
+	//elgg_push_breadcrumb($title);
+
+	$vars = tidypics_prepare_form_vars($album);
+
+	$params['content'] = elgg_view_form('photos/album/save', array('method' => 'post'), $vars);
+
+	return $params;
 }
 
 /**
@@ -66,6 +275,7 @@ function tp_get_img_dir() {
  * @return type
  */
 function tidypics_prepare_form_vars($entity = null) {
+
 	// input names => defaults
 	$values = array(
 		'title' => '',
@@ -93,6 +303,8 @@ function tidypics_prepare_form_vars($entity = null) {
 	}
 
 	elgg_clear_sticky_form('tidypics');
+
+	elgg_dump($entity->getTitle());
 
 	return $values;
 }
@@ -153,67 +365,6 @@ function tidypics_is_upgrade_available() {
 }
 
 /**
- * This lists the photos in an album as sorted by metadata
- *
- * @todo this only supports a single album. The only case for use a
- * procedural function like this instead of TidypicsAlbum::viewImgaes() is to
- * fetch images across albums as a helper to elgg_get_entities().
- * This should function be deprecated or fixed to work across albums.
- *
- * @param array $options
- * @return string
- */
-function tidypics_list_photos(array $options = array()) {
-	global $autofeed;
-	$autofeed = true;
-
-	$defaults = array(
-		'offset' => (int) max(get_input('offset', 0), 0),
-		'limit' => (int) max(get_input('limit', 10), 0),
-		'full_view' => true,
-		'list_type_toggle' => false,
-		'pagination' => true,
-	);
-
-	$options = array_merge($defaults, $options);
-
-	$options['count'] = true;
-	$count = elgg_get_entities($options);
-
-	$album = get_entity($options['container_guid']);
-	if ($album) {
-		$guids = $album->getImageList();
-		// need to pass all the guids and handle the limit / offset in sql
-		// to avoid problems with the navigation
-		//$guids = array_slice($guids, $options['offset'], $options['limit']);
-		$options['guids'] = $guids;
-		unset($options['container_guid']);
-	}
-	$options['count'] = false;
-	$entities = elgg_get_entities($options);
-
-	$keys = array();
-	foreach ($entities as $entity) {
-		$keys[] = $entity->guid;
-	}
-	
-	$entities = array_combine($keys, $entities);
-
-	$sorted_entities = array();
-	foreach ($guids as $guid) {
-		if (isset($entities[$guid])) {
-			$sorted_entities[] = $entities[$guid];
-		}
-	}
-
-	// for this function count means the total number of entities
-	// and is required for pagination
-	$options['count'] = $count;
-
-	return elgg_view_entity_list($sorted_entities, $options);
-}
-
-/**
  * Returns just a guid from a database $row. Used in elgg_get_entities()'s callback.
  *
  * @param stdClass $row
@@ -223,114 +374,17 @@ function tp_guid_callback($row) {
 	return ($row->guid) ? $row->guid : false;
 }
 
-
-/*********************************************************************
- * the functions below replace broken core functions or add functions 
- * that could/should exist in the core
- */
-
-function tp_view_entity_list($entities, $count, $offset, $limit, $fullview = true, $viewtypetoggle = false, $pagination = true) {
-	$context = get_context();
-
-	$html = elgg_view('tidypics/gallery',array(
-			'entities' => $entities,
-			'count' => $count,
-			'offset' => $offset,
-			'limit' => $limit,
-			'baseurl' => $_SERVER['REQUEST_URI'],
-			'fullview' => $fullview,
-			'context' => $context,
-			'viewtypetoggle' => $viewtypetoggle,
-			'viewtype' => get_input('search_viewtype','list'),
-			'pagination' => $pagination
-	));
-
-	return $html;
-}
-
-function tp_get_entities_from_annotations_calculate_x($sum = "sum", $entity_type = "", $entity_subtype = "", $name = "", $mdname = '', $mdvalue = '', $owner_guid = 0, $limit = 10, $offset = 0, $orderdir = 'desc', $count = false) {
-	global $CONFIG;
-
-	$sum = sanitise_string($sum);
-	$entity_type = sanitise_string($entity_type);
-	$entity_subtype = get_subtype_id($entity_type, $entity_subtype);
-	$name = get_metastring_id($name);
-	$limit = (int) $limit;
-	$offset = (int) $offset;
-	$owner_guid = (int) $owner_guid;
-	if (!empty($mdname) && !empty($mdvalue)) {
-		$meta_n = get_metastring_id($mdname);
-		$meta_v = get_metastring_id($mdvalue);
-	}
-
-	if (empty($name)) return 0;
-
-	$where = array();
-
-	if ($entity_type!="")
-		$where[] = "e.type='$entity_type'";
-	if ($owner_guid > 0)
-		$where[] = "e.owner_guid = $owner_guid";
-	if ($entity_subtype)
-		$where[] = "e.subtype=$entity_subtype";
-	if ($name!="")
-		$where[] = "a.name_id='$name'";
-
-	if (!empty($mdname) && !empty($mdvalue)) {
-		if ($mdname!="")
-			$where[] = "m.name_id='$meta_n'";
-		if ($mdvalue!="")
-			$where[] = "m.value_id='$meta_v'";
-	}
-
-	if ($sum != "count")
-		$where[] = "a.value_type='integer'"; // Limit on integer types
-
-	if (!$count) {
-		$query = "SELECT distinct e.*, $sum(ms.string) as sum ";
-	} else {
-		$query = "SELECT count(distinct e.guid) as num, $sum(ms.string) as sum ";
-	}
-	$query .= " from {$CONFIG->dbprefix}entities e JOIN {$CONFIG->dbprefix}annotations a on a.entity_guid = e.guid JOIN {$CONFIG->dbprefix}metastrings ms on a.value_id=ms.id ";
-
-	if (!empty($mdname) && !empty($mdvalue)) {
-		$query .= " JOIN {$CONFIG->dbprefix}metadata m on m.entity_guid = e.guid ";
-	}
-
-	$query .= " WHERE ";
-	foreach ($where as $w)
-		$query .= " $w and ";
-	$query .= get_access_sql_suffix("a"); // now add access
-	$query .= ' and ' . get_access_sql_suffix("e"); // now add access
-	if (!$count) $query .= ' group by e.guid';
-
-	if (!$count) {
-		$query .= ' order by sum ' . $orderdir;
-		$query .= ' limit ' . $offset . ' , ' . $limit;
-		return get_data($query, "entity_row_to_elggstar");
-	} else {
-		if ($row = get_data_row($query)) {
-			return $row->num;
-		}
-	}
-	return false;
-}
-
 /**
- * Is page owner a group - convenience function
+ * Get image directory path
  *
- * @return true/false
+ * Each album gets a subdirectory based on its container id
+ *
+ * @return string	path to image directory
  */
-function tp_is_group_page() {
-
-	if ($group = page_owner_entity()) {
-		if ($group instanceof ElggGroup)
-			return true;
-	}
-
-	return false;
+function tp_get_img_dir() {
+	$file = new ElggFile();
+	return $file->getFilenameOnFilestore() . 'image/';
 }
-
 
 /**
  * Is the request from a known browser
@@ -349,60 +403,4 @@ function tp_is_person() {
 	}
 
 	return false;
-}
-
-/**
- * get a list of people that can be tagged in an image
- *
- * @param $viewer entity
- * @return array of guid->name for tagging
- */
-function tp_get_tag_list($viewer) {
-	$friends = get_user_friends($viewer->getGUID(), '', 999, 0);
-	$friend_list = array();
-	if ($friends) {
-		foreach($friends as $friend) {
-			//error_log("friend $friend->name");
-			$friend_list[$friend->guid] = $friend->name;
-		}
-	}
-
-	// is this a group
-	$is_group = tp_is_group_page();
-	if ($is_group) {
-		$group_guid = page_owner();
-		$viewer_guid = $viewer->guid;
-		$members = get_group_members($group_guid, 999);
-		if (is_array($members)) {
-			foreach ($members as $member) {
-				if ($viewer_guid != $member->guid) {
-					$group_list[$member->guid] = $member->name;
-					//error_log("group $member->name");
-				}
-			}
-
-			// combine group and friends list
-			$intersect = array_intersect_key($friend_list, $group_list);
-			$unique_friends = array_diff_key($friend_list, $group_list);
-			$unique_members = array_diff_key($group_list, $friend_list);
-			//$friend_list = array_merge($friend_list, $group_list);
-			//$friend_list = array_unique($friend_list);
-			$friend_list = $intersect + $unique_friends + $unique_members;
-		}
-	}
-
-	asort($friend_list);
-
-	return $friend_list;
-}
-
-/**
- * Convenience function for listing recent images
- *
- * @param int $max
- * @param bool $pagination
- * @return string
- */
-function tp_mostrecentimages($max = 8, $pagination = true) {
-	return list_entities("object", "image", 0, $max, false, false, $pagination);
 }
