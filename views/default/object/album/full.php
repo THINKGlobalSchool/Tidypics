@@ -49,7 +49,15 @@ if ($album->description) {
 	));
 }
 
-$body .= $album->viewImages();
+$options = array(
+	'container_guid' => $album->guid,
+);
+
+if ($album->getContainerEntity()->canEdit(elgg_get_logged_in_user_guid())) {
+	$options['enable_upload'] = TRUE;
+}
+
+$body .= tidypics_view_photo_list($options);
 
 echo elgg_view('object/elements/full', array(
 	'entity' => $album,

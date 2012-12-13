@@ -152,9 +152,9 @@ a photo) and enter it below.',
 	'tidypics:thumbnail_tool:created' => 'Created thumbnails.',
 
 	//actions
-	'album:create' => "Create new album",
+	'album:create' => "Create New Album",
 	'album:add' => "Add Photo Album",
-	'album:addpix' => "Add photos to album",
+	'album:addpix' => "Add New Photos",
 	'album:edit' => "Edit album",
 	'album:delete' => "Delete album",
 	'album:sort' => "Sort",

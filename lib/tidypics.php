@@ -19,24 +19,9 @@
 function tidypics_get_list_content($type, $page_type, $container_guid = NULL) {
 	$params = array();
 
-	if ($type == 'albums') {
-		$subtype = 'album';
-	} else {
-		$type = 'photos';
-		$subtype = 'image';
- 	}
-
 	$logged_in_user_guid = elgg_get_logged_in_user_guid();
 
-	// Photo list options
-	$options = array(
-		'type' => 'object',
-		'subtype' => $subtype,
-		'full_view' => FALSE,
-		'list_type' => 'gallery',
-		'gallery_class' => "tidypics-gallery tidypics-gallery-{$type} tp-jsh-gallery-{$type}",
-		'limit' => 16,
-	);
+	$options = array();
 
 	if ($page_type == 'owner' && $container_guid)  {
 		$owner = get_entity($container_guid);
@@ -52,11 +37,15 @@ function tidypics_get_list_content($type, $page_type, $container_guid = NULL) {
 		$params['title'] = elgg_echo("{$type}:all");
 	}
 
-	$content = elgg_list_entities($options);
-
-	if (!$content) {
-		$content = "<center><strong>" . elgg_echo("{$type}:none") . "</strong></center>";
+	if ($logged_in_user_guid) {
+		$options['enable_upload'] = TRUE;
 	}
+
+	if ($type == 'albums') {
+		$content = tidypics_view_album_list($options);
+	} else {
+		$content = tidypics_view_photo_list($options);
+ 	}
 
 	$params['content'] = $content;
 
@@ -96,8 +85,21 @@ function tidypics_get_view_album_content($album_guid) {
 
 	elgg_push_breadcrumb($album->getTitle());
 
-	$params['content'] = elgg_view_entity($album, array('full_view' => TRUE));
+	if (elgg_is_xhr()) {
+		$options = array(
+			'container_guid' => $album->guid,
+		);
 
+		if ($album->getContainerEntity()->canEdit(elgg_get_logged_in_user_guid())) {
+			$options['enable_upload'] = TRUE;
+		}
+
+		$params['content'] = tidypics_view_photo_list($options);
+		
+	} else {
+		$params['content'] = elgg_view_entity($album, array('full_view' => TRUE));
+	}
+	
 	if ($album->getContainerEntity()->canWriteToContainer()) {
 		// @todo upload box
 	}
@@ -268,6 +270,75 @@ function tidypics_get_album_edit_content($album_guid) {
 	return $params;
 }
 
+
+/**
+ * Tidypics view album list
+ * 
+ * @param $options Entity getter options
+ */
+function tidypics_view_album_list(array $options = array()) {
+	// Entity options
+	$defaults = array(
+		'type' => 'object',
+		'subtype' => 'album',
+		'limit' => 24,
+		'offset' => get_input('offset', 0),
+	);
+
+	if ($options['enable_upload'] && !$defaults['offset']) {
+		$defaults['limit'] = 23;
+	}
+
+	$options = array_merge($defaults, (array)$options);
+
+	$options['count'] = TRUE;
+
+	$count = elgg_get_entities($options);
+
+	unset($options['count']);
+
+	$albums = elgg_get_entities($options);
+
+	$options['items'] = $albums;
+	$options['count'] = $count;
+
+	return elgg_view('photos/album_list', $options);
+}
+
+/**
+ * Tidypics view photo list
+ * 
+ * @param $options Entity getter options
+ */
+function tidypics_view_photo_list(array $options = array()) {
+	// Entity options
+	$defaults = array(
+		'type' => 'object',
+		'subtype' => 'image',
+		'limit' => 24,
+		'offset' => get_input('offset', 0),
+	);
+
+	if ($options['enable_upload'] && !$defaults['offset']) {
+		$defaults['limit'] = 23;
+	}
+
+	$options = array_merge($defaults, (array)$options);
+
+	$options['count'] = TRUE;
+
+	$count = elgg_get_entities($options);
+
+	unset($options['count']);
+
+	$photos = elgg_get_entities($options);
+
+	$options['items'] = $photos;
+	$options['count'] = $count;
+
+	return elgg_view('photos/photo_list', $options);
+}
+
 /**
  * Prepare vars for a form, pulling from an entity or sticky forms.
  * 
@@ -303,8 +374,6 @@ function tidypics_prepare_form_vars($entity = null) {
 	}
 
 	elgg_clear_sticky_form('tidypics');
-
-	elgg_dump($entity->getTitle());
 
 	return $values;
 }

@@ -16,6 +16,8 @@
  * - Clean languages
  * - Photo access independant of album? (Our fork says no)
  * - Improve photo layout
+ * - Long albums names?
+ * - Upgrades need to stay.. need to check against our old fork
  */
 
 elgg_register_event_handler('init', 'system', 'tidypics_init');
@@ -58,6 +60,16 @@ function tidypics_init() {
 	$js = elgg_get_simplecache_url('js', 'photos/uploading');
 	elgg_register_simplecache_view('js/photos/uploading');
 	elgg_register_js('tidypics:uploading', $js, 'footer');
+
+	// Register jquery-waypoints js lib
+	$js = elgg_get_simplecache_url('js', 'waypoints');
+	elgg_register_simplecache_view('js/waypoints');
+	elgg_register_js('jquery-waypoints', $js);
+
+	// Register jquery-masonry js lib
+	$js = elgg_get_simplecache_url('js', 'masonry');
+	elgg_register_simplecache_view('js/masonry');
+	elgg_register_js('jquery-masonry', $js);
 
 	// Add photos link to owner block/hover menus
 	elgg_register_plugin_hook_handler('register', 'menu:owner_block', 'tidypics_owner_block_menu');
@@ -125,123 +137,225 @@ function tidypics_init() {
  * My Albums:     photos/albums/owner
  * 
  * @todo 
- * - Makes these ajax loaded? (Using the 'standard' elggy routing)
  * - What about friends.. we don't use it but it's a standard elgg pattern
  * - From posts (similar to G+): photos/posts (maybe?) 
- * - Groups
  *
  * @param array $page
  * @return bool
  */
 function tidypics_page_handler($page) {
-
 	$page_type = $page[0];
-
 	$page_base = elgg_get_plugins_path() . 'tidypics/pages/photos';
 
-	elgg_load_js('tidypics');
+	// Load content for XHR requests
+	if (elgg_is_xhr()) {
+		switch ($page_type) {
+			// All/default
+			case 'all':
+			case 'world':
+			default:
+				$params = tidypics_get_list_content('photos', $page_type);
+				break;
+			// Albums
+			case 'albums':
+				switch ($page[1]) {
+					case 'owner':
+						$user = get_user_by_username($page[2]);
+						$params = tidypics_get_list_content('albums', $page[1], $user->guid);
+						break;
+					case 'all':
+					default:
+						$params = tidypics_get_list_content('albums', $page[1]);
+						break;
+				}
+				break;
+			case 'album':
+				$params = tidypics_get_view_album_content($page[1]);
+				break;
+			// Groups
+			case 'group':
+				$group = elgg_get_page_owner_entity();
+				$params = tidypics_get_list_content('albums', 'owner', $group->guid);
+				break;
+			// Photos
+			case 'owner':
+				$user = elgg_get_page_owner_entity();
+				$params = tidypics_get_list_content('photos', $page_type, $user->guid);
+				break;
+		}
 
-	// @todo breadcrumbs
-	
-	switch ($page_type) {
-		// Albums
-		case 'albums':
-			switch ($page[1]) {
-				case 'owner':
-					$user = get_user_by_username($page[2]);
-					$params = tidypics_get_list_content('albums', $page[1], $user->guid);
-					break;
-				case 'all':
-				default:
-					$params = tidypics_get_list_content('albums', $page[1]);
-					break;
-			}
-			break;
-		case 'album':
-			$params = tidypics_get_view_album_content($page[1]);
-			break;
-		// Groups
-		case 'group':
-			$group = elgg_get_page_owner_entity();
-			$params = tidypics_get_list_content('albums', 'owner', $group->guid);
-			break;
-		// Photos
-		case 'owner':
-			$user = elgg_get_page_owner_entity();
-			$params = tidypics_get_list_content('photos', $page_type, $user->guid);
-			break;
-		case "image": // @todo this will be a lightbox..
-		case "view":
-			$params = tidypics_get_view_image_contnet($page[1]);
-			break;
-		// Editing
-		case "edit": //edit image or album
-			$entity = get_entity($page[1]);
-			if (elgg_instanceof($entity, 'object', 'album')) {
-				$params = tidypics_get_album_edit_content($page[1]);
-			} else if (elgg_instanceof($entity, 'object', 'image')) {
-				$params = tidypics_get_photo_edit_content($page[1]);
-			} else {
-				forward('photos');
-			}		
-			break;
-		// Other pages
-		case "thumbnail": // tidypics thumbnail
-			set_input('guid', $page[1]);
-			set_input('size', elgg_extract(2, $page, 'small'));
-			require "$page_base/image/thumbnail.php";
-			return TRUE;
-			break;
-		// All/default
-		case 'all':
-		case 'world':
-		default:
-			$params = tidypics_get_list_content('photos', $page_type);
-			break;
+		echo $params['content'];
+		return TRUE;
+	} else {
+
+		elgg_load_js('tidypics');
+		elgg_load_js('jquery-waypoints');
+		elgg_load_js('jquery-masonry');
+
+		switch ($page_type) {
+			case 'album':
+				$params = tidypics_get_view_album_content($page[1]);
+				break;
+			case "image": // @todo this will be a lightbox..
+			case "view":
+				$params = tidypics_get_view_image_contnet($page[1]);
+				break;
+			// Editing
+			case "edit": //edit image or album
+				$entity = get_entity($page[1]);
+				if (elgg_instanceof($entity, 'object', 'album')) {
+					$params = tidypics_get_album_edit_content($page[1]);
+				} else if (elgg_instanceof($entity, 'object', 'image')) {
+					$params = tidypics_get_photo_edit_content($page[1]);
+				} else {
+					forward('photos');
+				}		
+				break;
+			// Other pages
+			case "thumbnail": // tidypics thumbnail
+				set_input('guid', $page[1]);
+				set_input('size', elgg_extract(2, $page, 'small'));
+				require "$page_base/image/thumbnail.php";
+				return TRUE;
+				break;
+			default:
+				$params['content'] = elgg_view('photos/content', array('page' => $page));
+				break; 
+		}
+
+		// Photos sidebar
+		$params['sidebar'] = elgg_view('photos/sidebar');
+
+		// Photos filter menu
+		if (!$params['filter']) {
+			$params['filter'] = elgg_view_menu('photos-filter', array(
+				'class' => 'elgg-menu-hz elgg-menu-filter elgg-menu-filter-default',
+				'sort_by' => 'priority',
+			));
+		}
+
+		$body = elgg_view_layout($params['layout'] ? $params['layout'] : 'content', $params);
+
+		echo elgg_view_page($params['title'], $body);
 	}
-
-	// Photos sidebar
-	$params['sidebar'] = elgg_view('photos/sidebar');
-
-	// Photos filter menu
-	if (!$params['filter']) {
-		$params['filter'] = elgg_view_menu('photos-filter', array(
-			'class' => 'elgg-menu-hz elgg-menu-filter elgg-menu-filter-default',
-			'sort_by' => 'priority',
-		));
-	}
-
-	$body = elgg_view_layout($params['layout'] ? $params['layout'] : 'content', $params);
-
-	echo elgg_view_page($params['title'], $body);
-
 	return TRUE;
-
-	/* Leftover need to implement uploading and album creation etc.. */
-	// case "new":  // create new album
-	// case "add":
-	// 	set_input('guid', $page[1]);
-	// 	require "$base/album/add.php";
-	// 	break;
-
-	// case "sort": // sort a photo album
-	// 	set_input('guid', $page[1]);
-	// 	require "$base/album/sort.php";
-	// 	break;
-
-	// case "upload": // upload images to album
-	// 	set_input('guid', $page[1]);
-
-	// 	if (elgg_get_plugin_setting('uploader', 'tidypics')) {
-	// 		$default_uploader = 'ajax';
-	// 	} else {
-	// 		$default_uploader = 'basic';
-	// 	}
-
-	// 	set_input('uploader', elgg_extract(2, $page, $default_uploader));
-	// 	require "$base/image/upload.php";
-	// 	break;
 }
+
+function tidypics_ajax_handler($page) {
+
+}
+
+
+// function tidypics_page_handler($page) {
+
+// 	$page_type = $page[0];
+
+// 	$page_base = elgg_get_plugins_path() . 'tidypics/pages/photos';
+
+// 	elgg_load_js('tidypics');
+// 	elgg_load_js('jquery-waypoints');
+
+// 	// @todo breadcrumbs
+	
+// 	switch ($page_type) {
+// 		// All/default
+// 		case 'all':
+// 		case 'world':
+// 		default:
+// 			$params = tidypics_get_list_content('photos', $page_type);
+// 			break;
+// 		// Albums
+// 		case 'albums':
+// 			switch ($page[1]) {
+// 				case 'owner':
+// 					$user = get_user_by_username($page[2]);
+// 					$params = tidypics_get_list_content('albums', $page[1], $user->guid);
+// 					break;
+// 				case 'all':
+// 				default:
+// 					$params = tidypics_get_list_content('albums', $page[1]);
+// 					break;
+// 			}
+// 			break;
+// 		case 'album':
+// 			$params = tidypics_get_view_album_content($page[1]);
+// 			break;
+// 		// Groups
+// 		case 'group':
+// 			$group = elgg_get_page_owner_entity();
+// 			$params = tidypics_get_list_content('albums', 'owner', $group->guid);
+// 			break;
+// 		// Photos
+// 		case 'owner':
+// 			$user = elgg_get_page_owner_entity();
+// 			$params = tidypics_get_list_content('photos', $page_type, $user->guid);
+// 			break;
+// 		case "image": // @todo this will be a lightbox..
+// 		case "view":
+// 			$params = tidypics_get_view_image_contnet($page[1]);
+// 			break;
+// 		// Editing
+// 		case "edit": //edit image or album
+// 			$entity = get_entity($page[1]);
+// 			if (elgg_instanceof($entity, 'object', 'album')) {
+// 				$params = tidypics_get_album_edit_content($page[1]);
+// 			} else if (elgg_instanceof($entity, 'object', 'image')) {
+// 				$params = tidypics_get_photo_edit_content($page[1]);
+// 			} else {
+// 				forward('photos');
+// 			}		
+// 			break;
+// 		// Other pages
+// 		case "thumbnail": // tidypics thumbnail
+// 			set_input('guid', $page[1]);
+// 			set_input('size', elgg_extract(2, $page, 'small'));
+// 			require "$page_base/image/thumbnail.php";
+// 			return TRUE;
+// 			break;
+// 	}
+
+// 	// Photos sidebar
+// 	$params['sidebar'] = elgg_view('photos/sidebar');
+
+// 	// Photos filter menu
+// 	if (!$params['filter']) {
+// 		$params['filter'] = elgg_view_menu('photos-filter', array(
+// 			'class' => 'elgg-menu-hz elgg-menu-filter elgg-menu-filter-default',
+// 			'sort_by' => 'priority',
+// 		));
+// 	}
+
+// 	$body = elgg_view_layout($params['layout'] ? $params['layout'] : 'content', $params);
+
+// 	echo elgg_view_page($params['title'], $body);
+
+// 	return TRUE;
+
+// 	/* Leftover need to implement uploading and album creation etc.. */
+// 	// case "new":  // create new album
+// 	// case "add":
+// 	// 	set_input('guid', $page[1]);
+// 	// 	require "$base/album/add.php";
+// 	// 	break;
+
+// 	// case "sort": // sort a photo album
+// 	// 	set_input('guid', $page[1]);
+// 	// 	require "$base/album/sort.php";
+// 	// 	break;
+
+// 	// case "upload": // upload images to album
+// 	// 	set_input('guid', $page[1]);
+
+// 	// 	if (elgg_get_plugin_setting('uploader', 'tidypics')) {
+// 	// 		$default_uploader = 'ajax';
+// 	// 	} else {
+// 	// 		$default_uploader = 'basic';
+// 	// 	}
+
+// 	// 	set_input('uploader', elgg_extract(2, $page, $default_uploader));
+// 	// 	require "$base/image/upload.php";
+// 	// 	break;
+// }
 
 /**
  * Add a menu item to an ownerblock
@@ -414,7 +528,7 @@ function tidypics_notify_message($hook, $type, $result, $params) {
 
 
 /**
- * Uberpics pagesetup event handler
+ * Tidypics pagesetup event handler
  *
  * @param string $event  Event name
  * @param string $type   Object type
@@ -446,22 +560,25 @@ function tidypics_pagesetup($event, $type, $object) {
 		);
 		elgg_register_menu_item('photos-filter', $params);
 
-		// My photos filter item
-		$params = array(
-			'name' => 'myphotos',
-			'text' => elgg_echo('photos:mine'),
-			'href' => "photos/owner/{$user->username}",
-			'priority' => 300,
-		);
-		elgg_register_menu_item('photos-filter', $params);
+		// My photos/albums only for logged in
+		if ($user) {
+			// My photos filter item
+			$params = array(
+				'name' => 'myphotos',
+				'text' => elgg_echo('photos:mine'),
+				'href' => "photos/owner/{$user->username}",
+				'priority' => 300,
+			);
+			elgg_register_menu_item('photos-filter', $params);
 
-		// My albums filter item
-		$params = array(
-			'name' => 'myalbums',
-			'text' => elgg_echo('albums:mine'),
-			'href' => "photos/albums/owner/{$user->username}",
-			'priority' => 400,
-		);
-		elgg_register_menu_item('photos-filter', $params);
+			// My albums filter item
+			$params = array(
+				'name' => 'myalbums',
+				'text' => elgg_echo('albums:mine'),
+				'href' => "photos/albums/owner/{$user->username}",
+				'priority' => 400,
+			);
+			elgg_register_menu_item('photos-filter', $params);
+		}
 	}
 }
