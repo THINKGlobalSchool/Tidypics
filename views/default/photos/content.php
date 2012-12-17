@@ -5,7 +5,6 @@
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2
  */
 
-
 $content = <<<HTML
 	<div id='tidypics-content-container'>
 	</div>
@@ -14,7 +13,7 @@ HTML;
 $script = <<<JAVASCRIPT
 <script type='text/javascript'>
 	tidypics_init_content = function() {
-		elgg.tidypics.getPageContent(window.location.href);
+		elgg.tidypics.loadTabContent(window.location.href);
 
 		// Implement popstate
 		window.addEventListener("popstate", function(e) {

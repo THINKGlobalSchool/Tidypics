@@ -29,33 +29,52 @@ elgg.tidypics.init = function() {
 		$('input[name="guids"]').val(tidypics_guids.toString());
 	});
 
-	elgg.tidypics.initAjaxLinks();
-	elgg.tidypics.initInfiniteScroll();
+	elgg.tidypics.initFilterLinks();
 };
 
-elgg.tidypics.initAjaxLinks = function() {
+elgg.tidypics.initFilterLinks = function() {
+	// Filter items
 	$('ul.elgg-menu-photos-filter > li').each(function() {
-		$(this).delegate('a', 'click', function(event) {
-
-			history.pushState(null, null, $(this).attr('href'));
-
-			$('ul.elgg-menu-photos-filter > li').removeClass('elgg-state-selected');
-
-			$(this).parent().addClass('elgg-state-selected');
-
-			elgg.tidypics.getPageContent($(this).attr('href'));
-
-			event.preventDefault();
-		});
+		elgg.tidypics.initHistoryLink($(this));
 	});
 }
 
-elgg.tidypics.getPageContent = function(href) {
+elgg.tidypics.initBreadcrumbLinks = function() {
+	// Breadcrumb items
+	$('ul.elgg-menu.elgg-breadcrumbs > li').each(function() {
+		elgg.tidypics.initHistoryLink($(this));
+	});
+}
+
+elgg.tidypics.initHistoryLink = function($link) {
+	$link.delegate('a', 'click', function(event) {
+		history.pushState(null, null, $(this).attr('href'));
+
+		$('ul.elgg-menu-photos-filter > li').removeClass('elgg-state-selected');
+
+		$('ul.elgg-menu-photos-filter > li > a[href^="' + $(this).attr('href') + '"]')
+			.parent().addClass('elgg-state-selected');
+
+		elgg.tidypics.loadTabContent($(this).attr('href'));
+
+		event.preventDefault();
+	});
+}
+
+elgg.tidypics.loadTabContent = function(href) {
+	var $loading = $("<div id='_tp-content-loader' class='elgg-ajax-loader'></div>");
+
+	$('#tidypics-content-container').html($loading);
+
 	elgg.get(href, {
 		data: {},
 		success: function(data) {
+			var $data = $(data);
 			$('#tidypics-content-container').html(data);
+			elgg.tidypics.loadBreadcrumbsContent($data.filter('#_tp-content-tab-breadcrumbs'));
+			elgg.tidypics.loadSidebarContent($data.filter('#_tp-content-tab-sidebar'));
 			elgg.tidypics.initInfiniteScroll();
+			elgg.tidypics.initBreadcrumbLinks();
 		}, 
 		error: function(xhr, ajaxOptions, thrownError) {
 			console.log(xrh.status);
@@ -64,8 +83,18 @@ elgg.tidypics.getPageContent = function(href) {
 	});
 }
 
+elgg.tidypics.loadSidebarContent = function($data) {
+	$sidebar = $('div.elgg-layout.elgg-layout-one-sidebar > div.elgg-sidebar');
+	$sidebar.replaceWith($data.children());
+}
+
+elgg.tidypics.loadBreadcrumbsContent = function($data) {
+	$breadcrumbs = $('div.elgg-main.elgg-body > ul.elgg-menu.elgg-breadcrumbs');
+	$breadcrumbs.replaceWith($data.children());
+}
+
 elgg.tidypics.popState = function(event) {
-	elgg.tidypics.getPageContent(location.href);
+	elgg.tidypics.loadTabContent(location.href);
 
 	// Select the proper tab
 	$('ul.elgg-menu-photos-filter > li').removeClass('elgg-state-selected');

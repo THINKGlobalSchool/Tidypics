@@ -30,11 +30,16 @@ function tidypics_get_list_content($type, $page_type, $container_guid = NULL) {
 
 		if (elgg_instanceof($owner, 'group')) {
 			$options['container_guid'] = $container_guid;
+			elgg_push_breadcrumb($owner->name, "photos/group/$owner->guid/all");
 		} else {
 			$options['owner_guid'] = $container_guid;
+			elgg_push_breadcrumb($owner->name, "photos/owner/$owner->username");
 		}
+		elgg_push_breadcrumb(elgg_echo("{$type}"));
+
 	} else {
-		$params['title'] = elgg_echo("{$type}:all");
+		$params['title'] = elgg_echo("{$type}:allsite");
+		elgg_push_breadcrumb(elgg_echo("{$type}:all"));
 	}
 
 	if ($logged_in_user_guid) {
@@ -59,8 +64,6 @@ function tidypics_get_list_content($type, $page_type, $container_guid = NULL) {
  * @return array
  */
 function tidypics_get_view_album_content($album_guid) {
-	group_gatekeeper();
-
 	$params['filter'] = ' ';
 
 	// Get the album entity
@@ -75,12 +78,14 @@ function tidypics_get_view_album_content($album_guid) {
 
 	$owner = elgg_get_page_owner_entity();
 
+	group_gatekeeper();
+
 	$params['title'] = elgg_echo($album->getTitle());
 
 	if (elgg_instanceof($owner, 'group')) {
-		//elgg_push_breadcrumb($owner->name, "photos/group/$owner->guid/all");
+		elgg_push_breadcrumb($owner->name, "photos/group/$owner->guid/all");
 	} else {
-		//elgg_push_breadcrumb($owner->name, "photos/owner/$owner->username");
+		elgg_push_breadcrumb($owner->name, "photos/owner/$owner->username");
 	}
 
 	elgg_push_breadcrumb($album->getTitle());
@@ -114,8 +119,6 @@ function tidypics_get_view_album_content($album_guid) {
  * @return array
  */
 function tidypics_get_view_image_contnet($photo_guid) {
-	group_gatekeeper();
-
 	$params['filter'] = ' ';
 
 	// Get the photo entity
@@ -142,16 +145,18 @@ function tidypics_get_view_image_contnet($photo_guid) {
 	}
 	$owner = elgg_get_page_owner_entity();
 
+	group_gatekeeper();
+
 	$params['title'] = elgg_echo($photo->getTitle());
 
 	if (elgg_instanceof($owner, 'group')) {
-		//elgg_push_breadcrumb($owner->name, "photos/group/$owner->guid/all");
+		elgg_push_breadcrumb($owner->name, "photos/group/$owner->guid/all");
 	} else {
-		//elgg_push_breadcrumb($owner->name, "photos/owner/$owner->username");
+		elgg_push_breadcrumb($owner->name, "photos/owner/$owner->username");
 	}
 
-	//elgg_push_breadcrumb($album->getTitle(), $album->getURL());
-	//elgg_push_breadcrumb($params['title']);
+	elgg_push_breadcrumb($album->getTitle(), $album->getURL());
+	elgg_push_breadcrumb($params['title']);
 
 	if (elgg_get_plugin_setting('download_link', 'tidypics')) {
 		// add download button to title menu
@@ -175,6 +180,8 @@ function tidypics_get_view_image_contnet($photo_guid) {
  * @return array
  */
 function tidypics_get_photo_edit_content($photo_guid) {
+	gatekeeper();
+
 	$params['filter'] = ' ';
 
 	$guid = (int) get_input('guid');
@@ -198,21 +205,20 @@ function tidypics_get_photo_edit_content($photo_guid) {
 	elgg_set_page_owner_guid($album->getContainerGUID());
 	$owner = elgg_get_page_owner_entity();
 
-	gatekeeper();
 	group_gatekeeper();
 
 	$params['title'] = elgg_echo('image:edit');
 
 	// Set up breadcrumbs
-	//elgg_push_breadcrumb(elgg_echo('photos'), "photos/all");
+	elgg_push_breadcrumb(elgg_echo('photos'), "photos/all");
 	if (elgg_instanceof($owner, 'user')) {
-		//elgg_push_breadcrumb($owner->name, "photos/owner/$owner->username");
+		elgg_push_breadcrumb($owner->name, "photos/owner/$owner->username");
 	} else {
-		//elgg_push_breadcrumb($owner->name, "photos/group/$owner->guid/all");
+		elgg_push_breadcrumb($owner->name, "photos/group/$owner->guid/all");
 	}
-	// elgg_push_breadcrumb($album->getTitle(), $album->getURL());
-	// elgg_push_breadcrumb($photo->getTitle(), $photo->getURL());
-	// elgg_push_breadcrumb($params['title']);
+	elgg_push_breadcrumb($album->getTitle(), $album->getURL());
+	elgg_push_breadcrumb($photo->getTitle(), $photo->getURL());
+	elgg_push_breadcrumb($params['title']);
 
 	$vars = tidypics_prepare_form_vars($photo);
 	$params['content'] = elgg_view_form('photos/image/save', array('method' => 'post'), $vars);
@@ -227,6 +233,8 @@ function tidypics_get_photo_edit_content($photo_guid) {
  * @return array
  */
 function tidypics_get_album_edit_content($album_guid) {
+	gatekeeper(); 
+
 	$params['filter'] = ' ';
 
 	$guid = (int) get_input('guid');
@@ -248,20 +256,19 @@ function tidypics_get_album_edit_content($album_guid) {
 	elgg_set_page_owner_guid($album->getContainerGUID());
 	$owner = elgg_get_page_owner_entity();
 
-	gatekeeper(); 
 	group_gatekeeper();
 
-	$title = elgg_echo('album:edit');
+	$params['title'] = elgg_echo('album:edit');
 
 	// Set up breadcrumbs
-	//elgg_push_breadcrumb(elgg_echo('photos'), "photos/all");
+	elgg_push_breadcrumb(elgg_echo('photos'), "photos/all");
 	if (elgg_instanceof($owner, 'user')) {
-		//elgg_push_breadcrumb($owner->name, "photos/owner/$owner->username");
+		elgg_push_breadcrumb($owner->name, "photos/owner/$owner->username");
 	} else {
-		//elgg_push_breadcrumb($owner->name, "photos/group/$owner->guid/all");
+		elgg_push_breadcrumb($owner->name, "photos/group/$owner->guid/all");
 	}
-	//elgg_push_breadcrumb($album->getTitle(), $album->getURL());
-	//elgg_push_breadcrumb($title);
+	elgg_push_breadcrumb($album->getTitle(), $album->getURL());
+	elgg_push_breadcrumb($params['title']);
 
 	$vars = tidypics_prepare_form_vars($album);
 
@@ -270,6 +277,58 @@ function tidypics_get_album_edit_content($album_guid) {
 	return $params;
 }
 
+/**
+ * Build album sort content
+ *
+ * @param $album_guid
+ * @return array
+ */
+function tidypics_get_album_sort_content($album_guid) {
+	gatekeeper(); 
+
+	$params['filter'] = ' ';
+
+	$guid = (int) get_input('guid');
+
+	// Get the photo entity
+	$album = get_entity($album_guid);
+	if (!$album) {
+		register_error(elgg_echo('noaccess'));
+		$_SESSION['last_forward_from'] = current_page_url();
+		forward('');
+	}
+
+	// Make sure we can edit the photo
+	if (!$album->canEdit()) {
+		register_error(elgg_echo('tidypics:nopermission'));
+		forward($album->getURL());
+	}
+
+	elgg_set_page_owner_guid($album->getContainerGUID());
+	$owner = elgg_get_page_owner_entity();
+
+	group_gatekeeper();
+
+	$params['title'] = elgg_echo('tidypics:sort', array($album->getTitle()));
+
+	// set up breadcrumbs
+	elgg_push_breadcrumb(elgg_echo('photos'), 'photos/all');
+	if (elgg_instanceof($owner, 'group')) {
+		elgg_push_breadcrumb($owner->name, "photos/group/$owner->guid/all");
+	} else {
+		elgg_push_breadcrumb($owner->name, "photos/owner/$owner->username");
+	}
+	elgg_push_breadcrumb($album->getTitle(), $album->getURL());
+	elgg_push_breadcrumb(elgg_echo('album:sort'));
+
+	if ($album->getSize()) {
+		$params['content'] = elgg_view_form('photos/album/sort', array(), array('album' => $album));
+	} else {
+		$params['content'] = elgg_echo('tidypics:sort:no_images');
+	}
+
+	return $params;
+}
 
 /**
  * Tidypics view album list
@@ -325,13 +384,16 @@ function tidypics_view_photo_list(array $options = array()) {
 
 	$options = array_merge($defaults, (array)$options);
 
-	$options['count'] = TRUE;
-
-	$count = elgg_get_entities($options);
-
-	unset($options['count']);
-
-	$photos = elgg_get_entities($options);
+	// If we have an album container, get its sorted list of images
+	if ($options['container_guid'] && elgg_instanceof($album = get_entity($options['container_guid']), 'object', 'album')) {
+		$count = $album->getSize();
+		$photos = $album->getImages($options['limit'], $options['offset']);
+	} else {
+		$options['count'] = TRUE;
+		$count = elgg_get_entities($options);
+		unset($options['count']);
+		$photos = elgg_get_entities($options);
+	}
 
 	$options['items'] = $photos;
 	$options['count'] = $count;

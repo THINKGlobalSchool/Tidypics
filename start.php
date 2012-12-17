@@ -147,6 +147,8 @@ function tidypics_page_handler($page) {
 	$page_type = $page[0];
 	$page_base = elgg_get_plugins_path() . 'tidypics/pages/photos';
 
+	elgg_push_breadcrumb('photos', 'photos/all');
+
 	// Load content for XHR requests
 	if (elgg_is_xhr()) {
 		switch ($page_type) {
@@ -183,8 +185,12 @@ function tidypics_page_handler($page) {
 				$params = tidypics_get_list_content('photos', $page_type, $user->guid);
 				break;
 		}
+		// Photos sidebar
+		$params['sidebar'] = elgg_view('photos/sidebar');
 
-		echo $params['content'];
+		// Output special ajax view
+		echo elgg_view('photos/ajax_content', $params);
+
 		return TRUE;
 	} else {
 
@@ -210,6 +216,9 @@ function tidypics_page_handler($page) {
 				} else {
 					forward('photos');
 				}		
+				break;
+			case "sort": // sort a photo album
+				$params = tidypics_get_album_sort_content($page[1]);
 				break;
 			// Other pages
 			case "thumbnail": // tidypics thumbnail
@@ -336,11 +345,6 @@ function tidypics_ajax_handler($page) {
 // 	// case "add":
 // 	// 	set_input('guid', $page[1]);
 // 	// 	require "$base/album/add.php";
-// 	// 	break;
-
-// 	// case "sort": // sort a photo album
-// 	// 	set_input('guid', $page[1]);
-// 	// 	require "$base/album/sort.php";
 // 	// 	break;
 
 // 	// case "upload": // upload images to album
