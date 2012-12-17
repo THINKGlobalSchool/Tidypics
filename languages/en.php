@@ -73,7 +73,21 @@ $english = array(
 	'tidypics:upgrade' => 'Upgrade',
 	'tidypics:sort' => 'Sorting the %s album',
 	'tidypics:none' => 'No photo albums',
-		
+
+	// upload labels
+	'tidypics:upload' => 'Upload',
+	'tidypics:upload:cancel' => 'Cancel',
+	'tidypics:upload:addtoalbum' => 'Add Photos To Album',
+	'tidypics:upload:addphotos' => 'Add New Photos',
+	'tidypics:upload:addalbum' => 'Create New Album',
+	'tidypics:upload:togroup' => ' in Group: %s',
+	'tidypics:upload:toalbum' => ': %s', 
+	'tidypics:upload:or' => 'or ', 
+	'tidypics:upload:albumname' => 'Album name: ',
+	'tidypics:upload:choosealbum' => 'add to an existing album',
+	'tidypics:upload:drophere' => 'Drop Photos Here',
+	'tidypics:upload:browsephotos' => 'Browse photos on your computer',
+
 	//settings
 	'tidypics:settings' => 'Settings',
 	'tidypics:settings:main' => 'Primary settings',

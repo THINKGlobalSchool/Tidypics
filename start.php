@@ -48,6 +48,9 @@ function tidypics_init() {
 	elgg_extend_view('css/elgg', 'css/photos/css');
 	elgg_extend_view('css/admin', 'css/photos/css');
 
+	// Extend Elgg JS
+	elgg_extend_view('js/elgg', 'js/photos/config');
+
 	// Register JS Libs
 	$js = elgg_get_simplecache_url('js', 'photos/tidypics');
 	elgg_register_simplecache_view('js/photos/tidypics');
@@ -126,6 +129,9 @@ function tidypics_init() {
 	elgg_register_action("photos/admin/settings", "$base_dir/admin/settings.php", 'admin');
 	elgg_register_action("photos/admin/create_thumbnails", "$base_dir/admin/create_thumbnails.php", 'admin');
 	elgg_register_action("photos/admin/upgrade", "$base_dir/admin/upgrade.php", 'admin');
+
+	// Ajax whitelist
+	elgg_register_ajax_view('photos/upload');
 }
 
 /**

@@ -23,11 +23,11 @@ foreach ($items as $item) {
 
 // Determine if we're showing the upload/create box
 if ($enable_upload && !$offset) {
-	$params = array(
-		'class' => 'elgg-module-tidypics-upload',
-	);
-
-	$upload_content = elgg_view_module('tidypics-album', '', elgg_echo('album:create'), $params);
+	$upload_content = elgg_view('input/photo_upload', array(
+		'text' => elgg_echo('album:create'),
+		'context' => 'addalbum', 
+		// @todo groups
+	));
 }
 
 $content = <<<HTML

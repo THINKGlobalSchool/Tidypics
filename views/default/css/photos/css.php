@@ -172,7 +172,7 @@ div.tidypics-photos-list-container > div.elgg-module-tidypics-upload {
 }
 
 /* ***************************************
-	Upload items
+	Upload
 *************************************** */
 
 .elgg-module-tidypics-upload > div {
@@ -184,4 +184,36 @@ div.tidypics-photos-list-container > div.elgg-module-tidypics-upload {
 	line-height: 159px;
 	text-align: center;
 	cursor: pointer;
+}
+
+div#tidypics-upload-container {
+	min-width: 700px;
+	min-height: 500px;
+	overflow: hidden;
+}
+
+div#tidypics-upload-dropzone {
+	border: 2px dashed #CCCCCC;
+	border-radius: 3px 3px 3px 3px;
+	-moz-border-radius: 3px 3px 3px 3px;
+	-webkit-border-radius: 3px 3px 3px 3px;
+	height: 400px;
+	margin-top: 10px;
+	width: 99%;
+	position: relative;
+}
+
+div#tidypics-upload-dropzone-inner {
+	position: absolute;
+	top: 50%;
+	height: 150px;
+	width: 100%;
+	margin-top: -75px;
+	color: #888888;
+	text-align: center;
+}
+
+input.tidypics-upload-new-album-title,
+select.tidypics-upload-select-existing-album {
+	width: 50%;
 }
