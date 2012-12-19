@@ -5,33 +5,54 @@
 
 elgg_load_library('tidypics:upload');
 
-$album_guid = (int) get_input('album_guid');
-$file_var_name = get_input('file_var_name', 'Image');
-$batch = get_input('batch');
-
-$album = get_entity($album_guid);
-if (!$album) {
-	echo elgg_echo('tidypics:baduploadform');
-	exit;
+if ($_SESSION['_tp_new_album_guid']) {
+	$album_guid = $_SESSION['_tp_new_album_guid'];
+} else {
+	$album_guid = get_input('_tp_upload_select_existing_album');
+	$new_album = get_input('_tp_upload_new_album_title', NULL);
 }
+
+$batch = get_input('_tp-upload-batch');
+$container_guid = get_input('container_guid', elgg_get_logged_in_user_guid());
+
+$errors = array();
+$messages = array();
+
+if ($album_guid) {
+	$album = get_entity($album_guid);
+} else if ($new_album) {
+	$album = new TidypicsAlbum();
+	$album->container_guid = $container_guid;
+	$album->owner_guid = elgg_get_logged_in_user_guid();
+	$album->access_id = ACCESS_LOGGED_IN;
+	$album->title = $new_album;
+	$album->save();
+
+	$_SESSION['_tp_new_album_guid'] = $album->guid;
+}
+
+if (!elgg_instanceof($album, 'object', 'album')) {
+	register_error(elgg_echo('tidypics:baduploadform'));
+	forward(REFERER);
+}
+
+// Set album guid in session for upload complete action
+$_SESSION['_tp_album_guid'] = $album->guid;
 
 // probably POST limit exceeded
 if (empty($_FILES)) {
 	trigger_error('Tidypics warning: user exceeded post limit on image upload', E_USER_WARNING);
 	register_error(elgg_echo('tidypics:exceedpostlimit'));
-	exit;
+	forward(REFERER);
 }
 
-$file = $_FILES[$file_var_name];
+$file = $_FILES['_tp_upload_file_input'];
 
 $mime = tp_upload_get_mimetype($file['name']);
 if ($mime == 'unknown') {
-	echo 'Not an image';
-	exit;
+	register_error(elgg_echo('tidypics:not_image'));
+	forward(REFERER);
 }
-
-// we have to override the mime type because uploadify sends everything as application/octet-string
-$file['type'] = $mime;
 
 $image = new TidypicsImage();
 $image->container_guid = $album->getGUID();
@@ -47,11 +68,18 @@ try {
 		add_to_river('river/object/image/create', 'create', $image->getOwnerGUID(), $image->getGUID());
 	}
 
-	echo elgg_echo('success');
+	system_message(elgg_echo('success'));
 } catch (Exception $e) {
 	// remove the bits that were saved
 	$image->delete();
-	echo $e->getMessage();
+	register_error($e->getMessage());
+	forward(REFERER);
 }
 
-exit;
+echo json_encode(array(
+	'album_guid' => $album->guid,
+	'image_guid' => $image->guid,
+	'batch' => $batch,
+));
+
+forward(REFERER);

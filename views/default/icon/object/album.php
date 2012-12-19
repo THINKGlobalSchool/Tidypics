@@ -29,7 +29,7 @@ if ($cover_guid) {
 	));
 
 	$params = array(
-		'href' => $url,
+		'href' => $vars['href'],
 		'text' => $img,
 		'is_trusted' => true,
 	);

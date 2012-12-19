@@ -339,7 +339,7 @@ class TidypicsAlbum extends ElggObject {
 	 */
 	protected function deleteImages() {
 		$images = elgg_get_entities(array(
-			"type=" => "object",
+			"type" => "object",
 			"subtype" => "image",
 			"container_guid" => $this->guid,
 			"limit" => ELGG_ENTITIES_NO_VALUE,

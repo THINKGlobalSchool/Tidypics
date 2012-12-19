@@ -535,3 +535,35 @@ function tp_is_person() {
 
 	return false;
 }
+
+/**
+ * Auto orient image using im command line
+ *
+ * @param ElggFile holds the image that was uploaded
+ * @return bool    TRUE on success
+ */
+function tp_auto_orient_im_cmdline($file) {
+	// Get im path
+	$im_path = elgg_get_plugin_setting('im_path', 'tidypics');
+	if (!$im_path) {
+		$im_path = "/usr/bin/";
+	}
+	if (substr($im_path, strlen($im_path)-1, 1) != "/") {
+		$im_path .= "/";
+	}
+
+	// Auto-orient the image
+	$command = $im_path . "convert \"" . $file->getFilenameOnFilestore() . "\" -auto-orient \"" . $file->getFilenameOnFilestore() . "\"";
+	$output = array();
+	$ret = 0;
+	exec($command, $output, $ret);
+	if ($ret == 127) {
+		trigger_error('Tidypics warning: Image Magick convert is not found', E_USER_WARNING);
+		return FALSE;
+	} else if ($ret > 0) {
+		trigger_error('Tidypics warning: Image Magick convert failed', E_USER_WARNING);
+		return FALSE;
+	}
+	
+	return TRUE;
+}

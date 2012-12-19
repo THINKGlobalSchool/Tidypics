@@ -37,6 +37,7 @@ class TidypicsImage extends ElggFile {
 			// new image
 			$this->simpletype = "image";
 			$this->saveImageFile($data);
+			$this->autoOrient();
 			$this->saveThumbnails();
 			$this->extractExifData();
 		}
@@ -286,6 +287,32 @@ class TidypicsImage extends ElggFile {
 			if (tp_create_gd_thumbnails($this, $prefix, $filename) != true) {
 				trigger_error('Tidypics warning: failed to create thumbnails - GD', E_USER_WARNING);
 			}
+		}
+	}
+
+	/**
+	 * Auto orient the image
+	 */
+	protected function autoOrient() {
+		elgg_load_library('tidypics:core');
+
+		$imageLib = elgg_get_plugin_setting('image_lib', 'tidypics');
+
+		$prefix = "image/" . $this->container_guid . "/";
+		$filename = $this->getFilename();
+		$filename = substr($filename, strrpos($filename, '/') + 1);
+
+		if ($imageLib == 'ImageMagick') {
+			// ImageMagick command line
+			if (tp_auto_orient_im_cmdline($this) != true) {
+				trigger_error('Tidypics warning: failed to auto-orient the image - ImageMagick command line', E_USER_WARNING);
+			}
+		} else if ($imageLib == 'ImageMagickPHP') {
+			// imagick php extension
+			// not yet implemented..
+		} else {
+			// GD
+			// not yet implemented..
 		}
 	}
 

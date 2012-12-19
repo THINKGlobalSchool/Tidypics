@@ -1,16 +1,22 @@
 <?php
 /**
- * A batch is complete so check if this is first upload to album
- *
+ * Ajax batch upload complete
  */
 
+// Unset new album guid from previous uploads
+if (isset($_SESSION['_tp_new_album_guid'])) {
+	unset($_SESSION['_tp_new_album_guid']);
+}
+
 $batch = get_input('batch');
-$album_guid = (int) get_input('album_guid');
+$album_guid = (int) $_SESSION['_tp_album_guid'];
 $img_river_view = elgg_get_plugin_setting('img_river_view', 'tidypics');
 
 $album = get_entity($album_guid);
 if (!elgg_instanceof($album, 'object', 'album')) {
-	exit;
+	register_error('');
+	echo elgg_echo('tidypics:baduploadform');
+	forward(REFERER);
 }
 
 $params = array(
@@ -22,11 +28,12 @@ $params = array(
 );
 
 $images = elgg_get_entities_from_metadata($params);
+
 if ($images) {
 	// Create a new batch object to contain these photos
 	$batch = new ElggObject();
 	$batch->subtype = "tidypics_batch";
-	$batch->access_id = ACCESS_PUBLIC;
+	$batch->access_id = $album->access_id;
 	$batch->container_guid = $album->guid;
 	
 	if ($batch->save()) {
@@ -35,8 +42,13 @@ if ($images) {
 		}
 	}
 } else {
-	// @todo some sort of message to edit them manually.
-	exit;
+	// No images uploaded! Display an error. Delete the album if it's brand new
+	if ($album->new_album) {
+		$album->delete();
+	}
+	register_error('');
+	echo elgg_echo('tidypics:noimagesuploaded');
+	forward(REFERER);
 }
 
 // "added images to album" river
@@ -71,4 +83,4 @@ if ($album->new_album) {
 }
 
 echo json_encode(array('batch_guid' => $batch->getGUID()));
-exit;
+forward(REFERER);

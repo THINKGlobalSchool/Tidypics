@@ -7,11 +7,9 @@
  *
  * @todo
  * - People tagging
- * - Ajax page handler
  * - River entries/annotating (handler 'batch' commente etc)
  * - Batch class?
  * - Clean up subtypes (tidypics_batch vs image/album)
- * - Uploader
  * - Tile layout
  * - Clean languages
  * - Photo access independant of album? (Our fork says no)
@@ -26,6 +24,7 @@ elgg_register_event_handler('init', 'system', 'tidypics_init');
  * Tidypics plugin initialization
  */
 function tidypics_init() {
+
 	// Register libraries
 	$base_dir = elgg_get_plugins_path() . 'tidypics/lib';
 	elgg_register_library('tidypics:core', "$base_dir/tidypics.php");
@@ -74,6 +73,12 @@ function tidypics_init() {
 	elgg_register_simplecache_view('js/masonry');
 	elgg_register_js('jquery-masonry', $js);
 
+	// Register jquery-file-upload js lib
+	$js = elgg_get_simplecache_url('js', 'jquery_file_upload');
+	elgg_register_simplecache_view('js/jquery_file_upload');
+	elgg_register_js('jquery-file-upload', $js);
+	elgg_load_js('jquery-file-upload');
+
 	// Add photos link to owner block/hover menus
 	elgg_register_plugin_hook_handler('register', 'menu:owner_block', 'tidypics_owner_block_menu');
 
@@ -117,10 +122,15 @@ function tidypics_init() {
 	elgg_register_action("photos/album/sort", "$base_dir/album/sort.php");
 	elgg_register_action("photos/album/set_cover", "$base_dir/album/set_cover.php");
 
-	elgg_register_action("photos/image/upload", "$base_dir/image/upload.php");
+	///elgg_register_action("photos/image/upload", "$base_dir/image/upload.php");
 	elgg_register_action("photos/image/save", "$base_dir/image/save.php");
 	elgg_register_action("photos/image/ajax_upload", "$base_dir/image/ajax_upload.php", 'logged_in');
-	elgg_register_action("photos/image/ajax_upload_complete", "$base_dir/image/ajax_upload_complete.php", 'logged_in');
+
+	// New upload actions
+	elgg_register_action("photos/upload", "$base_dir/image/ajax_upload.php", 'logged_in');
+	elgg_register_action("photos/uploads_complete", "$base_dir/image/ajax_upload_complete.php", 'logged_in');
+
+	//elgg_register_action("photos/image/ajax_upload_complete", "$base_dir/image/ajax_upload_complete.php", 'logged_in');
 	elgg_register_action("photos/image/tag", "$base_dir/image/tag.php");
 	elgg_register_action("photos/image/untag", "$base_dir/image/untag.php");
 
@@ -131,7 +141,7 @@ function tidypics_init() {
 	elgg_register_action("photos/admin/upgrade", "$base_dir/admin/upgrade.php", 'admin');
 
 	// Ajax whitelist
-	elgg_register_ajax_view('photos/upload');
+	elgg_register_ajax_view('photos/ajax_upload');
 }
 
 /**
@@ -233,6 +243,11 @@ function tidypics_page_handler($page) {
 				require "$page_base/image/thumbnail.php";
 				return TRUE;
 				break;
+			case "download": // download an image
+				set_input('guid', $page[1]);
+				set_input('disposition', elgg_extract(2, $page, 'attachment'));
+				include "$page_base/image/download.php";
+				break;
 			default:
 				$params['content'] = elgg_view('photos/content', array('page' => $page));
 				break; 
@@ -255,11 +270,6 @@ function tidypics_page_handler($page) {
 	}
 	return TRUE;
 }
-
-function tidypics_ajax_handler($page) {
-
-}
-
 
 // function tidypics_page_handler($page) {
 

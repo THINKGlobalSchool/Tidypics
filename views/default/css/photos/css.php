@@ -187,23 +187,31 @@ div.tidypics-photos-list-container > div.elgg-module-tidypics-upload {
 }
 
 div#tidypics-upload-container {
-	min-width: 700px;
+	min-width: 800px;
 	min-height: 500px;
 	overflow: hidden;
 }
 
-div#tidypics-upload-dropzone {
-	border: 2px dashed #CCCCCC;
-	border-radius: 3px 3px 3px 3px;
-	-moz-border-radius: 3px 3px 3px 3px;
-	-webkit-border-radius: 3px 3px 3px 3px;
+div.tidypics-upload-dropzone {
 	height: 400px;
 	margin-top: 10px;
 	width: 99%;
 	position: relative;
+	overflow-y: scroll;
 }
 
-div#tidypics-upload-dropzone-inner {
+div.tidypics-upload-dropzone-droppable {
+	border: 2px dashed #CCCCCC;
+	border-radius: 3px 3px 3px 3px;
+	-moz-border-radius: 3px 3px 3px 3px;
+	-webkit-border-radius: 3px 3px 3px 3px;
+}
+
+div.tidypics-upload-dropzone-droppable.tidypics-upload-dropzone-drag {
+	background: #EEEEEE;
+}
+
+div.tidypics-upload-dropzone-inner {
 	position: absolute;
 	top: 50%;
 	height: 150px;
@@ -212,6 +220,83 @@ div#tidypics-upload-dropzone-inner {
 	color: #888888;
 	text-align: center;
 }
+
+input.tidypics-upload-finish-input {
+	display: none;
+}
+
+span.tidypics-upload-album-label {
+	color: #555555;
+	font-weight: bold;
+}
+
+div.tidypics-upload-status {
+	color: #777777;
+	font-weight: bold;
+	font-size: 1.2em;
+}
+
+div.tidypics-upload-status-error {
+	color: red;
+}
+
+div.tidypics-upload-image-element {
+	background: none repeat scroll 0 0 #EEEEEE;
+	border: 1px solid #BBBBBB;
+	float: left;
+	margin: 2px;
+	overflow: hidden;
+	padding: 5px;
+	height: 130px;
+	width: 138px;
+	position: relative;
+}
+
+div.tidypics-upload-image-element .tidypics-upload-image-progress {
+	border: 1px solid #AAAAAA;
+	height: 16px;
+	width: 134px;
+	position: absolute;
+	bottom: 5px;
+	padding: 1px;
+}
+
+div.tidypics-upload-image-element .tidypics-upload-image-progress .tidypics-upload-image-progress-bar {
+	height: 16px;
+	background: darkred;
+	width: 0px;
+}
+
+div.tidypics-upload-image-element .tidypics-upload-image-error-header {
+	font-size: 12px;
+	font-weight: bold;
+	color: #888;
+}
+
+
+div.tidypics-upload-image-element .tidypics-upload-image-errors {
+	font-size: 11px;
+	font-weight: bold;
+	color: red;
+}
+
+div.tidypics-upload-image-element .tidypics-upload-image-name {
+	color: #999999;
+	font-weight: bold;
+	height: 20px;
+	margin-top: 45px;
+	overflow: hidden;
+	text-align: center;
+}
+
+div.tidypics-upload-image-element img.tidypics-upload-image-thumbnail {
+	display: block;
+	height: 122px;
+	margin-left: auto;
+	margin-right: auto;
+	text-align: center;
+}
+
 
 input.tidypics-upload-new-album-title,
 select.tidypics-upload-select-existing-album {
