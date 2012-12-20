@@ -260,7 +260,7 @@ elgg.tidypics.initUploadEvents = function(hook, type, params, options) {
 	});
 
 	$upload_container.delegate('input[name="_tp-upload-finish"]', 'click', function(event) {
-		window.location.reload();
+		window.location = window.location.href;
 		event.preventDefault();
 	});
 

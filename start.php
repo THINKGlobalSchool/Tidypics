@@ -16,6 +16,7 @@
  * - Improve photo layout
  * - Long albums names?
  * - Upgrades need to stay.. need to check against our old fork
+ * - Fix plugin ordering issue (jquery file upload)
  */
 
 elgg_register_event_handler('init', 'system', 'tidypics_init');
@@ -76,8 +77,8 @@ function tidypics_init() {
 	// Register jquery-file-upload js lib
 	$js = elgg_get_simplecache_url('js', 'jquery_file_upload');
 	elgg_register_simplecache_view('js/jquery_file_upload');
-	elgg_register_js('tp-jquery-file-upload', $js);
-	elgg_load_js('tp-jquery-file-upload');
+	elgg_register_js('jquery-file-upload', $js);
+	elgg_load_js('jquery-file-upload');
 
 	// Add photos link to owner block/hover menus
 	elgg_register_plugin_hook_handler('register', 'menu:owner_block', 'tidypics_owner_block_menu');
