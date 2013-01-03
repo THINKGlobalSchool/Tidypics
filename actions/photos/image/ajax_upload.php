@@ -18,14 +18,22 @@ $container_guid = get_input('container_guid', elgg_get_logged_in_user_guid());
 $errors = array();
 $messages = array();
 
+// Existing album
 if ($album_guid) {
 	$album = get_entity($album_guid);
-} else if ($new_album) {
+} else if ($new_album) { // New album
+	// Get tags
+	$tags = string_to_tag_array(get_input('_tp_upload_album_tags'));
+
+	// Get access id
+	$access_id = get_input('_tp_upload_album_access_id', ACCESS_DEFAULT);
+
 	$album = new TidypicsAlbum();
 	$album->container_guid = $container_guid;
 	$album->owner_guid = elgg_get_logged_in_user_guid();
-	$album->access_id = ACCESS_LOGGED_IN;
+	$album->access_id = $access_id;
 	$album->title = $new_album;
+	$album->tags = $tags;
 	$album->save();
 
 	$_SESSION['_tp_new_album_guid'] = $album->guid;
@@ -58,6 +66,7 @@ $image = new TidypicsImage();
 $image->container_guid = $album->getGUID();
 $image->setMimeType($mime);
 $image->access_id = $album->access_id;
+$image->tags = $album->tags; // Set image tags from album tags
 $image->batch = $batch;
 
 try {

@@ -233,6 +233,8 @@ elgg.tidypics.initUploadEvents = function(hook, type, params, options) {
 
 		$upload_container.find('#_tp-upload-album-label').html(elgg.echo('tidypics:upload:addtoexistingalbum'));
 		
+		$upload_container.find('._tp-upload-album-metadata-menu').hide();
+
 		event.preventDefault();
 	});
 
@@ -255,6 +257,8 @@ elgg.tidypics.initUploadEvents = function(hook, type, params, options) {
 			.attr('name', '_tp_upload_choose_existing_album');
 
 		$upload_container.find('#_tp-upload-album-label').html(elgg.echo('tidypics:upload:newalbumname'));
+
+		$upload_container.find('._tp-upload-album-metadata-menu').show();
 
 		event.preventDefault();
 	});
@@ -348,8 +352,8 @@ elgg.tidypics.initUploadEvents = function(hook, type, params, options) {
 
 			var $active_input = $(this).closest('form').find('#_tp-upload-album-menu ._tp-upload-active-input');
 
-			$album_menu.children().each(function() {
-				if (!$(this).is('span#_tp-upload-album-label')) {
+			$album_menu.find('li').each(function() {
+				if (!$(this).is('.elgg-menu-item-album-label')) {
 					$(this).hide();
 				} else {
 					if ($active_input.is('select')) {

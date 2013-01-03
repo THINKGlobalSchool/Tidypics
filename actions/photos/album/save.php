@@ -29,17 +29,44 @@ if ($guid) {
 	$message = elgg_echo("album:created");
 }
 
+// Store old access id
+$old_access_id = $album->access_id;
+
+// Store old tags
+$old_tags = $album->tags;
+
+if (!is_array($old_tags)) {
+	$old_tags = array($old_tags);
+}
+
 $album->container_guid = $container_guid;
 $album->owner_guid = elgg_get_logged_in_user_guid();
 $album->access_id = $access_id;
 $album->title = $title;
 $album->description = $description;
+
+
 if ($tags) {
 	$album->tags = string_to_tag_array($tags);
 }
 
+// If we've updated the access_id for the album, push update images context
+if ($old_access_id != $access_id) {
+	elgg_push_context('tidypics_update_images_access');
+}
+
+// If we've updated the album tags push update tags context
+if (serialize($old_tags) != serialize(string_to_tag_array($tags))) {
+	elgg_push_context('tidypics_update_images_tags');
+}
+
 if (!$album->save()) {
 	register_error(elgg_echo("album:savefailed"));
+
+	// Revert image updates
+	elgg_push_context('tidypics_update_images_access');
+	elgg_push_context('tidypics_update_images_tags');
+
 	forward(REFERER);
 }
 

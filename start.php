@@ -7,16 +7,15 @@
  *
  * @todo
  * - People tagging
- * - River entries/annotating (handler 'batch' commente etc)
+ * - River entries/annotating (handler 'batch' comments etc)
  * - Batch class?
  * - Clean up subtypes (tidypics_batch vs image/album)
  * - Tile layout
  * - Clean languages
- * - Photo access independant of album? (Our fork says no)
  * - Improve photo layout
- * - Long albums names?
  * - Upgrades need to stay.. need to check against our old fork
  * - Fix plugin ordering issue (jquery file upload)
+ * - Groups!
  */
 
 elgg_register_event_handler('init', 'system', 'tidypics_init');
@@ -114,6 +113,15 @@ function tidypics_init() {
 
 	// Register pagesetup event handler for menu items
 	elgg_register_event_handler('pagesetup', 'system', 'tidypics_pagesetup');
+
+	// Register album create event handler
+	elgg_register_event_handler('create', 'album', 'tidypics_album_create_handler');
+
+	// Register album update event handler
+	elgg_register_event_handler('update', 'album', 'tidypics_album_update_handler');
+
+	// Register album delete event handler
+	elgg_register_event_handler('delete', 'album', 'tidypics_album_delete_handler');
 
 	// Register actions
 	$base_dir = elgg_get_plugins_path() . 'tidypics/actions/photos';
@@ -602,4 +610,69 @@ function tidypics_pagesetup($event, $type, $object) {
 			elgg_register_menu_item('photos-filter', $params);
 		}
 	}
+}
+
+/**
+ * Tidypics Album Create Event Handler
+ *
+ * @param string $event  Event name
+ * @param string $type   Object type
+ * @param mixed  $object Object
+ *
+ * @return bool
+ */
+function tidypics_album_create_handler($event, $type, $object) {
+	//
+}
+
+/**
+ * Tidypics Album Update Event Handler
+ *
+ * @param string $event  Event name
+ * @param string $type   Object type
+ * @param mixed  $object Object
+ *
+ * @return bool
+ */
+function tidypics_album_update_handler($event, $type, $object) {
+	// Update images if appropriate
+	if (elgg_in_context('tidypics_update_images_access') ||
+		elgg_in_context('tidypics_update_images_tags')) {
+
+		// Get album images
+		$images = elgg_get_entities(array(
+			'type' => 'object',
+			'subtype' => 'image',
+			'container_guids' => $object->guid,
+			'limit' => 0
+		));
+
+		foreach ($images as $image) {
+			// Update access
+			if (elgg_in_context('tidypics_update_images_access')) {
+				$image->access_id = $object->access_id;
+			}
+
+			// Update tags
+			if (elgg_in_context('tidypics_update_images_tags')) {
+				// Merging album and image tags, this method retains the original album tags (do we want that?)
+				tidypics_merge_album_image_tags($object, $image);
+			}
+
+			$image->save();
+		}
+	}
+}
+
+/**
+ * Tidypics Album Delete Event Handler
+ *
+ * @param string $event  Event name
+ * @param string $type   Object type
+ * @param mixed  $object Object
+ *
+ * @return bool
+ */
+function tidypics_album_delete_handler($event, $type, $object) {
+	//
 }

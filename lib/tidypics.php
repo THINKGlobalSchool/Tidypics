@@ -496,6 +496,48 @@ function tidypics_is_upgrade_available() {
 }
 
 /**
+ * Merge tags from album to image
+ * 
+ * @param TidypicsAlbum $album
+ * @param TidypicsImage $image
+ * @return bool
+ */
+function tidypics_merge_album_image_tags($album, $image) {
+	// Make sure the forum entity has tags
+	if ($album_tags = $album->tags) {
+
+		// Make sure forum tags is an array
+		if (!is_array($album->tags)) {
+			$album_tags = array($album_tags);
+		}
+
+		$image_tags = $image->tags;
+
+		// Make sure topic tags is an array
+		if (!is_array($image->tags)) {
+			if (!$image_tags) {
+				$image_tags = array();
+			} else {
+				$image_tags = array($image_tags);
+			}
+		}
+
+		// Merge album and image tags
+		$new_tags = array_merge($album_tags, $image_tags);
+
+		// Remove dupes
+		$new_tags = array_unique($new_tags);
+
+		// Update image tags
+		$image->tags = $new_tags;
+
+		return TRUE;
+	}
+
+	return FALSE;
+}
+
+/**
  * Returns just a guid from a database $row. Used in elgg_get_entities()'s callback.
  *
  * @param stdClass $row

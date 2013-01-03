@@ -225,11 +225,6 @@ input.tidypics-upload-finish-input {
 	display: none;
 }
 
-span.tidypics-upload-album-label {
-	color: #555555;
-	font-weight: bold;
-}
-
 div.tidypics-upload-status {
 	color: #777777;
 	font-weight: bold;
@@ -297,8 +292,28 @@ div.tidypics-upload-image-element img.tidypics-upload-image-thumbnail {
 	text-align: center;
 }
 
-
 input.tidypics-upload-new-album-title,
 select.tidypics-upload-select-existing-album {
-	width: 50%;
+	width: 398px;
+}
+
+/* Upload menus */
+.elgg-menu-tidypics-upload-album-metadata {
+	margin-top: 3px;
+}
+
+.elgg-menu-tidypics-upload-album li,
+.elgg-menu-tidypics-upload-album-metadata li {
+	margin-right: 5px;
+}
+
+.elgg-menu-item-album-label span {
+	margin-right: 5px;
+}
+
+.elgg-menu-item-album-label,
+.elgg-menu-item-album-tags-label,
+.elgg-menu-item-album-access-label {
+	color: #555555;
+	font-weight: bold;
 }

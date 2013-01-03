@@ -35,6 +35,9 @@ class TidypicsAlbum extends ElggObject {
 
 		if (!isset($this->new_album)) {
 			$this->new_album = true;
+			elgg_trigger_event('create', 'album', $this);
+		} else if (!$this->new_album) {
+			elgg_trigger_event('update', 'album', $this);
 		}
 
 		if (!isset($this->last_notified)) {
@@ -44,10 +47,11 @@ class TidypicsAlbum extends ElggObject {
 		if (!parent::save()) {
 			return false;
 		}
-		
-		mkdir(tp_get_img_dir() . $this->guid, 0755, true);
 
-		elgg_trigger_event('create', 'album', $this);
+		// Create image directory if it doesn't exist
+		if (!is_dir(tp_get_img_dir() . $this->guid)) {
+			mkdir(tp_get_img_dir() . $this->guid, 0755, true);
+		}
 
 		return true;
 	}
@@ -61,6 +65,8 @@ class TidypicsAlbum extends ElggObject {
 
 		$this->deleteImages();
 		$this->deleteAlbumDir();
+
+		elgg_trigger_event('delete', 'album', $this);
 		
 		return parent::delete();
 	}
