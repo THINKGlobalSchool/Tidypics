@@ -294,7 +294,7 @@ div.tidypics-upload-image-element img.tidypics-upload-image-thumbnail {
 
 input.tidypics-upload-new-album-title,
 select.tidypics-upload-select-existing-album {
-	width: 398px;
+	width: 380px;
 }
 
 /* Upload menus */

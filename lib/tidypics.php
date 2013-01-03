@@ -9,23 +9,22 @@
 /** CONTENT FUNCTIONS **/
 
 /**
- * Get content for photos listing
+ * Get content for photos/albums listing
  *
  * @param $type            what are we listing? either photos or albums
  * @param $page_type       page type (owner, all, group, etc)
- * @param $container_guid  container guid for photos (optional)
+ * @param $container_guid  container guid for photos/albums (optional)
  * @return array
  */
 function tidypics_get_list_content($type, $page_type, $container_guid = NULL) {
 	$params = array();
 
 	$logged_in_user_guid = elgg_get_logged_in_user_guid();
+	$owner = get_entity($container_guid);
 
 	$options = array();
 
 	if ($page_type == 'owner' && $container_guid)  {
-		$owner = get_entity($container_guid);
-
 		$params['title'] = elgg_echo("{$type}:owner", array($owner->name));
 
 		if (elgg_instanceof($owner, 'group')) {
@@ -42,13 +41,16 @@ function tidypics_get_list_content($type, $page_type, $container_guid = NULL) {
 		elgg_push_breadcrumb(elgg_echo("{$type}:all"));
 	}
 
-	if ($logged_in_user_guid) {
-		$options['enable_upload'] = TRUE;
-	}
-
 	if ($type == 'albums') {
+		// Make sure we can create a new album here (check for group perms)
+		if ($logged_in_user_guid && (!elgg_instanceof($owner, 'group') || $owner->canWriteToContainer($logged_in_user_guid))) {
+			$options['enable_upload'] = TRUE;
+		}
 		$content = tidypics_view_album_list($options);
 	} else {
+		if ($logged_in_user_guid) {
+			$options['enable_upload'] = TRUE;
+		}
 		$content = tidypics_view_photo_list($options);
  	}
 
@@ -95,7 +97,7 @@ function tidypics_get_view_album_content($album_guid) {
 			'container_guid' => $album->guid,
 		);
 
-		if ($album->getContainerEntity()->canEdit(elgg_get_logged_in_user_guid())) {
+		if ($album->getContainerEntity()->canWriteToContainer(elgg_get_logged_in_user_guid())) {
 			$options['enable_upload'] = TRUE;
 		}
 
@@ -103,10 +105,6 @@ function tidypics_get_view_album_content($album_guid) {
 		
 	} else {
 		$params['content'] = elgg_view_entity($album, array('full_view' => TRUE));
-	}
-	
-	if ($album->getContainerEntity()->canWriteToContainer()) {
-		// @todo upload box
 	}
 
 	return $params;

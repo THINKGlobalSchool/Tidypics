@@ -16,6 +16,7 @@ $offset = elgg_extract('offset', $vars);
 $limit = elgg_extract('limit', $vars);
 $count = elgg_extract('count', $vars);
 $enable_upload = elgg_extract('enable_upload', $vars);
+$container_guid = elgg_extract('container_guid', $vars);
 
 foreach ($items as $item) {
 	$albums_content .= elgg_view_entity($item, array('full_view' => FALSE));
@@ -23,11 +24,16 @@ foreach ($items as $item) {
 
 // Determine if we're showing the upload/create box
 if ($enable_upload && !$offset) {
-	$upload_content = elgg_view('input/photo_upload', array(
+	$upload_params =  array(
 		'text' => elgg_echo('album:create'),
 		'context' => 'addalbum', 
-		// @todo groups
-	));
+	);
+
+	if ($container_guid) {
+		$upload_params['container_guid'] = $container_guid;
+	}
+
+	$upload_content = elgg_view('input/photo_upload',$upload_params);
 }
 
 $content = <<<HTML

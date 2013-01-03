@@ -53,6 +53,16 @@ if (count($images) == 1) {
 	$summary = elgg_echo('image:river:created:multiple', array($subject_link, count($images), $album_link));
 }
 
+$album_container = $album->getContainerEntity();
+
+if ($album_container instanceof ElggGroup && $album_container->guid != elgg_get_page_owner_guid()) {
+	$group_link = elgg_view('output/url', array(
+		'href' => $album_container->getURL(),
+		'text' => $album_container->name,
+	));
+	$summary .= '&nbsp;' . elgg_echo('river:ingroup', array($group_link));
+}
+
 echo elgg_view('river/elements/layout', array(
 	'item' => $vars['item'],
 	'attachments' => $attachments,

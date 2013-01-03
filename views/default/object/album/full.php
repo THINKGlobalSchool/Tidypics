@@ -53,7 +53,7 @@ $options = array(
 	'container_guid' => $album->guid,
 );
 
-if ($album->getContainerEntity()->canEdit(elgg_get_logged_in_user_guid())) {
+if ($album->getContainerEntity()->canWriteToContainer(elgg_get_logged_in_user_guid())) {
 	$options['enable_upload'] = TRUE;
 }
 

@@ -44,6 +44,12 @@ if (!elgg_instanceof($album, 'object', 'album')) {
 	forward(REFERER);
 }
 
+if (!$album->getContainerEntity()->canWriteToContainer(elgg_get_logged_in_user_guid())) {
+	register_error(elgg_echo('tidypics:nopermission'));
+	forward(REFERER);
+}
+
+
 // Set album guid in session for upload complete action
 $_SESSION['_tp_album_guid'] = $album->guid;
 
@@ -63,7 +69,7 @@ if ($mime == 'unknown') {
 }
 
 $image = new TidypicsImage();
-$image->container_guid = $album->getGUID();
+$image->container_guid = $album->guid;
 $image->setMimeType($mime);
 $image->access_id = $album->access_id;
 $image->tags = $album->tags; // Set image tags from album tags
@@ -79,8 +85,6 @@ try {
 
 	system_message(elgg_echo('success'));
 } catch (Exception $e) {
-	// remove the bits that were saved
-	$image->delete();
 	register_error($e->getMessage());
 	forward(REFERER);
 }

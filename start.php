@@ -15,7 +15,6 @@
  * - Improve photo layout
  * - Upgrades need to stay.. need to check against our old fork
  * - Fix plugin ordering issue (jquery file upload)
- * - Groups!
  */
 
 elgg_register_event_handler('init', 'system', 'tidypics_init');
@@ -500,7 +499,7 @@ function tidypics_entity_menu_setup($hook, $type, $return, $params) {
  * @return mixed
  */
 function tidypics_group_permission_override($hook, $type, $result, $params) {
-	if (get_input('action') == 'photos/image/upload') {
+	if (get_input('action') == 'photos/upload' || get_input('action') == 'photos/uploads_complete') {
 		if (isset($params['container'])) {
 			$album = $params['container'];
 		} else {

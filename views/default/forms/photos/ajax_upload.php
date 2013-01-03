@@ -9,7 +9,7 @@
 $context = elgg_extract('context', $vars);
 $container_guid = elgg_extract('container_guid', $vars);
 
-// Get container entity
+// Get container entity 
 $container = get_entity($container_guid);
 
 // Default heading
@@ -25,6 +25,9 @@ if (elgg_instanceof($container, 'group')) {
 	}
 }
 
+// 'or' label
+$or_label = elgg_echo('tidypics:upload:or');
+
 // Depending on context, show different album options
 if ($context == 'addphotos' || $context == 'addalbum') {
 	// 'addphotos' and 'addalbum' share some menu items
@@ -36,9 +39,6 @@ if ($context == 'addphotos' || $context == 'addalbum') {
 		'class' => 'tidypics-upload-new-album-title _tp-upload-active-input',
 		'value' => date('F j, Y'),
 	));
-
-	// 'or' label
-	$or_label = elgg_echo('tidypics:upload:or');
 
 	// Tags label 
 	$album_tags_label = elgg_echo('tidypics:upload:newalbumtags');
@@ -104,6 +104,15 @@ if ($context == 'addphotos' || $context == 'addalbum') {
 		);
 		elgg_register_menu_item('tidypics-upload-album', $params);
 
+	} else if ($context == 'addalbum' && elgg_instanceof($container, 'group')) {
+		// Hidden group container menu item
+		$params = array(
+			'name' => 'album-group',
+			'text' => elgg_view('input/hidden', array('name' => 'container_guid', 'value' => $container->guid)),
+			'href' => FALSE,
+			'priority' => 9000,
+		);
+		elgg_register_menu_item('tidypics-upload-album', $params);
 	}
 
 	// Label menu item
