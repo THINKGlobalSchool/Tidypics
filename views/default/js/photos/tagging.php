@@ -42,6 +42,7 @@ elgg.tidypics.tagging.destroy = function() {
 	$('#tidypics-tagging-quit').unbind('click');
 	$('a._tp-people-tag-remove').unbind('click');
 	$(".tidypics-photo").unbind('mouseenter mouseleave');
+	$('input[name=_tp_people_tag_submit]').unbind('click');
 }
 
 /**
@@ -110,8 +111,9 @@ elgg.tidypics.tagging.startSelect = function(img, selection) {
 		at : 'right center',
 		of : img
 	})
-	.find('input[name=_tp_people_tag_submit]').click(elgg.tidypics.tagging.peopleTagAddClick)
-	.find('input[type=text]').focus();
+	.find('input[name=_tp_people_tag_submit]').click(elgg.tidypics.tagging.peopleTagAddClick);
+	
+	$('input[type=text].elgg-input-autocomplete').val('').focus();
 };
 
 /**
@@ -125,7 +127,6 @@ elgg.tidypics.tagging.position = function() {
 
 	// add image offset
 	var image_pos = $('.tidypics-photo').position();
-	console.log(image_pos);
 	tag_left += image_pos.left;
 	tag_top += image_pos.top;
 

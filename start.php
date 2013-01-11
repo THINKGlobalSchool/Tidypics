@@ -7,11 +7,10 @@
  *
  * @todo
  * - River entries/annotating (handler 'batch' comments etc)
- * - Batch class?
- * - Clean up subtypes (tidypics_batch vs image/album)
  * - Clean languages
  * - Upgrades need to stay.. need to check against our old fork
  * - Fix plugin ordering issue (jquery file upload)
+ * - Need to sort out 'actions' menu
  */
 
 elgg_register_event_handler('init', 'system', 'tidypics_init');

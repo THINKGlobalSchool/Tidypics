@@ -29,9 +29,11 @@ if (empty($username)) {
 
 $user = get_user_by_username($username);
 if (!$user) {
+	register_error(elgg_echo("tidypics:phototagging:nouser"));
+	forward(REFERER);
 	// plain tag
-	$relationships_type = 'word';
-	$value = $username;
+	//$relationships_type = 'word';
+	//$value = $username;
 } else {
 	$relationships_type = 'user';
 	$value = $user->guid;

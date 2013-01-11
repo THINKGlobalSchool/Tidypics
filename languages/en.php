@@ -225,6 +225,7 @@ a photo) and enter it below.',
 	'tidypics:usertag' => "Photos tagged with user %s",
 	'tidypics:phototagging:success' => 'Photo tag was successfully added',
 	'tidypics:phototagging:error' => 'Unexpected error occurred during tagging',
+	'tidypics:phototagging:nouser' => 'Unknown user',
 
 	'tidypics:phototagging:delete:success' => 'Photo tag was removed.',
 	'tidypics:phototagging:delete:error' => 'Unexpceted error occurred when removing photo tag.',

@@ -12,7 +12,7 @@ echo '<div class="elgg-col elgg-col-4of5">';
 
 echo elgg_view('input/autocomplete', array(
 	'name' => 'username',
-	'match_on' => 'friends',
+	'match_on' => 'users',
 ));
 
 echo elgg_view('input/hidden', array(
