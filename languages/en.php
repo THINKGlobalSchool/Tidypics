@@ -73,6 +73,8 @@ $english = array(
 	'tidypics:upgrade' => 'Upgrade',
 	'tidypics:sort' => 'Sorting the %s album',
 	'tidypics:none' => 'No photo albums',
+	'tidypics:close' => 'Close',
+	'tidypics:no_description' => 'No Description',
 
 	// upload labels
 	'tidypics:upload' => 'Upload',
@@ -319,6 +321,8 @@ The photo can be viewed here: %s",
 	'images:notedited' => "Not all images were successfully updated",
 	'image:blank' => 'Please give this image a title.',
 	'image:error' => 'Could not save image.',
+	'image:invalid_image' => 'Invalid image',
+	'image:no_update' => 'Nothing to update',
 
 	'tidypics:upgrade:failed' => "The upgrade of Tidypics failed", 
 );

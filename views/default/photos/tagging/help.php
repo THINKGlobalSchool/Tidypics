@@ -7,9 +7,10 @@
  */
 
 $button = elgg_view('output/url', array(
-	'text' => elgg_echo('quit'),
+	'text' => elgg_echo('tidypics:finish_tagging'),
 	'href' => '#',
 	'id' => 'tidypics-tagging-quit',
+	'class' => 'elgg-button elgg-button-submit',
 ));
 
 $instructions = elgg_echo('tidypics:taginstruct', array($button));

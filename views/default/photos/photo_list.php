@@ -9,6 +9,7 @@
  * @uses $vars['limit']
  * @uses $vars['enable_upload']
  * @uses $vars['count']
+ * @uses $vars['container_guid']
  */
 
 $items = elgg_extract('items', $vars);
@@ -19,7 +20,9 @@ $enable_upload = elgg_extract('enable_upload', $vars);
 $container_guid = elgg_extract('container_guid', $vars);
 
 foreach ($items as $item) {
-	$photos_content .= elgg_view_entity($item, array('full_view' => FALSE));
+	$photos_content .= elgg_view_entity($item, array(
+		'full_view' => FALSE
+	));
 }
 
 // Determine if we're showing the upload/create box
@@ -31,7 +34,7 @@ if ($enable_upload && !$offset) {
 
 	if ($container_guid) {
 		$upload_params['container_guid'] = $container_guid;
-		$upload_params['context'] = 'addtoalbum'; // good name?
+		$upload_params['context'] = 'addtoalbum';
 	} else {
 		$upload_params['context'] = 'addphotos';
 	}

@@ -88,6 +88,7 @@ function tidypics_get_view_album_content($album_guid) {
 		elgg_push_breadcrumb($owner->name, "photos/group/$owner->guid/all");
 	} else {
 		elgg_push_breadcrumb($owner->name, "photos/owner/$owner->username");
+		elgg_push_breadcrumb(elgg_echo('albums'), "photos/albums/owner/$owner->username");
 	}
 
 	elgg_push_breadcrumb($album->getTitle());
@@ -111,12 +112,12 @@ function tidypics_get_view_album_content($album_guid) {
 }
 
 /**
- * Build content to view an image
+ * Build content to view an image (old way)
  *
  * @param int $photo_guid Photo guid
  * @return array
  */
-function tidypics_get_view_image_contnet($photo_guid) {
+function tidypics_get_view_image_content($photo_guid) {
 	$params['filter'] = ' ';
 
 	// Get the photo entity
@@ -130,7 +131,7 @@ function tidypics_get_view_image_contnet($photo_guid) {
 	// Add view annotation
 	$photo->addView();
 
-	// Load tagging @todo fix or update
+	// Load tagging
 	if (elgg_get_plugin_setting('tagging', 'tidypics')) {
 		elgg_load_js('tidypics:tagging');
 		elgg_load_js('jquery.imgareaselect');
@@ -167,6 +168,25 @@ function tidypics_get_view_image_contnet($photo_guid) {
 	}
 
 	$params['content'] = elgg_view_entity($photo, array('full_view' => TRUE));
+
+	return $params;
+}
+
+/**
+ * Get content for ajax/lightbox image full view
+ * 
+ * @param int $photo_guid Photo guid
+ * @return array
+ */
+function tidypics_get_view_image_ajax_content($photo_guid) {
+	// Get the photo entity
+	$photo = get_entity($photo_guid);
+	if (!$photo) {
+		// Error..
+		echo elgg_echo('noaccess');
+	}
+
+	$params['content'] = elgg_view_entity($photo, array('lightbox' => TRUE));
 
 	return $params;
 }
@@ -386,6 +406,7 @@ function tidypics_view_photo_list(array $options = array()) {
 	if ($options['container_guid'] && elgg_instanceof($album = get_entity($options['container_guid']), 'object', 'album')) {
 		$count = $album->getSize();
 		$photos = $album->getImages($options['limit'], $options['offset']);
+		elgg_push_context('tidypics_view_album');
 	} else {
 		$options['count'] = TRUE;
 		$count = elgg_get_entities($options);

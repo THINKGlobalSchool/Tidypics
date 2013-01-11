@@ -10,14 +10,7 @@
 
 $image = elgg_extract('entity', $vars);
 
-$img = elgg_view_entity_icon($image, 'small');
-
-$body = elgg_view('output/url', array(
-	'text' => $img,
-	'href' => $image->getURL(),
-	'encode_text' => false,
-	'is_trusted' => true,
-));
+$body = elgg_view_entity_icon($image, 'small', array('link_class' => 'tidypics-lightbox'));
 
 $params = array(
 	//'footer' => $footer,

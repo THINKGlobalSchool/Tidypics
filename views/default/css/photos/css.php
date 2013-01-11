@@ -8,12 +8,29 @@
 ?>
 
 /* ***************************************
+	TWEAKS/FIXES
+*************************************** */
+
+.elgg-system-messages {
+	z-index: 9002; /* Make sure system messages are visible */
+}
+
+/* Fix tinyMCE toolbar */
+.tidypics-lightbox-comments-container .mceToolbar * {
+    white-space: normal !important;
+}
+.tidypics-lightbox-comments-container .mceToolbar tr,
+.tidypics-lightbox-comments-container .mceToolbar td {
+    float:left !important;
+}
+/* ***************************************
 	TIDYPICS
 *************************************** */
 .elgg-module-tidypics-album,
 .elgg-module-tidypics-image,
 .elgg-module-tidypics-upload {
 	width: 161px;
+	min-height: 161px;
 	text-align: center;
 	margin: 5px 0;
 }
@@ -105,14 +122,14 @@
 	position: absolute;
 	left: 50%;
 	top: -25px;
-	width: 250px;
-	margin-left: -125px;
+	width: 360px;
+	margin-left: -180px;
 	text-align: center;
 }
 
 .tidypics-tagging-select {
 	position: absolute;
-	max-width: 300px;
+	width: 300px;
 }
 
 .tidypics-tag-wrapper {
@@ -126,7 +143,7 @@
 }
 
 .tidypics-tag-label {
-	float: left;
+	float: right;
 	margin-top: 5px;
 	color: #666;
 }
@@ -316,4 +333,157 @@ select.tidypics-upload-select-existing-album {
 .elgg-menu-item-album-access-label {
 	color: #555555;
 	font-weight: bold;
+}
+
+/* ***************************************
+	Photo lightbox
+*************************************** */
+
+.tidypics-lightbox-wrap {
+    height: 100% !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+}
+
+.tidypics-lightbox-wrap .fancybox2-skin {
+	height: 100% !important;
+	width: 100% !important;
+	padding: 0 !important;
+	-webkit-border-radius: 0;
+	-moz-border-radius: 0;
+	border-radius: 0;
+}
+
+.tidypics-lightbox-wrap .fancybox2-outer {
+	background: #000000;
+	height: 100%;
+}
+
+.tidypics-lightbox-wrap .fancybox2-inner {
+	width: 100% !important;
+	height: 100% !important;
+}
+
+/* Lightbox inner content */
+.tidypics-lightbox-container {
+	display: table;
+	height: 100%;
+	width: 100%;
+}
+
+.tidypics-lightbox-container .tidypics-lightbox-header {
+	display: table-row;
+	height: 60px;
+}
+
+.tidypics-lightbox-container .tidypics-lightbox-header .tidypics-lightbox-header-metadata {
+	float: right;
+    padding: 16px 20px 15px 15px;
+}
+
+.tidypics-lightbox-container .tidypics-lightbox-header a.tidypics-lightbox-close {
+	float: right;
+	margin-left: 15px;
+    margin-top: 2px;
+    font-weight: bolder;
+    color: #FFFFFF;
+}
+
+.tidypics-lightbox-container .tidypics-lightbox-header a.tidypics-lightbox-close:hover {
+	cursor: pointer;
+	text-decoration: none;
+}
+
+.tidypics-lightbox-container .tidypics-lightbox-middle {
+	display: table;
+	width: 100%;
+	height: 100%;
+}
+
+.tidypics-lightbox-container .tidypics-lightbox-middle .tidypics-lightbox-middle-container {
+	display: table-cell;
+}
+
+.tidypics-lightbox-container .tidypics-lightbox-middle .tidypics-lightbox-sidebar {
+	display: table-cell;
+	width: 475px;
+	vertical-align: top;
+}
+
+.tidypics-lightbox-container .tidypics-lightbox-middle .tidypics-lightbox-sidebar .tidypics-lightbox-photo-title {
+	border-bottom: 1px solid #CCCCCC;
+	margin-bottom: 5px;
+	position: relative;
+}
+
+.tidypics-lightbox-container .tidypics-lightbox-middle .tidypics-lightbox-sidebar .tidypics-lightbox-photo-description {
+	margin-left: 10px;
+	position: relative;
+}
+
+.tidypics-lightbox-container .tidypics-lightbox-middle .tidypics-lightbox-sidebar .tidypics-lightbox-photo-description .none {
+	color: #666666;
+}
+
+.tidypics-lightbox-container .tidypics-lightbox-footer {
+	height: 60px;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+}
+
+.tidypics-lightbox-container .tidypics-photo {
+	display: none;
+	min-height: 50px;
+}
+
+.tidypics-lightbox-container .tidypics-photo-wrapper {
+	padding-top: 25px;
+	padding-bottom: 25px;
+}
+
+.tidypics-lightbox-container .tidypics-lightbox-sidebar-content {
+	background: none repeat scroll 0 0 #FFFFFF;
+	-moz-border-radius: 5px 5px 5px 5px;
+	-webkit-border-radius: 5px 5px 5px 5px;
+    border-radius: 5px 5px 5px 5px;
+    margin: 10px;
+    padding: 5px;
+    width: 435px;
+    overflow-y: auto;
+}
+
+.tidypics-lightbox-container .tidypics-lightbox-can-edit:hover .tidypics-lightbox-edit-overlay {
+	display: block;
+}
+
+.tidypics-lightbox-container .tidypics-lightbox-edit-overlay {
+	display: none;
+	position: absolute;
+    right: 0;
+    top: 0;
+}
+
+.tidypics-lightbox-container .tidypics-lightbox-edit-overlay a {
+	background: #FFFFFF;
+	border: 1px solid #BBBBBB;
+	padding: 2px;
+	width: 40px;
+	text-align: center;
+	display: block;
+	text-decoration: none;
+	-webkit-box-shadow: 1px 1px 5px #CCC;
+	-moz-box-shadow: 1px 1px 5px #CCC;
+	box-shadow: 1px 1px 5px #CCC;
+}
+
+.tidypics-lightbox-container .tidypics-lightbox-edit-title {
+	width: 70%;
+	margin-bottom: 2px;
+}
+
+.tidypics-lightbox-container .tidypics-lightbox-edit-description {
+	margin-bottom: 5px;
+	height: 150px;
 }

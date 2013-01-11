@@ -10,17 +10,39 @@
 //<script>
 elgg.provide('elgg.tidypics.tagging');
 
+// Image scale (should be 1 by default)
+elgg.tidypics.tagging.scale = 1;
+
+/**
+ * Init all tagging events
+ */
 elgg.tidypics.tagging.init = function() {
 	elgg.tidypics.tagging.active = false;
 	$('[rel=photo-tagging]').click(elgg.tidypics.tagging.start);
 
-	$('#tidypics-tagging-quit').click(elgg.tidypics.tagging.stop);
+	$('#tidypics-tagging-quit').click(function(event) {
+		elgg.tidypics.tagging.stop();
+		event.preventDefault();
+	});
 
 	$('.tidypics-tag').each(elgg.tidypics.tagging.position);
+
+	$('a._tp-people-tag-remove').click(elgg.tidypics.tagging.peopleTagRemoveClick);
 
 	elgg.tidypics.tagging.tag_hover = false;
 	elgg.tidypics.tagging.toggleTagHover();
 };
+
+/**
+ * Unbind all tagging events
+ */
+elgg.tidypics.tagging.destroy = function() {
+	elgg.tidypics.tagging.stop();
+	$('[rel=photo-tagging]').unbind('click');
+	$('#tidypics-tagging-quit').unbind('click');
+	$('a._tp-people-tag-remove').unbind('click');
+	$(".tidypics-photo").unbind('mouseenter mouseleave');
+}
 
 /**
  * Start a tagging session
@@ -32,10 +54,12 @@ elgg.tidypics.tagging.start = function(event) {
 		return;
 	}
 
-	$('.tidypics-photo').imgAreaSelect({
+	$('.tidypics-photo.taggable').imgAreaSelect({
 		disable      : false,
 		hide         : false,
 		classPrefix  : 'tidypics-tagging',
+		imageHeight  : $('.tidypics-photo.taggable').data('original_height'),
+		imageWidth   : $('.tidypics-photo.taggable').data('original_width'),
 		onSelectEnd  : elgg.tidypics.tagging.startSelect,
 		onSelectStart: function() {
 			$('#tidypics-tagging-select').hide();
@@ -44,7 +68,7 @@ elgg.tidypics.tagging.start = function(event) {
 
 	elgg.tidypics.tagging.toggleTagHover();
 
-	$('.tidypics-photo').css({"cursor" : "crosshair"});
+	$('.tidypics-photo.taggable').css({"cursor" : "crosshair"});
 
 	$('#tidypics-tagging-help').toggle();
 
@@ -58,8 +82,8 @@ elgg.tidypics.tagging.start = function(event) {
  *
  * A tagging session could be completed or the user could have quit.
  */
-elgg.tidypics.tagging.stop = function(event) {
-	$('#tidypics-tagging-help').toggle();
+elgg.tidypics.tagging.stop = function() {
+	$('#tidypics-tagging-help').hide();
 	$('#tidypics-tagging-select').hide();
 
 	$('.tidypics-photo').imgAreaSelect({hide: true, disable: true});
@@ -67,8 +91,6 @@ elgg.tidypics.tagging.stop = function(event) {
 
 	elgg.tidypics.tagging.active = false;
 	elgg.tidypics.tagging.toggleTagHover();
-
-	event.preventDefault();
 };
 
 /**
@@ -83,34 +105,35 @@ elgg.tidypics.tagging.startSelect = function(img, selection) {
 	$("input[name=coordinates]").val(coords);
 
 	$('#tidypics-tagging-select').show()
-		.css({
-			'top' : selection.y2 + 10,
-			'left' : selection.x2
-		})
-		.find('input[type=text]').focus();
-
+	.position({
+		my : 'left center',
+		at : 'right center',
+		of : img
+	})
+	.find('input[name=_tp_people_tag_submit]').click(elgg.tidypics.tagging.peopleTagAddClick)
+	.find('input[type=text]').focus();
 };
 
 /**
  * Position the tags over the image
  */
 elgg.tidypics.tagging.position = function() {
-	var tag_left = parseInt($(this).data('x1'));
-	var tag_top = parseInt($(this).data('y1'));
-	var tag_width = parseInt($(this).data('width'));
-	var tag_height = parseInt($(this).data('height'));
+	var tag_left = parseInt($(this).data('x1')) / elgg.tidypics.tagging.scale;
+	var tag_top = parseInt($(this).data('y1')) / elgg.tidypics.tagging.scale;
+	var tag_width = parseInt($(this).data('width')) / elgg.tidypics.tagging.scale;
+	var tag_height = parseInt($(this).data('height')) / elgg.tidypics.tagging.scale;
 
 	// add image offset
 	var image_pos = $('.tidypics-photo').position();
+	console.log(image_pos);
 	tag_left += image_pos.left;
 	tag_top += image_pos.top;
 
 	$(this).parent().css({
 		left: tag_left + 'px',
-		top: tag_top + 'px' /*
-		width: tag_width + 'px',
-		height: tag_height + 'px' */
-	});
+		top: tag_top + 'px'
+	});	
+						
 
 	$(this).css({
 		width: tag_width + 'px',
@@ -156,4 +179,63 @@ elgg.tidypics.tagging.toggleTagHover = function() {
 	elgg.tidypics.tagging.tag_hover = !elgg.tidypics.tagging.tag_hover;
 };
 
+/**
+ * People tag ajax submit handler
+ */
+elgg.tidypics.tagging.peopleTagAddClick = function(event) {
+	var $form = $(this).closest('form');
+	var action = $form.attr('action');
+	var value = $form.find('input[name=username]').val();
+	var guid = $form.find('input[name=guid]').val();
+
+	if (value) {
+		elgg.action(action, {
+			data: $form.serialize(),
+			success: function(json) {
+				if (json.status >= 0) {
+					// Success
+					elgg.tidypics.tagging.stop();
+					if ($('.tidypics-tagging-container').length) {
+						var tags_href = elgg.get_site_url() + 'ajax/view/photos/tagging/tags?entity_guid=' + guid;
+						$('.tidypics-tagging-container').load(tags_href, function() {
+							elgg.tidypics.tagging.destroy();
+							elgg.tidypics.tagging.init();
+						});
+						
+					} else {
+						window.location = window.location.href;
+					}
+				} else {
+					// There was an error
+				}
+			}
+		});
+	}
+
+	event.preventDefault();
+}
+
+/**
+ * People tag remove ajax handler
+ */
+elgg.tidypics.tagging.peopleTagRemoveClick = function(event) {
+	if (confirm(elgg.echo('tidypics:phototagging:delete:confirm'))) {
+		var action = $(this).attr('href');
+		var $_this = $(this);
+		elgg.action(action, {
+			data: {},
+			success: function(json) {
+				if (json.status >= 0) {
+					// Success, remove the tag from the DOM
+					$_this.closest('div.tidypics-tag-wrapper').remove();
+				} else {
+					// Error
+				}
+			}
+		});
+	}
+	event.preventDefault();
+}
+
 elgg.register_hook_handler('init', 'system', elgg.tidypics.tagging.init);
+elgg.register_hook_handler('photoLightboxBeforeClose', 'tidypics', elgg.tidypics.tagging.stop);

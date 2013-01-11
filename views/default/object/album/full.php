@@ -8,6 +8,14 @@
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2
  */
 
+$load_lightbox = get_input('lb', 0);
+
+$lightbox_image = get_entity($load_lightbox);
+
+if (elgg_instanceof($lightbox_image, 'object', 'image')) {
+	$lightbox_url = $lightbox_image->getURL();
+}
+
 $album = elgg_extract('entity', $vars);
 $owner = $album->getOwnerEntity();
 
@@ -65,3 +73,30 @@ echo elgg_view('object/elements/full', array(
 	'summary' => $summary,
 	'body' => $body,
 ));
+
+$js = <<<JAVASCRIPT
+<script type='text/javascript'>
+	$(document).ready(function() {
+		var load_lightbox = $load_lightbox;
+
+		var tidypics_init_full_album = function() {
+			// Init infinite scroll
+			elgg.tidypics.initInfiniteScroll();
+
+			// Implement popstate
+			window.addEventListener("popstate", function(e) {
+				elgg.tidypics.popState(e);
+			});
+
+			if (load_lightbox) {
+				var lightbox_url = '$lightbox_url';
+				$.fancybox2(elgg.tidypics.getFancyboxInit(lightbox_url));
+			}
+		}
+
+		elgg.register_hook_handler('ready', 'system', tidypics_init_full_album);
+	});
+</script>
+JAVASCRIPT;
+
+echo $js;

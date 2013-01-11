@@ -515,6 +515,12 @@ function tp_im_calc_resize_params($orig_width, $orig_height, $new_width, $new_he
 			$new_height = floor($new_width * $region_height / (float)$region_width);
 		}
 
+		// If both the region height and width are less than the new width, don't blow the images up
+		if ($region_width < $new_width && $region_height < $new_height) {
+			$new_width = $region_width;
+			$new_height = $region_height;
+		}
+
 		// by default, use entire image
 		$widthoffset = 0;
 		$heightoffset = 0;

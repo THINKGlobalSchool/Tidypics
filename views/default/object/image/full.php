@@ -12,8 +12,7 @@ $image = $photo = $vars['entity'];
 
 $img = elgg_view_entity_icon($image, 'large', array(
 	'href' => $image->getIconURL('master'),
-	'img_class' => 'tidypics-photo',
-	'link_class' => 'tidypics-lightbox',
+	'img_class' => 'tidypics-photo taggable',
 ));
 elgg_load_js('lightbox');
 elgg_load_css('lightbox');
@@ -22,6 +21,7 @@ $owner_link = elgg_view('output/url', array(
 	'href' => "photos/owner/" . $photo->getOwnerEntity()->username,
 	'text' => $photo->getOwnerEntity()->name,
 ));
+
 $author_text = elgg_echo('byline', array($owner_link));
 
 $owner_icon = elgg_view_entity_icon($photo->getOwnerEntity(), 'tiny');
