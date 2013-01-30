@@ -17,6 +17,7 @@ if (!$annotation->canEdit()) {
 
 if ($annotation->delete()) {
 	system_message(elgg_echo("tidypics:phototagging:delete:success"));
+	echo elgg_view('photos/tagging/tags_string', array('entity_guid' => $annotation->entity_guid));
 } else {
 	system_message(elgg_echo("tidypics:phototagging:delete:error"));
 }

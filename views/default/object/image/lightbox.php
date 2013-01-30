@@ -8,10 +8,13 @@
  */
 
 // Get image info
-$image = $photo = $vars['entity'];
+$photo = $vars['entity'];
 
-$img = elgg_view_entity_icon($image, 'large', array(
-	'href' => $image->getIconURL('master'),
+// Add view annotation
+$photo->addView();
+
+$img = elgg_view_entity_icon($photo, 'large', array(
+	'href' => $photo->getIconURL('master'),
 	'img_class' => 'tidypics-photo taggable',
 	'link_class' => 'tidypics-master-photo',
 ));
@@ -33,28 +36,20 @@ $metadata = elgg_view_menu('entity', array(
 
 $title = $photo->getTitle();
 
-$subtitle = "$author_text $date $categories $comments_link";
-
-$params = array(
-	'entity' => $photo,
-	'title' => false,
-	'metadata' => '',
-	'subtitle' => $subtitle,
-	'tags' => $tags,
-);
-$list_body = elgg_view('object/elements/summary', $params);
-
-$params = array('class' => 'mbl');
-$summary = elgg_view_image_block($owner_icon, $list_body, $params);
-
 // Set up inline editing
 if ($photo->canEdit()) {
-	$edit_title = $edit_description = '_tp-can-edit tidypics-lightbox-can-edit'; 
+	$edit_title = $edit_description = $edit_tags = '_tp-can-edit tidypics-lightbox-can-edit'; 
 
 	$edit_title_input = elgg_view('input/text', array(
 		'name' => '_tp_edit_inline_title',
 		'value' => $title,
 		'class' => 'tidypics-lightbox-edit-title hidden',
+	));
+
+	$edit_tags_input = elgg_view('input/tags', array(
+		'name' => '_tp_edit_inline_tags',
+		'value' => $photo->tags,
+		'class' => 'tidypics-lightbox-edit-tags hidden',
 	));
 
 	$edit_description_input = elgg_view('input/plaintext', array(
@@ -69,7 +64,7 @@ if ($photo->canEdit()) {
 		'class' => '_tp-edit-inline',
 	));
 
-	$edit_overlay = "<div class='tidypics-lightbox-edit-overlay'>" . $edit_link . "</div>";
+	$edit_overlay = "<div class='tidypics-lightbox-edit-overlay'>{$edit_link}</div>";
 
 	$save_link = elgg_view('output/url', array(
 		'text' => elgg_echo('save'),
@@ -83,7 +78,32 @@ if ($photo->canEdit()) {
 		'href' => '#',
 		'class' => 'elgg-button elgg-button-cancel _tp-cancel-inline hidden',
 	));
+
+	$photo_tags = "<span class='_tp-tags'>" . elgg_view('output/tags', array('tags' => $photo->tags)) . "</span>";
+
+	$tags = "<div class='tidypics-lightbox-photo-tags $edit_tags' data-field='tags'>$edit_overlay $photo_tags $edit_tags_input $save_link $cancel_link</div>";
+} else {
+	// Non-edit defaults
+	$tags = null;
 }
+
+// Photo summary/info
+$date = elgg_view_friendly_time($photo->time_created);
+
+$subtitle = "$author_text $date $categories $comments_link";
+
+$params = array(
+	'entity' => $photo,
+	'title' => false,
+	'metadata' => '',
+	'subtitle' => $subtitle,
+	'tags' => $tags,
+);
+
+$list_body = elgg_view('object/elements/summary', $params);
+
+$params = array('class' => 'mbl');
+$summary = elgg_view_image_block($owner_icon, $list_body, $params);
 
 // Set up description
 if ($photo->description) {
@@ -101,6 +121,7 @@ $comments = elgg_view_comments($photo);
 $people_tag_help = elgg_view('photos/tagging/help', $vars);
 $people_tag_select = elgg_view('photos/tagging/select', $vars);
 $people_tags = elgg_view('photos/tagging/tags', $vars);
+$people_tags_string = elgg_view('photos/tagging/tags_string', $vars);
 
 // Close lightbox button
 $close_lightbox = elgg_view('output/url', array(
@@ -147,6 +168,9 @@ $content = <<<HTML
 						$save_link $cancel_link
 					</div>
 					$edit_description_input
+					<div class='tidypics-lightbox-people-tags-container'>
+						$people_tags_string
+					</div>
 					<div class='tidypics-lightbox-comments-container'>
 						$comments
 					</div>

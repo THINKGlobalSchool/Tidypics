@@ -29,6 +29,6 @@ echo '</div>';
 echo '<div class="elgg-col elgg-col-1of5 center">';
 echo elgg_view('input/submit', array(
 	'name' => '_tp_people_tag_submit',
-	'value' => elgg_echo('tidypics:actiontag'),
+	'value' => elgg_echo('tidypics:tag'),
 ));
 echo '</div>';

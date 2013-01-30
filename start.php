@@ -11,6 +11,8 @@
  * - Upgrades need to stay.. need to check against our old fork
  * - Fix plugin ordering issue (jquery file upload)
  * - Need to sort out 'actions' menu
+ * - Move lightbox js to own library?
+ * - Add more documentation (JS mostly)
  */
 
 elgg_register_event_handler('init', 'system', 'tidypics_init');
@@ -390,6 +392,18 @@ function tidypics_entity_menu_setup($hook, $type, $return, $params) {
 			);
 			$return[] = ElggMenuItem::factory($options);
 		}
+
+		// Add album info to entity menu
+		$album_label = elgg_echo('tidypics:inalbum');
+
+		$options = array(
+			'name' => 'album-info',
+			'text' => $album_label . $album->getTitle(),
+			'href' =>  $album->getURL(),
+			'section' => 'info',
+			'priority' => 1,
+		);
+		$return[] = ElggMenuItem::factory($options);
 	}
 
 	// only show these options if there are images

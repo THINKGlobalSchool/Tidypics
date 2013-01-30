@@ -7,6 +7,7 @@
 
 $title = get_input('title', NULL);
 $description = get_input('description', NULL);
+$tags = get_input('tags', NULL);
 $entity_guid = get_input('entity_guid', NULL);
 
 $image = get_entity($entity_guid);
@@ -16,7 +17,7 @@ if (!elgg_instanceof($image, 'object', 'image') || !$image->canEdit()) {
 	forward(REFERER);
 }
 
-if (!$title && !$description) {
+if (!$title && !$description && !$tags) {
 	register_error(elgg_echo('image:error'));
 }
 
@@ -32,16 +33,21 @@ if ($description) {
 	$updated = $description;
 }
 
+if ($tags) {
+	$image->tags = string_to_tag_array($tags);
+	$updated = elgg_view('output/tags', array('tags' => $image->tags));
+}
+
 // If we updated a field, save and return the value
 if ($updated) {
 	if ($image->save()) {
 		echo $updated;
 	} else {
 		// Failed to save
-		register_error('image:error');
+		register_error(elgg_echo('image:error'));
 	}
 } else {
-	register_error('image:no_update');
+	register_error(elgg_echo('image:no_update'));
 }
 
 forward(REFERER);

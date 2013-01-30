@@ -15,7 +15,7 @@ if ($vars['entity']) {
 }
 
 if (elgg_instanceof($entity, 'object', 'image')) {
-	$tags = $entity->getPhotoTags();
+	$tags = $entity->getPhotoTags(0);
 	foreach ($tags as $tag) {
 		echo elgg_view('photos/tagging/tag', array('tag' => $tag));
 	}

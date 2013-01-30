@@ -31,6 +31,17 @@ elgg.tidypics.tagging.init = function() {
 
 	elgg.tidypics.tagging.tag_hover = false;
 	elgg.tidypics.tagging.toggleTagHover();
+
+
+	$('a._tp-people-tag-link').hover(
+		function() {
+			code = $(this).attr('id').substr(9);
+			$('#tag-id-' + code).parent().show();
+		},
+		function() {
+			code = $(this).attr('id').substr(9);
+			$('#tag-id-' + code).parent().hide();
+	});
 };
 
 /**
@@ -41,7 +52,8 @@ elgg.tidypics.tagging.destroy = function() {
 	$('[rel=photo-tagging]').unbind('click');
 	$('#tidypics-tagging-quit').unbind('click');
 	$('a._tp-people-tag-remove').unbind('click');
-	$(".tidypics-photo").unbind('mouseenter mouseleave');
+	$('.tidypics-photo').unbind('mouseenter mouseleave');
+	$('a._tp-people-tag-link').unbind('mouseenter mouseleave');
 	$('input[name=_tp_people_tag_submit]').unbind('click');
 }
 
@@ -196,14 +208,13 @@ elgg.tidypics.tagging.peopleTagAddClick = function(event) {
 				if (json.status >= 0) {
 					// Success
 					elgg.tidypics.tagging.stop();
-					if ($('.tidypics-tagging-container').length) {
-						var tags_href = elgg.get_site_url() + 'ajax/view/photos/tagging/tags?entity_guid=' + guid;
-						$('.tidypics-tagging-container').load(tags_href, function() {
-							elgg.tidypics.tagging.destroy();
-							elgg.tidypics.tagging.init();
-						});
-						
-					} else {
+
+					var params = {
+						output: json.output,
+						guid: guid
+					};
+
+					if (elgg.trigger_hook('peopleTagAdded', 'tidypics', params, true)) {
 						window.location = window.location.href;
 					}
 				} else {
@@ -229,6 +240,12 @@ elgg.tidypics.tagging.peopleTagRemoveClick = function(event) {
 				if (json.status >= 0) {
 					// Success, remove the tag from the DOM
 					$_this.closest('div.tidypics-tag-wrapper').remove();
+
+					var params = {
+						output: json.output
+					};
+
+					elgg.trigger_hook('peopleTagRemoved', 'tidypics', params, null);
 				} else {
 					// Error
 				}

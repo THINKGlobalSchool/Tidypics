@@ -381,12 +381,13 @@ class TidypicsImage extends ElggFile {
 	 *
 	 * @return array
 	 */
-	public function getPhotoTags() {
+	public function getPhotoTags($limit = 10) {
 
 		$tags = array();
 		$annotations = elgg_get_annotations(array(
 			'guid' => $this->getGUID(),
 			'annotation_name' => 'phototag',
+			'limit' => $limit
 		));
 		foreach ($annotations as $annotation) {
 			$tag = unserialize($annotation->value);

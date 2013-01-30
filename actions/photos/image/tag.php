@@ -75,6 +75,7 @@ if ($annotation_id) {
 	}
 
 	system_message(elgg_echo("tidypics:phototagging:success"));
+	echo elgg_view('photos/tagging/tags_string', array('entity_guid' => $image_guid));
 }
 
 forward(REFERER);

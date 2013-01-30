@@ -11,6 +11,7 @@
 $coords = json_decode('{' . $vars['tag']->coords . '}');
 
 $attributes = elgg_format_attributes(array(
+	'id' => 'tag-id-' . $vars['tag']->annotation_id,
 	'class' => 'tidypics-tag',
 	'data-x1' => $coords->x1,
 	'data-y1' => $coords->y1,

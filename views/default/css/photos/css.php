@@ -12,7 +12,7 @@
 *************************************** */
 
 .elgg-system-messages {
-	z-index: 9002; /* Make sure system messages are visible */
+	z-index: 9010; /* Make sure system messages are visible */
 }
 
 /* Fix tinyMCE toolbar */
@@ -23,6 +23,7 @@
 .tidypics-lightbox-comments-container .mceToolbar td {
     float:left !important;
 }
+
 /* ***************************************
 	TIDYPICS
 *************************************** */
@@ -122,8 +123,8 @@
 	position: absolute;
 	left: 50%;
 	top: -25px;
-	width: 360px;
-	margin-left: -180px;
+	width: 300px;
+	margin-left: -150px;
 	text-align: center;
 }
 
@@ -314,6 +315,10 @@ select.tidypics-upload-select-existing-album {
 	width: 380px;
 }
 
+.elgg-menu-item-album-info a {
+	color: #FFFFFF !important;
+}
+
 /* Upload menus */
 .elgg-menu-tidypics-upload-album-metadata {
 	margin-top: 3px;
@@ -377,6 +382,10 @@ select.tidypics-upload-select-existing-album {
 	height: 60px;
 }
 
+.tidypics-lightbox-container .tidypics-lightbox-header .elgg-menu-entity > li > a {
+	color: #AAAAAA;
+}
+
 .tidypics-lightbox-container .tidypics-lightbox-header .tidypics-lightbox-header-metadata {
 	float: right;
     padding: 16px 20px 15px 15px;
@@ -422,7 +431,17 @@ select.tidypics-upload-select-existing-album {
 	position: relative;
 }
 
+.tidypics-lightbox-container .tidypics-lightbox-middle .tidypics-lightbox-sidebar .tidypics-lightbox-photo-tags {
+	position: relative;
+	padding-bottom: 6px;
+}
+
 .tidypics-lightbox-container .tidypics-lightbox-middle .tidypics-lightbox-sidebar .tidypics-lightbox-photo-description .none {
+	color: #666666;
+}
+
+.tidypics-lightbox-container .tidypics-lightbox-middle .tidypics-lightbox-sidebar .tidypics-lightbox-people-tags-container {
+	margin: 10px;
 	color: #666666;
 }
 
@@ -479,11 +498,16 @@ select.tidypics-upload-select-existing-album {
 }
 
 .tidypics-lightbox-container .tidypics-lightbox-edit-title {
-	width: 70%;
+	width: 65%;
 	margin-bottom: 2px;
 }
 
 .tidypics-lightbox-container .tidypics-lightbox-edit-description {
 	margin-bottom: 5px;
 	height: 150px;
+}
+
+.tidypics-lightbox-container .tidypics-lightbox-edit-tags {
+	margin-bottom: 7px;
+    margin-top: 3px;
 }
