@@ -90,7 +90,7 @@ $js = <<<JAVASCRIPT
 
 			if (load_lightbox) {
 				var lightbox_url = '$lightbox_url';
-				$.fancybox2(elgg.tidypics.getFancyboxInit(lightbox_url));
+				$.fancybox2(elgg.tidypics.lightbox.getFancyboxInit(lightbox_url));
 			}
 		}
 

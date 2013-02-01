@@ -10,7 +10,6 @@
  * - Clean languages
  * - Upgrades need to stay.. need to check against our old fork
  * - Fix plugin ordering issue (jquery file upload)
- * - Move lightbox js to own library?
  * - Add more documentation (JS mostly)
  * - What to do with sidebar: Put back latest comments/tag cloud?
  */
@@ -59,6 +58,10 @@ function tidypics_init() {
 	$js = elgg_get_simplecache_url('js', 'photos/upload');
 	elgg_register_simplecache_view('js/photos/upload');
 	elgg_register_js('tidypics:upload', $js, 'footer');
+
+	$js = elgg_get_simplecache_url('js', 'photos/lightbox');
+	elgg_register_simplecache_view('js/photos/lightbox');
+	elgg_register_js('tidypics:lightbox', $js, 'footer');
 
 	// Register jquery-waypoints js lib
 	$js = elgg_get_simplecache_url('js', 'waypoints');
@@ -236,6 +239,7 @@ function tidypics_page_handler($page) {
 		elgg_load_js('tidypics');
 		elgg_load_js('tidypics:upload');
 		elgg_load_js('tidypics:tagging');
+		elgg_load_js('tidypics:lightbox');
 
 		// Load other JS
 		elgg_load_js('jquery-waypoints');

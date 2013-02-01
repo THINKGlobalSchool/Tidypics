@@ -71,8 +71,8 @@
 	display: inline-block;
 }
 
-.tidypics-photo-item + .tidypics-photo-item {
-	margin-left: 7px;
+.tidypics-photo-item {
+	margin-right: 7px;
 }
 
 .tidypics-gallery > li {

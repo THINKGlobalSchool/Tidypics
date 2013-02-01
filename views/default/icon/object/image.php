@@ -15,7 +15,7 @@
 
 $entity = $vars['entity'];
 
-$sizes = array('master', 'large', 'small', 'thumb');
+$sizes = array('master', 'large', 'small', 'tiny');
 
 // Get size
 if (!in_array($vars['size'], $sizes)) {
@@ -23,7 +23,7 @@ if (!in_array($vars['size'], $sizes)) {
 }
 
 switch ($vars['size']) {
-	case 'thumb':
+	case 'tiny':
 		$thumb_name = $entity->thumbnail;
 		break;
 	case 'small':
