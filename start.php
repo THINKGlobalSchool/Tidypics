@@ -10,9 +10,9 @@
  * - Clean languages
  * - Upgrades need to stay.. need to check against our old fork
  * - Fix plugin ordering issue (jquery file upload)
- * - Need to sort out 'actions' menu
  * - Move lightbox js to own library?
  * - Add more documentation (JS mostly)
+ * - What to do with sidebar: Put back latest comments/tag cloud?
  */
 
 elgg_register_event_handler('init', 'system', 'tidypics_init');
@@ -56,9 +56,9 @@ function tidypics_init() {
 	elgg_register_simplecache_view('js/photos/tagging');
 	elgg_register_js('tidypics:tagging', $js, 'footer');
 	
-	$js = elgg_get_simplecache_url('js', 'photos/uploading');
-	elgg_register_simplecache_view('js/photos/uploading');
-	elgg_register_js('tidypics:uploading', $js, 'footer');
+	$js = elgg_get_simplecache_url('js', 'photos/upload');
+	elgg_register_simplecache_view('js/photos/upload');
+	elgg_register_js('tidypics:upload', $js, 'footer');
 
 	// Register jquery-waypoints js lib
 	$js = elgg_get_simplecache_url('js', 'waypoints');
@@ -94,6 +94,9 @@ function tidypics_init() {
 	// Register for the entity menu
 	elgg_register_plugin_hook_handler('register', 'menu:entity', 'tidypics_entity_menu_setup');
 
+	// Register items for photo list filter
+	elgg_register_plugin_hook_handler('register', 'menu:photos-listing-filter', 'tidypics_photo_list_menu_setup');
+
 	// Register group option
 	add_group_tool_option('photos', elgg_echo('tidypics:enablephotos'), true);
 	elgg_extend_view('groups/tool_latest', 'photos/group_module');
@@ -108,6 +111,9 @@ function tidypics_init() {
 	// allow group members add photos to group albums
 	elgg_register_plugin_hook_handler('container_permissions_check', 'object', 'tidypics_group_permission_override');
 	elgg_register_plugin_hook_handler('permissions_check:metadata', 'object', 'tidypics_group_permission_override');
+
+	// Extend livesearch page handler
+	elgg_register_plugin_hook_handler('route', 'livesearch', 'tidypics_route_livesearch_handler', 50);
 
 	// @todo notifications
 	register_notification_object('object', 'album', elgg_echo('tidypics:newalbum_subject'));
@@ -226,17 +232,22 @@ function tidypics_page_handler($page) {
 
 		return TRUE;
 	} else {
-
+		// Load tidypics related JS
 		elgg_load_js('tidypics');
+		elgg_load_js('tidypics:upload');
+		elgg_load_js('tidypics:tagging');
+
+		// Load other JS
 		elgg_load_js('jquery-waypoints');
 		elgg_load_js('jquery-fancybox2');
 		elgg_load_css('jquery-fancybox2');
-		elgg_load_js('tidypics:tagging');
 		elgg_load_js('jquery.imgareaselect');
 		elgg_load_js('elgg.autocomplete');
 		elgg_load_js('jquery.ui.autocomplete.html');
 		elgg_load_js('tinymce');
     	elgg_load_js('elgg.tinymce');
+    	elgg_load_js('elgg.autocomplete');
+		elgg_load_js('jquery.ui.autocomplete.html');
 
 		switch ($page_type) {
 			case 'album':
@@ -425,6 +436,100 @@ function tidypics_entity_menu_setup($hook, $type, $return, $params) {
 }
 
 /**
+ * Set up photo listing filter menu
+ */
+function tidypics_photo_list_menu_setup($hook, $type, $return, $params) {
+	$container_guid = $params['container_guid'];
+	$type = $params['type'];
+
+	$logged_in = elgg_get_logged_in_user_guid();
+
+	$tag_label = elgg_echo('tidypics:tag');
+	$tag_input = elgg_view('input/autocomplete', array(
+		'name' => 'tag',
+		'data-match_on' => 'tags',
+		'value' => get_input('tag'),
+	));
+
+	// Search by tag label
+	$options = array(
+		'name' => 'photos-listing-tag-label',
+		'text' => "<label>{$tag_label}:</label>",
+		'href' => false,
+		'priority' => 100,
+	);
+	$return[] = ElggMenuItem::factory($options);
+
+	// Search by tag input
+	$options = array(
+		'name' => 'photos-listing-tag-input',
+		'text' => $tag_input,
+		'href' => false,
+		'priority' => 101,
+	);
+	$return[] = ElggMenuItem::factory($options);
+
+	// Don't show people tag when listing albums
+	if ($type != 'albums') {
+		$people_tag_label = elgg_echo('tidypics:peopletag');
+		$people_tag_input = elgg_view('input/autocomplete', array(
+			'name' => 'people_tag',
+			'data-match_on' => 'users',
+			'value' => get_input('people_tag'),
+		));
+
+		// Search by people tag label
+		$options = array(
+			'name' => 'photos-listing-people-tag-label',
+			'text' => "<label>{$people_tag_label}:</label>",
+			'href' => false,
+			'priority' => 400,
+		);
+		$return[] = ElggMenuItem::factory($options);
+
+		// Search by people tag input
+		$options = array(
+			'name' => 'photos-listing-people-tag-input',
+			'text' => $people_tag_input,
+			'href' => false,
+			'priority' => 401,
+		);
+		$return[] = ElggMenuItem::factory($options);
+	}
+
+	// Only show owner and role inputs when not viewing a container
+	if (!$container_guid) {
+
+		$owner_label = elgg_echo('tidypics:owner');
+		$owner_input = elgg_view('input/autocomplete', array(
+			'name' => 'owner',
+			'data-match_on' => 'users',
+			'value' => get_input('owner'),
+		));
+
+		// Search by owner label
+		$options = array(
+			'name' => 'photos-listing-owner-label',
+			'text' => "<label>{$owner_label}:</label>",
+			'href' => false,
+			'priority' => 200,
+		);
+		$return[] = ElggMenuItem::factory($options);
+
+		// Search by owner input
+		$options = array(
+			'name' => 'photos-listing-owner-input',
+			'text' => $owner_input,
+			'href' => false,
+			'priority' => 201,
+		);
+		$return[] = ElggMenuItem::factory($options);
+	}
+
+	return $return;
+}
+
+/**
  * Override permissions for group albums
  *
  * 1. To write to a container (album) you must be able to write to the owner of the container (odd)
@@ -448,6 +553,56 @@ function tidypics_group_permission_override($hook, $type, $result, $params) {
 			return $album->getContainerEntity()->canWriteToContainer();
 		}
 	}
+}
+
+/**
+ * Extend livesearch page handler to include tags
+ *
+ * @param string $hook
+ * @param string $type
+ * @param bool   $return
+ * @param array  $params
+ * @return mixed
+ */
+function tidypics_route_livesearch_handler($hook, $type, $return, $params) {
+	$match_on = get_input('match_on', 'all');
+	
+	// Prevent metadata menu from appearing in livesearch
+	elgg_push_context('owner_block');
+
+	if ($match_on == 'tags') {
+		$term = get_input('term');
+
+		// Only grab tags similar to the input
+		$wheres[] = "msv.string like '%$term%'";	
+
+		// Get site tags
+		$site_tags = elgg_get_tags(array(
+			'threshold' => 1, 
+			'limit' => 15,
+			'wheres' => $wheres,
+		));
+
+		$dbprefix = elgg_get_config('dbprefix');
+
+		$tags_array = array();
+
+		foreach ($site_tags as $site_tag) {
+			$tag = array();
+			$tags_array[] = array(
+				'type' => 'tag',
+				'name' => $site_tag->tag,
+				'value' => $site_tag->tag,
+				'label' => "<div style='width: 100%; cursor: pointer;'>{$site_tag->tag}</div>",
+			);
+		}
+		
+		header("Content-Type: application/json");
+		echo json_encode(array_values($tags_array));
+		return FALSE;
+	}
+
+	return $return;
 }
 
 /**

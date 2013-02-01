@@ -15,7 +15,10 @@ if (!$annotation->canEdit()) {
 	forward(REFERER);
 }
 
+$tag = unserialize($annotation->value);
+
 if ($annotation->delete()) {
+	remove_entity_relationship($tag->value, 'phototag', $annotation->entity_guid);
 	system_message(elgg_echo("tidypics:phototagging:delete:success"));
 	echo elgg_view('photos/tagging/tags_string', array('entity_guid' => $annotation->entity_guid));
 } else {

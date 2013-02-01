@@ -21,7 +21,7 @@ $english = array(
 	'photos:mine' => 'My Photos',
 	'photos:group' => "Group photos",
 	'photos:owner' => '%s\'s photos',
-	'photos:none' => 'No photos',
+	'photos:none' => 'No photos, why not add some?',
 	
 	'album' => "Photo Album",
 	'album:slideshow' => "Slideshow",
@@ -31,7 +31,7 @@ $english = array(
 	'albums:allsite' => "All site photo albums",
 	'albums:owner' => '%s\'s photo albums',
 	'albums:friends' => "Your friends' photo albums",
-	'albums:none' => 'No photo albums',
+	'albums:none' => 'No photo albums, why not add some?',
 	
 	'tidypics:disabled' => 'Disabled',
 	'tidypics:enabled' => 'Enabled',
@@ -77,6 +77,7 @@ $english = array(
 	'tidypics:no_description' => 'No Description',
 	'tidypics:taggedinphoto' => 'Tagged in this photo: ',
 	'tidypics:inalbum' => 'Album: ',
+	'tidypics:owner' => 'Owner',
 
 	// upload labels
 	'tidypics:upload' => 'Upload',
@@ -221,6 +222,7 @@ a photo) and enter it below.',
 	'tidypics:taginstruct' => 'Select the area that you want to tag',
 	'tidypics:finish_tagging' => 'Cancel',
 	'tidypics:tagthisphoto' => 'Tag this photo',
+	'tidypics:peopletag' => 'People Tag',
 	'tidypics:tag' => 'Tag',
 	'tidypics:actiontag' => 'Tag a person',
 	'tidypics:actioncancel' => 'Cancel',

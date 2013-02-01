@@ -12,6 +12,7 @@ $tab_content = elgg_extract('content', $vars);
 $title = elgg_extract('title', $vars);
 $sidebar = elgg_view('page/elements/sidebar', $vars);
 $breadcrumbs = elgg_view('navigation/breadcrumbs');
+$container_guid = elgg_extract('container_guid', $vars);
 
 $content = <<<HTML
 	<span id='_tp-content-tab-page-title' class='hidden'>$title</span>
@@ -23,4 +24,4 @@ $content = <<<HTML
 	</span>
 HTML;
 
-echo $content . $tab_content;
+echo $content . $menu . $tab_content;

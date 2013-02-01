@@ -36,9 +36,15 @@ if ($enable_upload && !$offset) {
 	$upload_content = elgg_view('input/photo_upload',$upload_params);
 }
 
+if (!$items) {
+	// No results!
+	$none = elgg_view_module('tidypics-image', '', elgg_echo('albums:none'), array('class' => 'tidypics-none'));
+}
+
 $content = <<<HTML
 	<div class='tidypics-albums-list-container' id='_tp-infinite-list-container'>
 		$upload_content
+		$none
 		$albums_content
 	</div>
 HTML;

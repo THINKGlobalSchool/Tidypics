@@ -189,6 +189,19 @@ div.tidypics-photos-list-container > div.elgg-module-tidypics-upload {
 	padding: 0 10px;
 }
 
+div.tidypics-none {
+	width: auto;
+}
+
+div.tidypics-none > div{
+	border: 5px solid #EEEEEE;
+    color: #999999;
+    font-weight: bold;
+    height: 152px;
+    line-height: 151px;
+    width: 510px;
+}
+
 /* ***************************************
 	Upload
 *************************************** */
@@ -338,6 +351,28 @@ select.tidypics-upload-select-existing-album {
 .elgg-menu-item-album-access-label {
 	color: #555555;
 	font-weight: bold;
+}
+
+/* ***************************************
+	Photo listing filter menu
+*************************************** */
+
+.elgg-menu-photos-listing-filter {
+	border-bottom: 1px dotted #CCC;
+	padding-bottom: 5px;
+}
+
+.elgg-menu-photos-listing-filter li label {
+	font-size: 85%;
+    margin-right: 5px;
+    margin-left: 5px;
+    text-transform: uppercase;
+}
+
+.elgg-menu-photos-listing-filter li input {
+	font-size: 85%;
+	height: 22px;
+	width: 135px;
 }
 
 /* ***************************************

@@ -54,7 +54,16 @@ function tidypics_get_list_content($type, $page_type, $container_guid = NULL) {
 		$content = tidypics_view_photo_list($options);
  	}
 
-	$params['content'] = $content;
+ 	$params['container_guid'] = $container_guid;
+
+ 	$params['content'] .= elgg_view_menu('photos-listing-filter', array(
+		'class' => 'elgg-menu-hz',
+		'sort_by' => 'priority',
+		'container_guid' => $container_guid,
+		'type' => $type,
+	));
+
+	$params['content'] .= $content;
 
 	return $params;
 }
@@ -368,13 +377,15 @@ function tidypics_view_album_list(array $options = array()) {
 
 	$options = array_merge($defaults, (array)$options);
 
+	$options = tidypics_get_filter_options($options);
+
 	$options['count'] = TRUE;
 
-	$count = elgg_get_entities($options);
+	$count = elgg_get_entities_from_relationship($options);
 
 	unset($options['count']);
 
-	$albums = elgg_get_entities($options);
+	$albums = elgg_get_entities_from_relationship($options);
 
 	$options['items'] = $albums;
 	$options['count'] = $count;
@@ -409,15 +420,53 @@ function tidypics_view_photo_list(array $options = array()) {
 		elgg_push_context('tidypics_view_album');
 	} else {
 		$options['count'] = TRUE;
-		$count = elgg_get_entities($options);
+
+		$options = tidypics_get_filter_options($options);
+
+		$count = elgg_get_entities_from_relationship($options);
 		unset($options['count']);
-		$photos = elgg_get_entities($options);
+		$photos = elgg_get_entities_from_relationship($options);
 	}
 
 	$options['items'] = $photos;
 	$options['count'] = $count;
 
 	return elgg_view('photos/photo_list', $options);
+}
+
+/**
+ * Get additonal filter options for album/photo lists
+ * 
+ * @param array $options Initial options
+ * @return array 
+ */
+function tidypics_get_filter_options($options) {
+	$filter_options = array();
+
+	if ($tag = get_input('tag')) {
+		$filter_options['metadata_name_value_pairs'][] = array(
+			'name' => 'tags', 
+			'value' => $tag
+		);
+	}
+
+	if ($owner = get_input('owner')) {
+		$user = get_user_by_username($owner);
+		$filter_options['owner_guid'] = $user->guid;
+	}
+
+	if ($people_tag = get_input('people_tag')) {
+		$user = get_user_by_username($people_tag);
+
+		$filter_options['relationship'] = 'phototag';
+		$filter_options['relationship_guid'] = $user->guid;
+		$filter_options['inverse_relationship'] = FALSE;
+	}
+
+	// Let other plugins modify/provide more filter options
+	$filter_options = elgg_trigger_plugin_hook('listing_filter_options', 'tidypics', NULL, $filter_options);
+
+	return array_merge($options, $filter_options);
 }
 
 /**

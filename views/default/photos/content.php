@@ -14,6 +14,7 @@ $script = <<<JAVASCRIPT
 <script type='text/javascript'>
 	tidypics_init_content = function() {
 		elgg.tidypics.loadTabContent(window.location.href);
+		history.pushState({from: 'contentLoad'}, null, window.location.href);
 
 		// Implement popstate
 		window.addEventListener("popstate", function(e) {
