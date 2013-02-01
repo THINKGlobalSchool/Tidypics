@@ -357,19 +357,27 @@ select.tidypics-upload-select-existing-album {
 	Photo listing filter menu
 *************************************** */
 
-.elgg-menu-photos-listing-filter {
-	border-bottom: 1px dotted #CCC;
+.elgg-menu-photos-listing-filter,
+.elgg-menu-photos-listing-sort {
 	padding-bottom: 5px;
+	border-bottom: 1px dotted #CCC;
 }
 
-.elgg-menu-photos-listing-filter li label {
+.elgg-menu-photos-listing-sort {
+	text-align: center;
+	padding-top: 5px;
+}
+
+.elgg-menu-photos-listing-filter li label,
+.elgg-menu-photos-listing-sort li label {
 	font-size: 85%;
     margin-right: 5px;
     margin-left: 5px;
     text-transform: uppercase;
 }
 
-.elgg-menu-photos-listing-filter li input {
+.elgg-menu-photos-listing-filter li input,
+.elgg-menu-photos-listing-sort li input {
 	font-size: 85%;
 	height: 22px;
 	width: 135px;
@@ -475,7 +483,7 @@ select.tidypics-upload-select-existing-album {
 	color: #666666;
 }
 
-.tidypics-lightbox-container .tidypics-lightbox-middle .tidypics-lightbox-sidebar .tidypics-lightbox-people-tags-container {
+.tidypics-lightbox-container .tidypics-lightbox-middle .tidypics-lightbox-sidebar .tidypics-lightbox-other {
 	margin: 10px;
 	color: #666666;
 }

@@ -63,6 +63,13 @@ function tidypics_get_list_content($type, $page_type, $container_guid = NULL) {
 		'type' => $type,
 	));
 
+	 $params['content'] .= elgg_view_menu('photos-listing-sort', array(
+		'class' => 'elgg-menu-hz',
+		'sort_by' => 'priority',
+		'container_guid' => $container_guid,
+		'type' => $type,
+	));
+
 	$params['content'] .= $content;
 
 	return $params;
@@ -443,6 +450,7 @@ function tidypics_view_photo_list(array $options = array()) {
 function tidypics_get_filter_options($options) {
 	$filter_options = array();
 
+	// Get tag input, if any
 	if ($tag = get_input('tag')) {
 		$filter_options['metadata_name_value_pairs'][] = array(
 			'name' => 'tags', 
@@ -450,11 +458,13 @@ function tidypics_get_filter_options($options) {
 		);
 	}
 
+	// Get owner input, if any
 	if ($owner = get_input('owner')) {
 		$user = get_user_by_username($owner);
 		$filter_options['owner_guid'] = $user->guid;
 	}
 
+	// Get people tag input, if any
 	if ($people_tag = get_input('people_tag')) {
 		$user = get_user_by_username($people_tag);
 
@@ -462,6 +472,55 @@ function tidypics_get_filter_options($options) {
 		$filter_options['relationship_guid'] = $user->guid;
 		$filter_options['inverse_relationship'] = FALSE;
 	}
+
+	// Set up order by, default is date
+	$order_by = get_input('order_by', 'date');
+
+	// Get db prefix for query customization
+	$db_prefix = elgg_get_config('dbprefix');
+
+	// Set up 
+	switch ($order_by) {
+		case 'date':
+		default:
+			// Order by date
+			$filter_options['order_by'] = "e.time_created";
+			break;
+		case 'views':
+			// Order by # views
+			$name_id = get_metastring_id('tp_view');
+			$filter_options['selects'][] = "count(ms_views.string) as view_sum";
+			$filter_options['joins'][] = "JOIN {$db_prefix}annotations a_views on a_views.entity_guid = e.guid";
+			$filter_options['joins'][] = "JOIN {$db_prefix}metastrings ms_views on a_views.value_id = ms_views.id";
+			$filter_options['wheres'][] = "a_views.name_id = '{$name_id}'";
+			$filter_options['order_by'] = 'view_sum';
+			$filter_options['group_by'] = 'e.guid';
+			break;
+		case 'recentcomments':
+			// Order by recently commented
+			$filter_options['selects'][] = "MAX(a_recent.time_created) as comment_time_created";
+			$filter_options['joins'][] = "JOIN {$db_prefix}annotations a_recent on a_recent.entity_guid = e.guid";
+			$filter_options['joins'][] = "JOIN {$db_prefix}metastrings ms_recent on ms_recent.id = a_recent.name_id";
+			$filter_options['wheres'][] = "ms_recent.string = 'generic_comment'";
+			$filter_options['order_by'] = "comment_time_created";
+			$filter_options['group_by'] = "e.guid";
+			break;
+		case 'numcomments':
+			// Order by number of comments
+			$filter_options['selects'][] = "count(ms_comments.string) as comment_sum";
+			$filter_options['joins'][] = "JOIN {$db_prefix}annotations a_comments on a_comments.entity_guid = e.guid";
+			$filter_options['joins'][] = "JOIN {$db_prefix}metastrings ms_comments on ms_comments.id = a_comments.name_id";
+			$filter_options['wheres'][] = "ms_comments.string = 'generic_comment'";
+			$filter_options['order_by'] = "comment_sum";
+			$filter_options['group_by'] = "e.guid";
+			break;
+	}
+
+	// Get sort order input
+	$sort_order = get_input('sort_order', 'desc');
+
+	// Set sort order
+	$filter_options['order_by'] .= " $sort_order";	
 
 	// Let other plugins modify/provide more filter options
 	$filter_options = elgg_trigger_plugin_hook('listing_filter_options', 'tidypics', NULL, $filter_options);

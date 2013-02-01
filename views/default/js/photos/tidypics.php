@@ -210,7 +210,7 @@ elgg.tidypics.initInfiniteScroll = function() {
 	}, opts);
 }
 
-// Init Filter options in photo/album listings
+// Init filter options in photo/album listings
 elgg.tidypics.initListingFilters = function() {
 	// Let plugins perform any extra init tasks
 	var params = {};
@@ -239,14 +239,37 @@ elgg.tidypics.initListingFilters = function() {
 			},
 		});
 	});
+
+	// init order by input
+	$('select#tidypics-list-order-input').change(function(event) {
+		elgg.tidypics.filterListings();
+		event.preventDefault();
+	});
+
+	// init sort order link
+	$('li.elgg-menu-item-tidypics-list-sort-order a').click(function(event) {
+		$(this).data('current_value', $(this).data('sort_order'));
+		elgg.tidypics.filterListings();
+		event.preventDefault();
+	});
 }
 
 // Load new content based on supplied filters
 elgg.tidypics.filterListings = function() {
 	var params = {};
+
+	// Get filtering values
 	$('.elgg-menu-photos-listing-filter input, .elgg-menu-photos-listing-filter select').each(function() {
 		params[$(this).attr('name')] = $(this).val();
 	});
+
+	// Get ordering values
+	$('.elgg-menu-photos-listing-sort input, .elgg-menu-photos-listing-sort select').each(function() {
+		params[$(this).attr('name')] = $(this).val();
+	});
+
+	// Get sort order value
+	params['sort_order'] = $('li.elgg-menu-item-tidypics-list-sort-order a').data('current_value');
 
 	var query_string = $.param(params);
 

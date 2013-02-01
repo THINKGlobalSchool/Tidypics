@@ -9,6 +9,8 @@
 //<script>
 elgg.provide('elgg.tidypics.lightbox');
 
+elgg.tidypics.lightbox.events_initted = false;
+
 // General init
 elgg.tidypics.lightbox.init = function() {
 	// Init fancybox2 lightbox
@@ -16,23 +18,13 @@ elgg.tidypics.lightbox.init = function() {
 		$(".tidypics-lightbox").attr('rel', 'tidypics-lightbox').fancybox2(elgg.tidypics.lightbox.getFancyboxInit(null));
 	}
 
-	// Bind click handler for ajax comments
-	$(document).delegate('form.elgg-form-comments-add input[type=submit]', 'click', elgg.tidypics.lightbox.submitCommentClick);
-
-	// Unbind elgg confirmation from delete links
-	$('.elgg-requires-confirmation').die('click');
-
-	// Bind click handler for ajax comment delete
-	$(document).delegate('div.tidypics-lightbox-comments-container .elgg-menu-item-delete a', 'click', elgg.tidypics.lightbox.deleteCommentClick);
-
-	// Bind lightbox close
-	$(document).delegate('a.tidypics-lightbox-close', 'click', function(event) {
-		$.fancybox2.close();
-		event.preventDefault();
-	});
-
-	// Ajaxify likes in lightboxes
-	$(document).delegate('body.fancybox2-lock li.elgg-menu-item-likes a', 'click', elgg.tidypics.lightbox.likeClick);
+	// If first init, init events
+	if (!elgg.tidypics.lightbox.events_initted) {
+		// Init general events
+		elgg.tidypics.lightbox.initEvents();
+		
+		elgg.tidypics.lightbox.events_initted = true;
+	}
 }
 
 // Get custom fancybox init
@@ -211,6 +203,26 @@ elgg.tidypics.lightbox.getFancyboxInit = function(href) {
 		}
 	}
 	return fancyboxInit;
+}
+
+elgg.tidypics.lightbox.initEvents = function() {
+	// Unbind elgg confirmation from delete links
+	$('.elgg-requires-confirmation').die('click');
+
+	// Bind click handler for ajax comments
+	$(document).delegate('form.elgg-form-comments-add input[type=submit]', 'click', elgg.tidypics.lightbox.submitCommentClick);
+
+	// Bind click handler for ajax comment delete
+	$(document).delegate('div.tidypics-lightbox-comments-container .elgg-menu-item-delete a', 'click', elgg.tidypics.lightbox.deleteCommentClick);
+
+	// Bind lightbox close
+	$(document).delegate('a.tidypics-lightbox-close', 'click', function(event) {
+		$.fancybox2.close();
+		event.preventDefault();
+	});
+
+	// Ajaxify likes in lightboxes
+	$(document).delegate('body.fancybox2-lock li.elgg-menu-item-likes a', 'click', elgg.tidypics.lightbox.likeClick);
 }
 
 // Lightbox comments click handler
@@ -452,15 +464,15 @@ elgg.tidypics.lightbox.likeClick = function(event) {
 
 // Hook handler for added people tag
 elgg.tidypics.lightbox.peopleTagAdded = function(hook, type, params, value) {
-	if ($('.tidypics-tagging-container').length) {
+	if ($('._tp-tagging-container').length) {
 		var tags_href = elgg.get_site_url() + 'ajax/view/photos/tagging/tags?entity_guid=' + params.guid;
-		$('.tidypics-tagging-container').load(tags_href, function() {
+		$('._tp-tagging-container').load(tags_href, function() {
 			elgg.tidypics.tagging.destroy();
 			elgg.tidypics.tagging.init();
 		});
 
 		// Update tag string
-		$('.tidypics-lightbox-people-tags-container').html(params.output);
+		$('._tp-people-tags-container').html(params.output);
 		return false;
 	}
 	return value;
@@ -468,9 +480,9 @@ elgg.tidypics.lightbox.peopleTagAdded = function(hook, type, params, value) {
 
 // Hook handler for removed people tag
 elgg.tidypics.lightbox.peopleTagRemoved = function(hook, type, params, value) {
-	if ($('.tidypics-lightbox-people-tags-container').length) {
+	if ($('._tp-people-tags-container').length) {
 		// Update tag string
-		$('.tidypics-lightbox-people-tags-container').html(params.output);
+		$('._tp-people-tags-container').html(params.output);
 		return false;
 	}
 	return value;

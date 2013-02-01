@@ -131,6 +131,12 @@ $close_lightbox = elgg_view('output/url', array(
 	'class' => 'tidypics-lightbox-close',
 ));
 
+// Views
+if (elgg_get_plugin_setting('view_count', 'tidypics')) {
+	$view_info = $photo->getViewInfo();
+	$views_text = elgg_echo('tidypics:numviews', array((int)$view_info['total']));
+}
+
 // Build content
 $content = <<<HTML
 	<div class='tidypics-lightbox-container'>
@@ -146,7 +152,7 @@ $content = <<<HTML
 					$img
 					$people_tag_help
 					$people_tag_select
-					<div class='tidypics-tagging-container'>
+					<div class='_tp-tagging-container'>
 						$people_tags
 					</div>
 				</div>
@@ -168,8 +174,11 @@ $content = <<<HTML
 						$save_link $cancel_link
 					</div>
 					$edit_description_input
-					<div class='tidypics-lightbox-people-tags-container'>
+					<div class='tidypics-lightbox-other _tp-people-tags-container'>
 						$people_tags_string
+					</div>
+					<div class='tidypics-lightbox-other'>
+						$views_text
 					</div>
 					<div class='tidypics-lightbox-comments-container'>
 						$comments

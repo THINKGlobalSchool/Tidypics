@@ -74,6 +74,8 @@ echo elgg_view('object/elements/full', array(
 	'body' => $body,
 ));
 
+echo elgg_view_comments($album);
+
 $js = <<<JAVASCRIPT
 <script type='text/javascript'>
 	$(document).ready(function() {

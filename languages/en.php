@@ -46,7 +46,7 @@ $english = array(
 	// General labels
 	'tidypics:enablephotos' => 'Enable group photo albums',
 	'tidypics:mostrecent' => 'Most recent images',
-	'tidypics:views' => "%s views",
+	'tidypics:numviews' => "%s views",
 	'tidypics:administration' => 'Tidypics Administration',
 	'tidypics:stats' => 'Stats',
 	'tidypics:upgrade' => 'Upgrade',
@@ -57,6 +57,14 @@ $english = array(
 	'tidypics:taggedinphoto' => 'Tagged in this photo: ',
 	'tidypics:inalbum' => 'Album: ',
 	'tidypics:owner' => 'Owner',
+	'tidypics:order' => 'Order By',
+	'tidypics:date' => 'Date Added',
+	'tidypics:views' => 'Views',
+	'tidypics:recentcomments' => 'Recent Comments',
+	'tidypics:numcomments' => 'Total Comments',
+	'tidypics:asc' => 'Sort Ascending ▲',
+	'tidypics:desc' => 'Sort Descending ▼',
+
 
 	// upload labels
 	'tidypics:upload' => 'Upload',

@@ -95,7 +95,10 @@ function tidypics_init() {
 	elgg_register_plugin_hook_handler('register', 'menu:entity', 'tidypics_entity_menu_setup');
 
 	// Register items for photo list filter
-	elgg_register_plugin_hook_handler('register', 'menu:photos-listing-filter', 'tidypics_photo_list_menu_setup');
+	elgg_register_plugin_hook_handler('register', 'menu:photos-listing-filter', 'tidypics_photo_list_filter_menu_setup');
+
+	// Register items for photo list sort
+	elgg_register_plugin_hook_handler('register', 'menu:photos-listing-sort', 'tidypics_photo_list_sort_menu_setup');
 
 	// Register group option
 	add_group_tool_option('photos', elgg_echo('tidypics:enablephotos'), true);
@@ -381,18 +384,6 @@ function tidypics_entity_menu_setup($hook, $type, $return, $params) {
 			$return[] = ElggMenuItem::factory($options);
 		}
 
-		if (elgg_get_plugin_setting('view_count', 'tidypics')) {
-			$view_info = $entity->getViewInfo();
-			$text = elgg_echo('tidypics:views', array((int)$view_info['total']));
-			$options = array(
-				'name' => 'views',
-				'text' => "<span>$text</span>",
-				'href' => false,
-				'priority' => 90,
-			);
-			$return[] = ElggMenuItem::factory($options);
-		}
-
 		if (elgg_get_plugin_setting('tagging', 'tidypics')) {
 			$options = array(
 				'name' => 'tagging',
@@ -439,7 +430,7 @@ function tidypics_entity_menu_setup($hook, $type, $return, $params) {
 /**
  * Set up photo listing filter menu
  */
-function tidypics_photo_list_menu_setup($hook, $type, $return, $params) {
+function tidypics_photo_list_filter_menu_setup($hook, $type, $return, $params) {
 	$container_guid = $params['container_guid'];
 	$type = $params['type'];
 
@@ -526,6 +517,67 @@ function tidypics_photo_list_menu_setup($hook, $type, $return, $params) {
 		);
 		$return[] = ElggMenuItem::factory($options);
 	}
+
+	return $return;
+}
+
+/**
+ * Set up photo listing filter menu
+ */
+function tidypics_photo_list_sort_menu_setup($hook, $type, $return, $params) {
+	$container_guid = $params['container_guid'];
+	$type = $params['type'];
+
+	$logged_in = elgg_get_logged_in_user_guid();
+
+	$order_label = elgg_echo('tidypics:order');
+
+	$options =  array(
+		'date' => elgg_echo('tidypics:date'),
+		'recentcomments' => elgg_echo('tidypics:recentcomments'),
+		'numcomments' => elgg_echo('tidypics:numcomments'),
+	);
+
+	if ($type != 'albums') {
+		$options['views'] = elgg_echo('tidypics:views');
+	}
+
+	$order_input = elgg_view('input/dropdown', array(
+		'id' => 'tidypics-list-order-input',
+		'name' => 'order_by',
+		'value' => get_input('order_by'),
+		'options_values' => $options,
+	));
+
+	// Order by label
+	$options = array(
+		'name' => 'tidypics-list-order-label',
+		'text' => "<label>{$order_label}:</label>",
+		'href' => false,
+		'priority' => 100,
+	);
+	$return[] = ElggMenuItem::factory($options);
+
+	// Order by input
+	$options = array(
+		'name' => 'tidypics-list-order-input',
+		'text' => $order_input,
+		'href' => false,
+		'priority' => 101,
+	);
+	$return[] = ElggMenuItem::factory($options);
+
+	// Sort order input
+	$sort_order  = get_input('sort_order', 'desc'); // Get sort order, default is desc
+	$options = array(
+		'data-sort_order' => $sort_order == 'asc' ? 'desc' : 'asc' ,
+		'data-current_value' => $sort_order,
+		'name' => 'tidypics-list-sort-order',
+		'text' => "<label>" . ($sort_order == 'asc' ? elgg_echo('tidypics:desc') : elgg_echo('tidypics:asc')) . "</label>",
+		'href' => '#',
+		'priority' => 200,
+	);
+	$return[] = ElggMenuItem::factory($options);
 
 	return $return;
 }
