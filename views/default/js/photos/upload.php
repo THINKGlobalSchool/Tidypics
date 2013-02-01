@@ -54,6 +54,7 @@ elgg.tidypics.upload.init = function() {
 	}
 }
 
+// Init upload events
 elgg.tidypics.upload.initEvents = function(hook, type, params, options) {
 	/** SET UP EVENTS FOR UPLOADER FORM **/
 	// Get uploader container
@@ -109,6 +110,7 @@ elgg.tidypics.upload.initEvents = function(hook, type, params, options) {
 		event.preventDefault();
 	});
 
+	// Finish uploading button
 	$upload_container.delegate('input[name="_tp-upload-finish"]', 'click', function(event) {
 		window.location = window.location.href;
 		event.preventDefault();

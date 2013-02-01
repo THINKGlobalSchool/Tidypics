@@ -7,10 +7,7 @@
  *
  * @todo
  * - River entries/annotating (handler 'batch' comments etc)
- * - Clean languages
  * - Upgrades need to stay.. need to check against our old fork
- * - Fix plugin ordering issue (jquery file upload)
- * - Add more documentation (JS mostly)
  * - What to do with sidebar: Put back latest comments/tag cloud?
  */
 
@@ -69,10 +66,10 @@ function tidypics_init() {
 	elgg_register_js('jquery-waypoints', $js);
 
 	// Register jquery-file-upload js lib
-	$js = elgg_get_simplecache_url('js', 'jquery_file_upload');
-	elgg_register_simplecache_view('js/jquery_file_upload');
-	elgg_register_js('jquery-file-upload', $js);
-	elgg_load_js('jquery-file-upload');
+	$js = elgg_get_simplecache_url('js', 'photos/jquery_file_upload');
+	elgg_register_simplecache_view('js/photos/jquery_file_upload');
+	elgg_register_js('tp-jquery-file-upload', $js);
+	elgg_load_js('tp-jquery-file-upload');
 
 	// Register jquery-fancybox2 js lib
 	$js = elgg_get_simplecache_url('js', 'fancybox2');

@@ -10,6 +10,7 @@
 //<script>
 elgg.provide('elgg.tidypics');
 
+// General tidypics init
 elgg.tidypics.init = function() {
 	// @todo move sort stuff
 	$("#tidypics-sort").sortable({
@@ -30,6 +31,7 @@ elgg.tidypics.init = function() {
 	elgg.tidypics.initFilterLinks();
 };
 
+// Init history for photos filter links
 elgg.tidypics.initFilterLinks = function() {
 	// Filter items
 	$('ul.elgg-menu-photos-filter > li').each(function() {
@@ -37,6 +39,7 @@ elgg.tidypics.initFilterLinks = function() {
 	});
 }
 
+// Init history for breadcrumb links
 elgg.tidypics.initBreadcrumbLinks = function() {
 	// Breadcrumb items
 	$('ul.elgg-menu.elgg-breadcrumbs > li').each(function() {
@@ -44,6 +47,7 @@ elgg.tidypics.initBreadcrumbLinks = function() {
 	});
 }
 
+// Init history pushstate for given link
 elgg.tidypics.initHistoryLink = function($parent) {
 	$parent.delegate('a', 'click', function(event) {
 		history.pushState({from: 'navigation'}, null, $(this).attr('href'));
@@ -59,11 +63,14 @@ elgg.tidypics.initHistoryLink = function($parent) {
 	});
 }
 
+// Main content loading
 elgg.tidypics.loadTabContent = function(href) {
 	var $loading = $("<div id='_tp-content-loader' class='elgg-ajax-loader'></div>");
 
+	// Set ajax spinner
 	$('#tidypics-content-container').html($loading);
 
+	// Ajax get content at given href
 	elgg.get(href, {
 		data: {},
 		success: function(data) {
@@ -101,11 +108,13 @@ elgg.tidypics.loadTabContent = function(href) {
 	});
 }
 
+// Load content into sidebar
 elgg.tidypics.loadSidebarContent = function($data) {
 	$sidebar = $('div.elgg-layout.elgg-layout-one-sidebar > div.elgg-sidebar');
 	$sidebar.replaceWith($data.children());
 }
 
+// Load content into breadcrumbs
 elgg.tidypics.loadBreadcrumbsContent = function($data) {
 	$breadcrumbs = $('div.elgg-main.elgg-body > ul.elgg-menu.elgg-breadcrumbs');
 	$breadcrumbs.replaceWith($data.children());
@@ -114,6 +123,7 @@ elgg.tidypics.loadBreadcrumbsContent = function($data) {
 	elgg.tidypics.initBreadcrumbLinks();
 }
 
+// Set page title
 elgg.tidypics.setPageTitles = function(title) {
 	// Set document title
 	document.title = elgg.config.sitename + ": " + title;
@@ -122,16 +132,18 @@ elgg.tidypics.setPageTitles = function(title) {
 	$('div.elgg-head > h2.elgg-heading-main').html(title);
 }
 
+// History popstate event
 elgg.tidypics.popState = function(event) {
 	// Fix chrome/safari page load popstate (need to supply a state in each pushState for this to work)
 	if (!event.state) {
 		return;
 	}
 
+	// If going back/forward to an image lightbox, call the lightbox jumpto event
 	if (location.href.indexOf('photos/image/') !== -1) {
 		if (event.state) {
 			$.fancybox2.jumpto(event.state.index);
-			elgg.tidypics.doPushState = false;
+			elgg.tidypics.doPushState = false; // @todo 
 		}
 	} else {
 		// Close fancybox if it's open, don't reload content
@@ -139,40 +151,55 @@ elgg.tidypics.popState = function(event) {
 			$.fancybox2.close();
 			return;
 		}
+		// Load content at location
 		elgg.tidypics.loadTabContent(location.href);
+
 		// Select the proper tab
 		$('ul.elgg-menu-photos-filter > li').removeClass('elgg-state-selected');
 		$('a[href="' + location.href + '"]').parent().addClass('elgg-state-selected');
 	}
 }
 
+// Init infinite scrolling with waypoint JS
 elgg.tidypics.initInfiniteScroll = function() {
+	// Ajax spinner
 	var $loading = $("<div id='_tp-waypoint-loader' class='elgg-ajax-loader'></div>"),
 
+	// Get the waypoint container
 	$infinite_waypoint = $('#_tp-waypoint-container');
 	opts = {
 		offset: '100%'
 	};
 	
+	// Bind waypoint
 	$infinite_waypoint.waypoint(function(event, direction) {
+		// Unbind waypoint
 		$infinite_waypoint.waypoint('remove');
+
+		// Show ajax spinner
 		$infinite_waypoint.append($loading);
 
+		// Get more content!
 		elgg.get($('._tp-waypoint-more').attr('href'), {
 			data: {},
 			success: function(data) {
 				var $data = $(data);
 
+				// Append new content
 				$('#_tp-infinite-list-container').append($data.filter('#_tp-infinite-list-container').html());
 
+				// Remove spinner
 				$loading.detach();
 
+				// Replace the next more link new content
 				$('._tp-waypoint-more').replaceWith($data.filter('#_tp-waypoint-container').find('._tp-waypoint-more'));
 
+				// Re-init waypoint
 				if ($data.filter('#_tp-waypoint-container').length) {
 					$infinite_waypoint.waypoint(opts);
 				}
 
+				// Trigger a hook for extra tasks
 				elgg.trigger_hook('infiniteWayPointLoaded', 'tidypics', null, null)
 			}, 
 			error: function(xhr, ajaxOptions, thrownError) {
@@ -183,6 +210,7 @@ elgg.tidypics.initInfiniteScroll = function() {
 	}, opts);
 }
 
+// Init Filter options in photo/album listings
 elgg.tidypics.initListingFilters = function() {
 	// Let plugins perform any extra init tasks
 	var params = {};
@@ -213,6 +241,7 @@ elgg.tidypics.initListingFilters = function() {
 	});
 }
 
+// Load new content based on supplied filters
 elgg.tidypics.filterListings = function() {
 	var params = {};
 	$('.elgg-menu-photos-listing-filter input, .elgg-menu-photos-listing-filter select').each(function() {

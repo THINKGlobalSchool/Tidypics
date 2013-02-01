@@ -9,12 +9,12 @@
 //<script>
 elgg.provide('elgg.tidypics.lightbox');
 
+// General init
 elgg.tidypics.lightbox.init = function() {
 	// Init fancybox2 lightbox
 	if ($(".tidypics-lightbox").length) {
 		$(".tidypics-lightbox").attr('rel', 'tidypics-lightbox').fancybox2(elgg.tidypics.lightbox.getFancyboxInit(null));
 	}
-
 
 	// Bind click handler for ajax comments
 	$(document).delegate('form.elgg-form-comments-add input[type=submit]', 'click', elgg.tidypics.lightbox.submitCommentClick);
@@ -35,6 +35,7 @@ elgg.tidypics.lightbox.init = function() {
 	$(document).delegate('body.fancybox2-lock li.elgg-menu-item-likes a', 'click', elgg.tidypics.lightbox.likeClick);
 }
 
+// Get custom fancybox init
 elgg.tidypics.lightbox.getFancyboxInit = function(href) {
 	var tagging = false;
 
@@ -346,6 +347,7 @@ elgg.tidypics.lightbox.pushComment = function(content) {
 	$new_comment.slideDown();
 }
 
+// Click handler for inline lightbox editing
 elgg.tidypics.lightbox.inlineEditClick = function(event) {
 	// Hide edit link for now
 	$(this).css('visibility', 'hidden');
@@ -386,6 +388,7 @@ elgg.tidypics.lightbox.inlineEditClick = function(event) {
 	$cancel.show();
 	$content.hide();
 
+	// Reset all inline edit inputs
 	var resetInlineEdit = function() {
 		$_edit.css('visibility', 'visible');
 		$save.removeAttr('disabled');
@@ -425,6 +428,7 @@ elgg.tidypics.lightbox.inlineEditClick = function(event) {
 		}
 	})
 
+	// Cancel click, so reset
 	$cancel.bind('click', function(event) {
 		resetInlineEdit();
 	});
@@ -446,6 +450,7 @@ elgg.tidypics.lightbox.likeClick = function(event) {
 	event.preventDefault();
 }
 
+// Hook handler for added people tag
 elgg.tidypics.lightbox.peopleTagAdded = function(hook, type, params, value) {
 	if ($('.tidypics-tagging-container').length) {
 		var tags_href = elgg.get_site_url() + 'ajax/view/photos/tagging/tags?entity_guid=' + params.guid;
@@ -461,6 +466,7 @@ elgg.tidypics.lightbox.peopleTagAdded = function(hook, type, params, value) {
 	return value;
 }
 
+// Hook handler for removed people tag
 elgg.tidypics.lightbox.peopleTagRemoved = function(hook, type, params, value) {
 	if ($('.tidypics-lightbox-people-tags-container').length) {
 		// Update tag string
@@ -488,6 +494,7 @@ elgg.tidypics.lightbox.removeTinyMCE = function() {
 	}	
 }
 
+// Register hooks
 elgg.register_hook_handler('init', 'system', elgg.tidypics.lightbox.init);
 elgg.register_hook_handler('loadTabContentComplete', 'tidypics', elgg.tidypics.lightbox.init);
 elgg.register_hook_handler('infiniteWayPointLoaded', 'tidypics', elgg.tidypics.lightbox.init);
