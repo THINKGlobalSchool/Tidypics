@@ -449,6 +449,17 @@ function tidypics_photo_list_filter_menu_setup($hook, $type, $return, $params) {
 		'value' => get_input('tag'),
 	));
 
+	$filter_label = elgg_echo('tidypics:filterby', array($type));
+
+	// Filter by label
+	$options = array(
+		'name' => 'photos-listing-filterby-label',
+		'text' => "<label>{$filter_label}</label>",
+		'href' => false,
+		'priority' => 1,
+	);
+	$return[] = ElggMenuItem::factory($options);
+
 	// Search by tag label
 	$options = array(
 		'name' => 'photos-listing-tag-label',

@@ -56,18 +56,10 @@ function tidypics_get_list_content($type, $page_type, $container_guid = NULL) {
 
  	$params['container_guid'] = $container_guid;
 
- 	$params['content'] .= elgg_view_menu('photos-listing-filter', array(
-		'class' => 'elgg-menu-hz',
-		'sort_by' => 'priority',
-		'container_guid' => $container_guid,
+ 	// Show listing menus
+ 	$params['content'] = elgg_view('photos/listing_menus', array(
 		'type' => $type,
-	));
-
-	 $params['content'] .= elgg_view_menu('photos-listing-sort', array(
-		'class' => 'elgg-menu-hz',
-		'sort_by' => 'priority',
 		'container_guid' => $container_guid,
-		'type' => $type,
 	));
 
 	$params['content'] .= $content;

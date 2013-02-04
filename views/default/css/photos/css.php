@@ -376,17 +376,22 @@ select.tidypics-upload-select-existing-album {
 
 .elgg-menu-photos-listing-filter li label,
 .elgg-menu-photos-listing-sort li label {
-	font-size: 85%;
+	font-size: 92%;
     margin-right: 5px;
     margin-left: 5px;
     text-transform: uppercase;
+    color: #555555;
 }
 
 .elgg-menu-photos-listing-filter li input,
 .elgg-menu-photos-listing-sort li input {
-	font-size: 85%;
-	height: 22px;
-	width: 135px;
+	font-size: 90%;
+	height: 24px;
+	width: 92px;
+}
+
+.elgg-menu-item-tidypics-list-sort-order a {
+	margin-bottom: 1px;
 }
 
 /* ***************************************

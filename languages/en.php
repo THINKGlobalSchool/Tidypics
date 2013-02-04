@@ -66,6 +66,7 @@ $english = array(
 	'tidypics:asc' => 'Sort Ascending ▲',
 	'tidypics:desc' => 'Sort Descending ▼',
 	'tidypics:loadmore' => 'Load More',
+	'tidypics:filterby' => 'Filter %s by',
 
 	// upload labels
 	'tidypics:upload' => 'Upload',
