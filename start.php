@@ -211,8 +211,13 @@ function tidypics_page_handler($page) {
 				break;
 			// Groups
 			case 'group':
+				if (isset($page[2]) && $page[2] == 'all') {
+					$type = 'photos';
+				} else {
+					$type = 'albums';
+				}
 				$group = elgg_get_page_owner_entity();
-				$params = tidypics_get_list_content('albums', 'owner', $group->guid);
+				$params = tidypics_get_list_content($type, 'owner', $group->guid);
 				break;
 			// Photos
 			case 'owner':
@@ -252,6 +257,7 @@ function tidypics_page_handler($page) {
     	elgg_load_js('elgg.tinymce');
     	elgg_load_js('elgg.autocomplete');
 		elgg_load_js('jquery.ui.autocomplete.html');
+		elgg_unregister_js('jQuery-File-Upload');
 
 		switch ($page_type) {
 			case 'album':
@@ -711,46 +717,69 @@ function tidypics_notify_message($hook, $type, $result, $params) {
  * @return bool
  */
 function tidypics_pagesetup($event, $type, $object) {
-	$user = elgg_get_logged_in_user_entity();
-
 	// Set up menu items for photos context
 	if (elgg_in_context('photos')) {
 
-		// All site photos filter item
-		$params = array(
-			'name' => 'allphotos',
-			'text' => elgg_echo('photos:all'),
-			'href' => 'photos/all',
-			'priority' => 100,
-		);
-		elgg_register_menu_item('photos-filter', $params);
+		$user = elgg_get_logged_in_user_entity();
 
-		// All site albums filter item
-		$params = array(
-			'name' => 'allalbums',
-			'text' => elgg_echo('albums:all'),
-			'href' => 'photos/albums/all',
-			'priority' => 200,
-		);
-		elgg_register_menu_item('photos-filter', $params);
+		$page_owner = elgg_get_page_owner_entity();
 
-		// My photos/albums only for logged in
-		if ($user) {
+		// Create non-group items
+		if (!elgg_instanceof($page_owner, 'group')) {
+			// All site photos filter item
+			$params = array(
+				'name' => 'allphotos',
+				'text' => elgg_echo('photos:all'),
+				'href' => 'photos/all',
+				'priority' => 100,
+			);
+			elgg_register_menu_item('photos-filter', $params);
+
+			// All site albums filter item
+			$params = array(
+				'name' => 'allalbums',
+				'text' => elgg_echo('albums:all'),
+				'href' => 'photos/albums/all',
+				'priority' => 200,
+			);
+			elgg_register_menu_item('photos-filter', $params);
+
+			// My photos/albums only for logged in
+			if ($user) {
+				// My photos filter item
+				$params = array(
+					'name' => 'myphotos',
+					'text' => elgg_echo('photos:mine'),
+					'href' => "photos/owner/{$user->username}",
+					'priority' => 300,
+				);
+				elgg_register_menu_item('photos-filter', $params);
+
+				// My albums filter item
+				$params = array(
+					'name' => 'myalbums',
+					'text' => elgg_echo('albums:mine'),
+					'href' => "photos/albums/owner/{$user->username}",
+					'priority' => 400,
+				);
+				elgg_register_menu_item('photos-filter', $params);
+			} 
+		} else {
 			// My photos filter item
 			$params = array(
-				'name' => 'myphotos',
-				'text' => elgg_echo('photos:mine'),
-				'href' => "photos/owner/{$user->username}",
-				'priority' => 300,
+				'name' => 'groupphotos',
+				'text' => elgg_echo('photos:group'),
+				'href' => "photos/group/{$page_owner->guid}/all",
+				'priority' => 100,
 			);
 			elgg_register_menu_item('photos-filter', $params);
 
 			// My albums filter item
 			$params = array(
-				'name' => 'myalbums',
-				'text' => elgg_echo('albums:mine'),
-				'href' => "photos/albums/owner/{$user->username}",
-				'priority' => 400,
+				'name' => 'groupalbums',
+				'text' => elgg_echo('albums:group'),
+				'href' => "photos/group/{$page_owner->guid}/albums/all",
+				'priority' => 200,
 			);
 			elgg_register_menu_item('photos-filter', $params);
 		}

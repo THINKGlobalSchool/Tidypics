@@ -47,8 +47,10 @@ if (!$items) {
 	$none = elgg_view_module('tidypics-image', '', elgg_echo('photos:none'), array('class' => 'tidypics-none'));
 }
 
+$id = $container_guid ? "_tp-load-more-container" : "_tp-infinite-list-container";
+
 $content = <<<HTML
-	<div class='tidypics-photos-list-container' id='_tp-infinite-list-container'>
+	<div class='tidypics-photos-list-container' id='$id'>
 		$upload_content
 		$none
 		$photos_content
@@ -63,5 +65,12 @@ echo $content;
 if (count($items) && $next_offset < $count) {
 	$next_offset = (int)$limit + (int)$offset;
 	$next_link = elgg_http_add_url_query_elements(current_page_url(), array('offset' => $next_offset));
-	echo "<div id='_tp-waypoint-container'><a class='_tp-waypoint-more' href='" . $next_link  . "'></a></div>";
+
+	// Only infinite scroll when not viewing an album
+	if (!$container_guid) {
+		echo "<div id='_tp-waypoint-container'><a class='_tp-waypoint-more' href='" . $next_link  . "'></a></div>";
+	} else {
+		$next_label = elgg_echo('tidypics:loadmore');
+		echo "<a class='_tp-load-more tidypics-load-more elgg-button elgg-button-action' href='{$next_link}'>{$next_label}</a>";
+	}
 }

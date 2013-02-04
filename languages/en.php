@@ -28,6 +28,7 @@ $english = array(
 	'albums' => "Photo Albums",
 	'albums:mine' => 'My Albums',
 	'albums:all' => 'All albums',
+	'albums:group' => "Group albums",
 	'albums:allsite' => "All site photo albums",
 	'albums:owner' => '%s\'s photo albums',
 	'albums:friends' => "Your friends' photo albums",
@@ -64,7 +65,7 @@ $english = array(
 	'tidypics:numcomments' => 'Total Comments',
 	'tidypics:asc' => 'Sort Ascending ▲',
 	'tidypics:desc' => 'Sort Descending ▼',
-
+	'tidypics:loadmore' => 'Load More',
 
 	// upload labels
 	'tidypics:upload' => 'Upload',

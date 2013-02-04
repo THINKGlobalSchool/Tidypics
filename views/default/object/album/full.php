@@ -82,8 +82,8 @@ $js = <<<JAVASCRIPT
 		var load_lightbox = $load_lightbox;
 
 		var tidypics_init_full_album = function() {
-			// Init infinite scroll
-			elgg.tidypics.initInfiniteScroll();
+			// Init load more
+			elgg.tidypics.initLoadMore();
 
 			// Implement popstate
 			window.addEventListener("popstate", function(e) {

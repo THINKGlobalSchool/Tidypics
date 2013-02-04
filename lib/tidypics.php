@@ -420,15 +420,27 @@ function tidypics_view_photo_list(array $options = array()) {
 
 	$options = array_merge($defaults, (array)$options);
 
+	// Get the container, if any
+	$container = get_entity($options['container_guid']);
+
 	// If we have an album container, get its sorted list of images
-	if ($options['container_guid'] && elgg_instanceof($album = get_entity($options['container_guid']), 'object', 'album')) {
-		$count = $album->getSize();
-		$photos = $album->getImages($options['limit'], $options['offset']);
+	if (elgg_instanceof($container, 'object', 'album')) {
+		$count = $container->getSize();
+		$photos = $container->getImages($options['limit'], $options['offset']);
 		elgg_push_context('tidypics_view_album');
 	} else {
 		$options['count'] = TRUE;
 
 		$options = tidypics_get_filter_options($options);
+
+		if (elgg_instanceof($container, 'group')) {
+			$dbprefix = elgg_get_config('dbprefix');
+			$cont = sanitise_int($options['container_guid']);
+			$options['joins'][] = "JOIN {$dbprefix}entities container_e on e.container_guid = container_e.guid";
+			$options['wheres'][] = "container_e.container_guid in ({$cont})";
+			unset($options['container_guid']);
+		}
+
 
 		$count = elgg_get_entities_from_relationship($options);
 		unset($options['count']);

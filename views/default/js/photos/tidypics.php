@@ -27,8 +27,6 @@ elgg.tidypics.init = function() {
 		});
 		$('input[name="guids"]').val(tidypics_guids.toString());
 	});
-
-	elgg.tidypics.initFilterLinks();
 };
 
 // Init history for photos filter links
@@ -100,6 +98,9 @@ elgg.tidypics.loadTabContent = function(href) {
 			};
 
 			elgg.trigger_hook('loadTabContentComplete', 'tidypics', params, null);
+
+			// Update filter menu
+			elgg.tidypics.loadFilterMenu($data.filter('#_tp-content-tab-filter'));
 		}, 
 		error: function(xhr, ajaxOptions, thrownError) {
 			console.log(xrh.status);
@@ -121,6 +122,13 @@ elgg.tidypics.loadBreadcrumbsContent = function($data) {
 
 	// Ajaxify breadcrumb links
 	elgg.tidypics.initBreadcrumbLinks();
+}
+
+// Load filter menu into sidebar
+elgg.tidypics.loadFilterMenu = function($data) {		
+	$filter = $('div.elgg-main.elgg-body > .elgg-menu-photos-filter');
+	$filter.replaceWith($data.children());
+	elgg.tidypics.initFilterLinks();
 }
 
 // Set page title
@@ -160,10 +168,45 @@ elgg.tidypics.popState = function(event) {
 	}
 }
 
+// Init load more button for albums
+elgg.tidypics.initLoadMore = function() { 
+	// Ajax spinner
+	var $loading = $("<div id='_tp-loader' class='elgg-ajax-loader'></div>");
+
+	$(document).delegate('._tp-load-more', 'click', function(event) {
+		event.preventDefault();
+
+		// Show ajax spinner
+		$(this).replaceWith($loading);
+
+		// Get more content!
+		elgg.get($(this).attr('href'), {
+			data: {},
+			success: function(data) {
+				var $data = $(data);
+
+				// Append new content
+				$('#_tp-load-more-container').append($data.filter('#_tp-load-more-container').html());
+
+				// Replace the next more link new content
+				$('#_tp-loader').replaceWith($data.filter('._tp-load-more'));
+
+				// Trigger a hook for extra tasks
+				elgg.trigger_hook('infiniteWayPointLoaded', 'tidypics', null, null)
+			}, 
+			error: function(xhr, ajaxOptions, thrownError) {
+				console.log(xrh.status);
+				console.log(thrownError);
+			}
+		});
+
+	});
+}
+
 // Init infinite scrolling with waypoint JS
 elgg.tidypics.initInfiniteScroll = function() {
 	// Ajax spinner
-	var $loading = $("<div id='_tp-waypoint-loader' class='elgg-ajax-loader'></div>"),
+	var $loading = $("<div id='_tp-waypoint-loader' class='elgg-ajax-loader'></div>");
 
 	// Get the waypoint container
 	$infinite_waypoint = $('#_tp-waypoint-container');

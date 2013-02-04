@@ -202,6 +202,12 @@ div.tidypics-none > div{
     width: 510px;
 }
 
+a.tidypics-load-more {
+	display: block;
+	margin-left: 9px;
+	width: 692px;
+}
+
 /* ***************************************
 	Upload
 *************************************** */

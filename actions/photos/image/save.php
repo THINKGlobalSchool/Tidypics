@@ -37,4 +37,5 @@ if (!$image->save()) {
 elgg_clear_sticky_form('tidypics');
 
 system_message(elgg_echo("image:saved"));
+
 forward($image->getURL());
