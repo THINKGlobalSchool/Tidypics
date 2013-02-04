@@ -79,13 +79,21 @@ if ($photo->canEdit()) {
 		'class' => 'elgg-button elgg-button-cancel _tp-cancel-inline hidden',
 	));
 
-	$photo_tags = "<span class='_tp-tags'>" . elgg_view('output/tags', array('tags' => $photo->tags)) . "</span>";
+	if (!$photo->tags) {
+		$photo_tags = "<span class='none'>No tags</span>";
+	} else {
+		$photo_tags =  elgg_view('output/tags', array('tags' => $photo->tags));
+	}
 
-	$tags = "<div class='tidypics-lightbox-photo-tags $edit_tags' data-field='tags'>$edit_overlay $photo_tags $edit_tags_input $save_link $cancel_link</div>";
+	$photo_tags_content = "<span class='_tp-tags'>{$photo_tags}</span>";
+
+	$tags = "<div class='tidypics-lightbox-photo-tags $edit_tags' data-field='tags'>$edit_overlay $photo_tags_content $edit_tags_input $save_link $cancel_link</div>";
 } else {
 	// Non-edit defaults
 	$tags = null;
 }
+
+
 
 // Photo summary/info
 $date = elgg_view_friendly_time($photo->time_created);
@@ -174,7 +182,7 @@ $content = <<<HTML
 						$save_link $cancel_link
 					</div>
 					$edit_description_input
-					<div class='tidypics-lightbox-other _tp-people-tags-container'>
+					<div class='_tp-people-tags-container'>
 						$people_tags_string
 					</div>
 					<div class='tidypics-lightbox-other'>

@@ -10,7 +10,6 @@
 $title = get_input('title');
 $description = get_input('description');
 $tags = get_input('tags');
-$access_id = get_input('access_id');
 $guid = get_input('guid');
 
 elgg_make_sticky_form('tidypics');
@@ -22,7 +21,9 @@ if (empty($title)) {
 
 $image = get_entity($guid);
 
-$image->access_id = $access_id;
+$album = $image->getContainerEntity();
+
+$image->access_id = $album->access_id;
 $image->title = $title;
 $image->description = $description;
 if ($tags) {

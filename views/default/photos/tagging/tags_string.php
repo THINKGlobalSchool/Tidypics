@@ -16,6 +16,7 @@ if ($vars['entity']) {
 if (elgg_instanceof($entity, 'object', 'image')) {
 	$tags = $entity->getPhotoTags(0);
 	if ($count = count($tags)) {
+		echo "<div class='tidypics-lightbox-other'>";
 		echo elgg_echo('tidypics:taggedinphoto');
 
 		foreach ($tags as $idx => $tag) {
@@ -37,5 +38,7 @@ if (elgg_instanceof($entity, 'object', 'image')) {
 				echo ', ';
 			}
 		}
+
+		echo "</div>";
 	}
 }

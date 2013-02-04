@@ -490,13 +490,15 @@ select.tidypics-upload-select-existing-album {
 	padding-bottom: 6px;
 }
 
-.tidypics-lightbox-container .tidypics-lightbox-middle .tidypics-lightbox-sidebar .tidypics-lightbox-photo-description .none {
+.tidypics-lightbox-container .tidypics-lightbox-middle .tidypics-lightbox-sidebar .none {
 	color: #666666;
 }
 
 .tidypics-lightbox-container .tidypics-lightbox-middle .tidypics-lightbox-sidebar .tidypics-lightbox-other {
 	margin: 10px;
 	color: #666666;
+	border-top: 1px solid #DDDDDD;
+	padding-top: 9px;
 }
 
 .tidypics-lightbox-container .tidypics-lightbox-footer {
