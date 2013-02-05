@@ -442,7 +442,7 @@ select.tidypics-upload-select-existing-album {
 
 .tidypics-lightbox-container .tidypics-lightbox-header .tidypics-lightbox-header-metadata {
 	float: right;
-    padding: 16px 20px 15px 15px;
+    padding: 16px 40px 15px 15px;
 }
 
 .tidypics-lightbox-container .tidypics-lightbox-header a.tidypics-lightbox-close {
@@ -451,6 +451,11 @@ select.tidypics-upload-select-existing-album {
     margin-top: 2px;
     font-weight: bolder;
     color: #FFFFFF;
+}
+
+.tidypics-lightbox-container .tidypics-lightbox-header a.tidypics-lightbox-close .fancybox2-close {
+	right: 14px;
+    top: 12px;
 }
 
 .tidypics-lightbox-container .tidypics-lightbox-header a.tidypics-lightbox-close:hover {

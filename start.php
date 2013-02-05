@@ -6,9 +6,9 @@
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2
  *
  * @todo
- * - River entries/annotating (handler 'batch' comments etc)
  * - Upgrades need to stay.. need to check against our old fork
  * - What to do with sidebar: Put back latest comments/tag cloud?
+ * - Clean up old uploader (make sure it still works as a fallback)
  */
 
 elgg_register_event_handler('init', 'system', 'tidypics_init');

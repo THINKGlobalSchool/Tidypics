@@ -458,7 +458,9 @@ function tidypics_get_filter_options($options) {
 	if ($tag = get_input('tag')) {
 		$filter_options['metadata_name_value_pairs'][] = array(
 			'name' => 'tags', 
-			'value' => $tag
+			'value' => $tag,
+			'operand' => '=',
+			'case_sensitive' => FALSE
 		);
 	}
 

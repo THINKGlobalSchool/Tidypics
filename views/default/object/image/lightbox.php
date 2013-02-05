@@ -143,8 +143,8 @@ $people_tags_string = elgg_view('photos/tagging/tags_string', $vars);
 
 // Close lightbox button
 $close_lightbox = elgg_view('output/url', array(
-	'text' => "X",
-	'href' => '#',
+	'text' => "<div class='fancybox2-close'></div>",
+	'href' => FALSE,
 	'title' => elgg_echo('tidypics:close'),
 	'class' => 'tidypics-lightbox-close',
 ));
