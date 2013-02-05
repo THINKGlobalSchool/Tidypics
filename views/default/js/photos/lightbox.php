@@ -405,23 +405,47 @@ elgg.tidypics.lightbox.inlineEditClick = function(event) {
 		$_edit.css('visibility', 'visible');
 		$save.removeAttr('disabled');
 		$save.hide();
+		$save.unbind('click');
 		$cancel.hide();
 		$input.hide();
 		$content.show();
 		$('.tidypics-lightbox-edit-overlay').removeAttr('style');
+
+		// Trigger a hook on cancel for special inputs
+		var params = {
+			'input': $input,
+		}
+
+		elgg.trigger_hook('photoLightboxInlineEditInputHide', 'tidypics', params, null);
 	}
 
 	// Bind a click event for the save button
 	$save.bind('click', function(event) {
-		var value = $input.val();
+		// Trigger a hook to allow special inputs
+		var params = {
+			'input': $input,
+		}
 
+		// Trigger a hook to allow special inputs to customize their value
+		var value = elgg.trigger_hook('photoLightboxInlineEditGetValue', 'tidypics', params, true);
+		if (value === true) {
+			value = $input.val();
+			if (!value) {
+				if (field == 'title') {
+					elgg.register_error(elgg.echo('image:blank'));
+				} else if (field == 'description') {
+					elgg.register_error(elgg.echo('image:no_update'));
+				}
+			}
+		}
+		
 		if (value && !$(this).attr('disabled')) {
 			$(this).attr('disabled', 'DISABLED');
 			$_save = $(this);
-			
+
 			var data = {};
-			data[field] = value;
 			data['entity_guid'] = $(this).data('entity_guid');
+			data[field] = value;
 
 			elgg.action('photos/image/update', {
 				data: data,

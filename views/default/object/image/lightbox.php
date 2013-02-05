@@ -40,23 +40,33 @@ $title = $photo->getTitle();
 if ($photo->canEdit()) {
 	$edit_title = $edit_description = $edit_tags = '_tp-can-edit tidypics-lightbox-can-edit'; 
 
+
 	$edit_title_input = elgg_view('input/text', array(
 		'name' => '_tp_edit_inline_title',
 		'value' => $title,
 		'class' => 'tidypics-lightbox-edit-title hidden',
 	));
 
+	// Emit a hook to modify inline title content
+	$edit_title_input = elgg_trigger_plugin_hook('inline_edit_title', 'tidypics', array('image' => $photo), $edit_title_input);
+
 	$edit_tags_input = elgg_view('input/tags', array(
-		'name' => '_tp_edit_inline_tags',
-		'value' => $photo->tags,
-		'class' => 'tidypics-lightbox-edit-tags hidden',
+			'name' => '_tp_edit_inline_tags',
+			'value' => $photo->tags,
+			'class' => 'tidypics-lightbox-edit-tags hidden',
 	));
+
+	// Emit a hook to modify inline tags content
+	$edit_tags_input = elgg_trigger_plugin_hook('inline_edit_tags', 'tidypics', array('image' => $photo), $edit_tags_input);
 
 	$edit_description_input = elgg_view('input/plaintext', array(
 		'name' => '_tp_edit_inline_description',
 		'value' => $photo->description,
 		'class' => 'tidypics-lightbox-edit-description hidden',
 	));
+
+	// Emit a hook to modify inline description content
+	$edit_description_input =  elgg_trigger_plugin_hook('inline_edit_description', 'tidypics', array('image' => $photo), $edit_description_input);
 
 	$edit_link = elgg_view('output/url', array(
 		'text' => elgg_echo('edit'),
