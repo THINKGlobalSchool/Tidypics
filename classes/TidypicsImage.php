@@ -35,11 +35,21 @@ class TidypicsImage extends ElggFile {
 
 		if ($data) {
 			// new image
+			$result = true;
 			$this->simpletype = "image";
-			$this->saveImageFile($data);
-			$this->autoOrient();
-			$this->saveThumbnails();
-			$this->extractExifData();
+			$result &= $this->saveImageFile($data);
+			$result &= $this->autoOrient();
+			$result &= $this->saveThumbnails();
+			$result &= $this->extractExifData();
+
+			// If any of the above fails
+			if (!$result) {
+				// Delete the image, we don't want incomplete entities everywhere
+				$this->delete();
+
+				// Throw an exception
+				throw new Exception(elgg_echo('tidypics:save_error'));
+			}
 		}
 
 		return true;
@@ -277,17 +287,22 @@ class TidypicsImage extends ElggFile {
 			// ImageMagick command line
 			if (tp_create_im_cmdline_thumbnails($this, $prefix, $filename) != true) {
 				trigger_error('Tidypics warning: failed to create thumbnails - ImageMagick command line', E_USER_WARNING);
+				return false;
 			}
 		} else if ($imageLib == 'ImageMagickPHP') {
 			// imagick php extension
 			if (tp_create_imagick_thumbnails($this, $prefix, $filename) != true) {
 				trigger_error('Tidypics warning: failed to create thumbnails - ImageMagick PHP', E_USER_WARNING);
+				return false;
 			}
 		} else {
 			if (tp_create_gd_thumbnails($this, $prefix, $filename) != true) {
 				trigger_error('Tidypics warning: failed to create thumbnails - GD', E_USER_WARNING);
+				return false;
 			}
 		}
+
+		return true;
 	}
 
 	/**
@@ -306,6 +321,7 @@ class TidypicsImage extends ElggFile {
 			// ImageMagick command line
 			if (tp_auto_orient_im_cmdline($this) != true) {
 				trigger_error('Tidypics warning: failed to auto-orient the image - ImageMagick command line', E_USER_WARNING);
+				return false;
 			}
 		} else if ($imageLib == 'ImageMagickPHP') {
 			// imagick php extension
@@ -314,6 +330,8 @@ class TidypicsImage extends ElggFile {
 			// GD
 			// not yet implemented..
 		}
+
+		return true;
 	}
 
 	/**
@@ -360,6 +378,7 @@ class TidypicsImage extends ElggFile {
 	public function extractExifData() {
 		elgg_load_library('tidypics:exif');
 		td_get_exif($this);
+		return true;
 	}
 	
 	/**
