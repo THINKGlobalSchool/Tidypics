@@ -61,6 +61,8 @@ elgg.tidypics.tagging.destroy = function() {
  * Start a tagging session
  */
 elgg.tidypics.tagging.start = function(event) {
+	// Trigger a tagging started hook
+	elgg.trigger_hook('peopleTagStarted', 'tidypics', null, null);
 
 	if (elgg.tidypics.tagging.active) {
 		elgg.tidypics.tagging.stop(event);

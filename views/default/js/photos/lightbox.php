@@ -36,7 +36,8 @@ elgg.tidypics.lightbox.getFancyboxInit = function(href) {
 		tagging = true;
 	}
 
-	var initial_state = window.location.href;
+	// Get initial state href, trim off querystring to strip lightbox code
+	var initial_state = window.location.href.substring(0, window.location.href.indexOf('?'));
 
 	elgg.tidypics.doPushState = true;
 
@@ -474,6 +475,9 @@ elgg.tidypics.lightbox.inlineEditClick = function(event) {
 
 // Ajax post like clicks
 elgg.tidypics.lightbox.likeClick = function(event) {
+	// Trigger a hook for like clicks
+	elgg.trigger_hook('photoLightboxLikeClick', 'tidypics', null, null);
+
 	elgg.action($(this).attr('href'), {data: {},
 		success: function(data) {
 			if (data.status == -1) {

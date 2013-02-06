@@ -409,7 +409,6 @@ function tidypics_entity_menu_setup($hook, $type, $return, $params) {
 			'name' => 'album-info',
 			'text' => $album_label . $album->getTitle(),
 			'href' =>  $album->getURL(),
-			'section' => 'info',
 			'priority' => 1,
 		);
 		$return[] = ElggMenuItem::factory($options);

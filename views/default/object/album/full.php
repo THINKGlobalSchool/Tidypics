@@ -85,6 +85,10 @@ $js = <<<JAVASCRIPT
 			// Init load more
 			elgg.tidypics.initLoadMore();
 
+			// Push a state
+			var initial_state = window.location.href.substring(0, window.location.href.indexOf('?'));
+			history.pushState({from: 'albumFull'}, null, initial_state);
+
 			// Implement popstate
 			window.addEventListener("popstate", function(e) {
 				elgg.tidypics.popState(e);

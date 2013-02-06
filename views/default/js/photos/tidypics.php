@@ -146,6 +146,9 @@ elgg.tidypics.popState = function(event) {
 		return;
 	}
 
+	// Trigger a hook for popState
+	elgg.trigger_hook('popState', 'tidypics', {'event' : event}, null);
+
 	// If going back/forward to an image lightbox, call the lightbox jumpto event
 	if (location.href.indexOf('photos/image/') !== -1) {
 		if (event.state) {
