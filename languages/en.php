@@ -14,6 +14,8 @@ $english = array(
 	'images' => "Images",
 	'caption' => "Caption",
 
+	'profile:photos_tagged' => 'Photos',
+
 	'photos' => "Photos",
 	'photos:add' => "Create album",
 	'photos:all' => 'All photos',

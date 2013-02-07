@@ -84,6 +84,9 @@ function tidypics_init() {
 	// Add photos link to owner block/hover menus
 	elgg_register_plugin_hook_handler('register', 'menu:owner_block', 'tidypics_owner_block_menu');
 
+	// Add a tagged photos tab to the tabbed profile
+	elgg_register_plugin_hook_handler('tabs', 'profile', 'tidypics_profile_tab_hander');
+
 	// Add admin menu item
 	elgg_register_admin_menu_item('configure', 'photos', 'settings');
 
@@ -349,6 +352,16 @@ function tidypics_owner_block_menu($hook, $type, $return, $params) {
 	}
 
 	return $return;
+}
+
+/**
+ * Handler to add a photo tab to the tabbed profile
+ */
+function tidypics_profile_tab_hander($hook, $type, $value, $params) {
+	if (elgg_is_logged_in()) {
+		$value[] = 'photos_tagged';
+		return $value;
+	}
 }
 
 /**
