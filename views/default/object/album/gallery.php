@@ -25,4 +25,8 @@ $footer .= '<div class="elgg-subtext">' . elgg_echo('album:num', array($album->g
 $params = array(
 	'footer' => $footer,
 );
+
+// Let plugins customize module params
+$params = elgg_trigger_plugin_hook('album_summary_params', 'tidypics', array('entity' => $album), $params);
+
 echo elgg_view_module('tidypics-album', $header, $album_cover, $params);

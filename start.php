@@ -92,7 +92,7 @@ function tidypics_init() {
 	elgg_register_entity_type('object', 'album');
 
 	// Register for the entity menu
-	elgg_register_plugin_hook_handler('register', 'menu:entity', 'tidypics_entity_menu_setup');
+	elgg_register_plugin_hook_handler('register', 'menu:entity', 'tidypics_entity_menu_setup', 100);
 
 	// Register items for photo list filter
 	elgg_register_plugin_hook_handler('register', 'menu:photos-listing-filter', 'tidypics_photo_list_filter_menu_setup');
@@ -385,6 +385,7 @@ function tidypics_entity_menu_setup($hook, $type, $return, $params) {
 			$options = array(
 				'name' => 'set_cover',
 				'text' => $text,
+				'href' => false,
 				'priority' => 80,
 			);
 			$return[] = ElggMenuItem::factory($options);

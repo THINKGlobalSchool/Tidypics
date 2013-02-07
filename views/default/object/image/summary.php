@@ -12,7 +12,7 @@ $image = elgg_extract('entity', $vars);
 
 $body = elgg_view_entity_icon($image, 'small', array('link_class' => 'tidypics-lightbox'));
 
-$params = array(
-	//'footer' => $footer,
-);
+// Let plugins customize module params
+$params = elgg_trigger_plugin_hook('photo_summary_params', 'tidypics', array('entity' => $image), NULL);
+
 echo elgg_view_module('tidypics-image', '', $body, $params);

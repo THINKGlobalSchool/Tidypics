@@ -11,6 +11,9 @@ elgg.provide('elgg.tidypics.lightbox');
 
 elgg.tidypics.lightbox.events_initted = false;
 
+// Need to be able to disable pushstate completly in some instances
+elgg.tidypics.lightbox.enable_pushstate = true;
+
 // General init
 elgg.tidypics.lightbox.init = function() {
 	// Init fancybox2 lightbox
@@ -36,8 +39,12 @@ elgg.tidypics.lightbox.getFancyboxInit = function(href) {
 		tagging = true;
 	}
 
-	// Get initial state href, trim off querystring to strip lightbox code
-	var initial_state = window.location.href.substring(0, window.location.href.indexOf('?'));
+	// Get initial state href, trim off querystring to strip lightbox code if any
+	if (window.location.href.indexOf('?') !== -1) {
+		var initial_state = window.location.href.substring(0, window.location.href.indexOf('?'));
+	} else {
+		var initial_state = window.location.href;
+	}
 
 	elgg.tidypics.doPushState = true;
 
@@ -53,10 +60,13 @@ elgg.tidypics.lightbox.getFancyboxInit = function(href) {
 			//console.log('beforeShow');
 			var new_state = this.href;
 
-			if (elgg.tidypics.doPushState) {
-				history.pushState({index: this.index}, null, new_state);
-			} else {
+			// Make sure pushstate is enabled
+			if (elgg.tidypics.lightbox.enable_pushstate) {
+				if (elgg.tidypics.doPushState) {
+					history.pushState({index: this.index}, null, new_state);
+				} else {
 				elgg.tidypics.doPushState = true;
+				}
 			}
 
 			if (tagging) {
@@ -163,7 +173,9 @@ elgg.tidypics.lightbox.getFancyboxInit = function(href) {
 		},
 		beforeClose: function() {
 			//console.log('beforeClose');
-			history.pushState({from: 'closeLightbox'}, null, initial_state);
+			if (elgg.tidypics.lightbox.enable_pushstate) {
+				history.pushState({from: 'closeLightbox'}, null, initial_state);
+			}
 			var params = {
 				'lightbox': this,
 			}
