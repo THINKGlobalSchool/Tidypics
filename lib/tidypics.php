@@ -51,6 +51,7 @@ function tidypics_get_list_content($type, $page_type, $container_guid = NULL) {
 		if ($logged_in_user_guid) {
 			$options['enable_upload'] = TRUE;
 		}
+
 		$content = tidypics_view_photo_list($options);
  	}
 
@@ -430,6 +431,7 @@ function tidypics_view_photo_list(array $options = array()) {
 			$cont = sanitise_int($options['container_guid']);
 			$options['joins'][] = "JOIN {$dbprefix}entities container_e on e.container_guid = container_e.guid";
 			$options['wheres'][] = "container_e.container_guid in ({$cont})";
+			$options['group_guid'] = $options['container_guid'];
 			unset($options['container_guid']);
 		}
 

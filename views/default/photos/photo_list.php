@@ -18,6 +18,7 @@ $limit = elgg_extract('limit', $vars);
 $count = elgg_extract('count', $vars);
 $enable_upload = elgg_extract('enable_upload', $vars);
 $container_guid = elgg_extract('container_guid', $vars);
+$group_guid = elgg_extract('group_guid', $vars);
 
 foreach ($items as $item) {
 	$photos_content .= elgg_view_entity($item, array(
@@ -37,6 +38,9 @@ if ($enable_upload && !$offset) {
 		$upload_params['context'] = 'addtoalbum';
 	} else {
 		$upload_params['context'] = 'addphotos';
+		if ($group_guid) {
+			$upload_params['group_guid'] = $group_guid;
+		}
 	}
 
 	$upload_content = elgg_view('input/photo_upload', $upload_params);

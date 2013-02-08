@@ -249,9 +249,11 @@ The photo can be viewed here: %s",
 	'album:river:annotate' => "a comment on the photo album",
 	'river:comment:object:image' => '%s commented on the photo %s',
 	'river:comment:object:album' => '%s commented on the album %s',
+	'river:comment:object:tidypics_batch' => '%s commented on the album %s',
 
 	// notifications
 	'tidypics:newalbum_subject' => 'New photo album',
+	'tidypics:newphotos' => 'New photos in album %s',
 	'tidypics:newalbum' => '%s created a new photo album',
 	'tidypics:updatealbum' => "%s uploaded new photos to the album %s",
 

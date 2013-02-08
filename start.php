@@ -6,9 +6,8 @@
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2
  *
  * @todo
- * - Upgrades need to stay.. need to check against our old fork
  * - What to do with sidebar: Put back latest comments/tag cloud?
- * - Clean up old uploader (make sure it still works as a fallback)
+ * - Clean up old uploader (make sure it still works as a fallback
  */
 
 elgg_register_event_handler('init', 'system', 'tidypics_init');
@@ -164,6 +163,22 @@ function tidypics_init() {
 	elgg_register_ajax_view('photos/ajax_upload');
 	elgg_register_ajax_view('photos/ajax_comment');
 	elgg_register_ajax_view('photos/tagging/tags');
+
+
+	/** BATCH COMMENTS/LIKING FIXES **/
+
+	// Extend batch comment river view
+	elgg_extend_view('river/elements/layout', 'photos/batch_comment', 1);
+
+	// Hook into annotation create event
+	elgg_register_event_handler('annotate', 'object', 'tidypics_batch_create_annotate_handler');
+	
+	// Hook into annotations delete event
+	elgg_register_event_handler('delete', 'annotations', 'tidypics_batch_delete_annotations_handler');
+
+
+	// Set some additional input to handle batch 'liking' (should translate to the photo)
+	elgg_register_plugin_hook_handler('permissions_check:annotate', 'object', 'tidypics_batch_annotation_permissions_handler');
 }
 
 /**
@@ -722,7 +737,7 @@ function tidypics_notify_message($hook, $type, $result, $params) {
 				$title = $entity->getTitle();
 				$owner = $entity->getOwnerEntity();
 
-				return elgg_echo('tidypics:updatealbum', array($owner->name, $title)) . ': ' . $entity->getURL();
+				return elgg_echo('tidypics:updatealbum', array($owner->name, $title)) . ":\n\n" . $entity->getURL();
 			}
 		}
 	}
@@ -873,4 +888,132 @@ function tidypics_album_update_handler($event, $type, $object) {
  */
 function tidypics_album_delete_handler($event, $type, $object) {
 	//
+}
+
+
+/**
+ * Hook into the annotate permissions to sort out batch liking
+ * 
+ * @param string $hook
+ * @param string $type
+ * @param bool   $result
+ * @param array  $params
+ * @return mixed
+ */
+function tidypics_batch_annotation_permissions_handler($hook, $type, $result, $params) {
+	if (elgg_instanceof($params['entity'], 'object', 'tidypics_batch') && $params['annotation_name'] == 'likes' && $result) {
+		// Set a flag here so we know we're liking a batch
+		set_input('like_batch', 'like_batch');
+	}
+	return $result;	
+}
+
+
+/**
+ * Tidypics batch create annotation handler
+ * - to keep likes and comments in sync with batches
+ *
+ * @param string $event  Event name
+ * @param string $type   Object type
+ * @param mixed  $params Params
+ *
+ * @return bool
+ */
+function tidypics_batch_create_annotate_handler($event, $type, $params) {
+	if (elgg_instanceof($params, 'object', 'tidypics_batch')) {
+		$user = elgg_get_logged_in_user_entity();
+
+		// Batch like
+		if (get_input('like_batch') == 'like_batch') {
+			// Get batch images
+			$images = elgg_get_entities_from_relationship(array(
+				'relationship' => 'belongs_to_batch',
+				'relationship_guid' => $params->getGUID(),
+				'inverse_relationship' => true,
+				'types' => array('object'),
+				'subtypes' => array('image'),
+				'limit' => 0,
+				'offset' => 0,
+				'count' => false,
+			));
+
+			$user = elgg_get_logged_in_user_entity();
+
+			// Like each image in the batch
+			foreach ($images as $image) {
+				// Make sure we haven't liked already
+				if (!elgg_annotation_exists($image->guid, 'likes')) {
+					$annotation = create_annotation(
+						$image->guid,
+						'likes',
+						"likes",
+						"",
+						$user->guid,
+						$image->access_id
+					);
+				}
+			}		
+		} else { // Batch comment
+			$album = get_entity($params->container_guid);
+
+			$comment_text = get_input('generic_comment');
+
+			$annotation = create_annotation($album->guid,
+				'generic_comment',
+				$comment_text,
+				"",
+				$user->guid,
+				$album->access_id
+			);
+		}	
+	}
+	return TRUE;
+}
+
+/**
+ * Tidypics batch delete annotation handler
+ * - to keep likes and comments in sync with batches
+ *
+ * @param string $event  Event name
+ * @param string $type   Object type
+ * @param mixed  $params Params
+ *
+ * @return bool
+ */
+function tidypics_batch_delete_annotations_handler($event, $type, $params) {
+	// Get entity
+	$entity = get_entity($params->entity_guid);
+
+	if (elgg_instanceof($entity, 'object', 'tidypics_batch')) {
+		if ($params->name == 'likes') {
+			// Get batch images
+			$images = elgg_get_entities_from_relationship(array(
+				'relationship' => 'belongs_to_batch',
+				'relationship_guid' => $entity->getGUID(),
+				'inverse_relationship' => true,
+				'types' => array('object'),
+				'subtypes' => array('image'),
+				'limit' => 0,
+				'offset' => 0,
+				'count' => false,
+			));
+
+			$user = elgg_get_logged_in_user_entity();
+
+			// Delete like for each image in batch
+			foreach ($images as $image) {
+				$image_guids[] = $image->guid;
+			}
+
+			if (count($image_guids)) {
+				// Delete likes
+				elgg_delete_annotations(array(
+					'guids' => $image_guids,
+					'annotation_owner_guid' => $user->guid,
+					'annotation_name' => 'likes',
+				));
+			}
+		}
+	}
+	return TRUE;
 }

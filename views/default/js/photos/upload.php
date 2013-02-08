@@ -27,6 +27,11 @@ elgg.tidypics.upload.init = function() {
 			params['container_guid'] = $uploader.data('container_guid');
 		}
 
+		// Check for group_guid data
+		if ($uploader.data('group_guid')) {
+			params['group_guid'] = $uploader.data('group_guid');
+		}
+
 		// Check for context data
 		if ($uploader.data('context')) {
 			params['context'] = $uploader.data('context');

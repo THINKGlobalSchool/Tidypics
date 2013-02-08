@@ -13,7 +13,12 @@ if ($_SESSION['_tp_new_album_guid']) {
 }
 
 $batch = get_input('_tp-upload-batch');
-$container_guid = get_input('container_guid', elgg_get_logged_in_user_guid());
+
+if ($group_guid = get_input('group_guid')) {
+	$container_guid = $group_guid;
+} else {
+	$container_guid = get_input('container_guid', elgg_get_logged_in_user_guid());
+}
 
 $errors = array();
 $messages = array();

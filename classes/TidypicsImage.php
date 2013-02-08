@@ -19,6 +19,22 @@ class TidypicsImage extends ElggFile {
 		parent::__construct($guid);
 	}
 
+	/* Override entity get to handle empty titles */
+	public function get($name) {
+		// Call parent
+		$value = parent::get($name);
+		if ($value) {
+			return $value;
+		} 
+
+		// If no title, make sure we return something valid
+		if ($name == 'title') {
+			return $this->getTitle();
+		}
+
+		return null;
+	}
+
 	/**
 	 * Save the image
 	 *

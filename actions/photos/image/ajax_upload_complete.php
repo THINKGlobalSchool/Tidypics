@@ -77,6 +77,9 @@ if ($album->new_album) {
 	}
 
 	if ($album->shouldNotify()) {
+		// This is a bit of a hack, but there's no other way to control the subject for image notifications
+		global $CONFIG;
+		$CONFIG->register_objects['object']['album'] = elgg_echo('tidypics:newphotos', array($album->title));
 		object_notifications('create', 'object', $album);
 		$album->last_notified = time();
 	}

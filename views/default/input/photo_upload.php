@@ -20,6 +20,10 @@ if ($container_guid = elgg_extract('container_guid', $vars)) {
 	$attributes['data-container_guid'] = $container_guid;
 }
 
+if ($group_guid = elgg_extract('group_guid', $vars)) {
+	$attributes['data-group_guid'] = $group_guid;	
+}
+
 if ($context = elgg_extract('context', $vars)) {
 	$attributes['data-context'] = $context;
 }

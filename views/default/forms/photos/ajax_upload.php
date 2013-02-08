@@ -7,7 +7,8 @@
 
 // Get context and container
 $context = elgg_extract('context', $vars);
-$container_guid = elgg_extract('container_guid', $vars);
+$container_guid = elgg_extract('container_guid', $vars); // For albums
+$group_guid = elgg_extract('group_guid', $vars); // For groups
 
 // Get container entity 
 $container = get_entity($container_guid);
@@ -101,6 +102,15 @@ if ($context == 'addphotos' || $context == 'addalbum') {
 			'text' => "<strong>- $or_label -</strong> $choose_album_input",
 			'href' => FALSE,
 			'priority' => 400,
+		);
+		elgg_register_menu_item('tidypics-upload-album', $params);
+
+		// Hidden group container menu item
+		$params = array(
+			'name' => 'album-group',
+			'text' => elgg_view('input/hidden', array('name' => 'group_guid', 'value' => $group_guid)),
+			'href' => FALSE,
+			'priority' => 9000,
 		);
 		elgg_register_menu_item('tidypics-upload-album', $params);
 
