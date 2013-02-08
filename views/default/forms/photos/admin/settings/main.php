@@ -46,3 +46,16 @@ echo elgg_view('input/text', array(
 	'value' => $quota,
 ));
 echo '</div>';
+
+
+// Notification interval
+$interval = $plugin->notify_interval;
+if (!$interval) {
+	$interval = 0;
+}
+echo '<div>' . elgg_echo('tidypics:settings:notify_interval');
+echo elgg_view('input/text', array(
+	'name' => 'params[notify_interval]',
+	'value' => $interval,
+));
+echo '</div>';

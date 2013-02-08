@@ -104,6 +104,7 @@ $english = array(
 	'tidypics:settings:grp_perm_override' => "Allow group members full access to group albums",
 	'tidypics:settings:maxfilesize' => "Maximum image size in megabytes (MB):",
 	'tidypics:settings:quota' => "User Quota (MB) - 0 equals no quota",
+	'tidypics:settings:notify_interval' => "New image object notification interval (seconds)", 
 	'tidypics:settings:watermark' => "Enter text to appear in the watermark",
 	'tidypics:settings:im_path' => "Enter the path to your ImageMagick commands",
 	'tidypics:settings:img_river_view' => "How many entries in activity river for each batch of uploaded images",
