@@ -145,6 +145,7 @@ function tidypics_init() {
 	elgg_register_action("photos/album/set_cover", "$base_dir/album/set_cover.php");
 	elgg_register_action("photos/image/save", "$base_dir/image/save.php");
 	elgg_register_action("photos/image/update", "$base_dir/image/update.php");
+	elgg_register_action("photos/image/move", "$base_dir/image/move.php");
 
 	// Ajax upload actions
 	elgg_register_action("photos/upload", "$base_dir/image/ajax_upload.php", 'logged_in');
@@ -162,6 +163,8 @@ function tidypics_init() {
 	// Ajax whitelist
 	elgg_register_ajax_view('photos/ajax_upload');
 	elgg_register_ajax_view('photos/ajax_comment');
+	elgg_register_ajax_view('photos/move_image');
+	elgg_register_ajax_view('forms/photos/album/list');
 	elgg_register_ajax_view('photos/tagging/tags');
 
 
@@ -394,6 +397,19 @@ function tidypics_entity_menu_setup($hook, $type, $return, $params) {
 	}
 
 	if (elgg_instanceof($entity, 'object', 'image')) {
+		// Move to album link
+		if ($entity->canEdit()) {
+			$options = array(
+				'name' => 'move_to_album',
+				'text' => elgg_echo('photo:move_to_album'),
+				'href' => elgg_get_site_url() . 'ajax/view/photos/move_image?entity_guid=' . $entity->guid,
+				'link_class' => 'tidypics-move-lightbox',
+				'priority' => 70,
+			);
+			$return[] = ElggMenuItem::factory($options);
+		}
+
+		// Set cover
 		$album = $entity->getContainerEntity();
 		$cover_guid = $album->getCoverImageGuid();
 		if ($cover_guid != $entity->getGUID() && $album->canEdit()) {
@@ -419,6 +435,7 @@ function tidypics_entity_menu_setup($hook, $type, $return, $params) {
 			$return[] = ElggMenuItem::factory($options);
 		}
 
+		// Person tagging
 		if (elgg_get_plugin_setting('tagging', 'tidypics')) {
 			$options = array(
 				'name' => 'tagging',

@@ -48,19 +48,28 @@ elgg.tidypics.tagging.init = function() {
  * Unbind all tagging events
  */
 elgg.tidypics.tagging.destroy = function() {
-	elgg.tidypics.tagging.stop();
+	if (elgg.tidypics.tagging.active) {
+		elgg.tidypics.tagging.stop();	
+	}
+
+	// Unbind events
 	$('[rel=photo-tagging]').unbind('click');
 	$('#tidypics-tagging-quit').unbind('click');
 	$('a._tp-people-tag-remove').unbind('click');
 	$('.tidypics-photo').unbind('mouseenter mouseleave');
 	$('a._tp-people-tag-link').unbind('mouseenter mouseleave');
 	$('input[name=_tp_people_tag_submit]').unbind('click');
+
+	// Clean up imgareaselect elements
+	$('.tidypics-tagging-outer').remove();
+	$('.tidypics-tagging-selection').parent().remove();
 }
 
 /**
  * Start a tagging session
  */
 elgg.tidypics.tagging.start = function(event) {
+
 	// Trigger a tagging started hook
 	elgg.trigger_hook('peopleTagStarted', 'tidypics', null, null);
 
@@ -100,7 +109,6 @@ elgg.tidypics.tagging.start = function(event) {
 elgg.tidypics.tagging.stop = function() {
 	$('#tidypics-tagging-help').hide();
 	$('#tidypics-tagging-select').hide();
-
 	$('.tidypics-photo').imgAreaSelect({hide: true, disable: true});
 	$('.tidypics-photo').css({"cursor" : "pointer"});
 
@@ -258,4 +266,4 @@ elgg.tidypics.tagging.peopleTagRemoveClick = function(event) {
 }
 
 elgg.register_hook_handler('init', 'system', elgg.tidypics.tagging.init);
-elgg.register_hook_handler('photoLightboxBeforeClose', 'tidypics', elgg.tidypics.tagging.stop);
+elgg.register_hook_handler('photoLightboxBeforeClose', 'tidypics', elgg.tidypics.tagging.destroy);

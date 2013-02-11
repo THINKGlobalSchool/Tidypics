@@ -179,6 +179,10 @@ elgg.tidypics.lightbox.getFancyboxInit = function(href) {
 			var params = {
 				'lightbox': this,
 			}
+
+			// Close any other lightboxes
+			$.fancybox.close();
+
 			elgg.trigger_hook('photoLightboxBeforeClose', 'tidypics', params, null);
 		},
 		afterClose: function() {
@@ -223,7 +227,7 @@ elgg.tidypics.lightbox.initEvents = function() {
 	$('.elgg-requires-confirmation').die('click');
 
 	// Bind click handler for ajax comments
-	$(document).delegate('form.elgg-form-comments-add input[type=submit]', 'click', elgg.tidypics.lightbox.submitCommentClick);
+	$(document).delegate('.tidypics-lightbox-comments-container form.elgg-form-comments-add input[type=submit]', 'click', elgg.tidypics.lightbox.submitCommentClick);
 
 	// Bind click handler for ajax comment delete
 	$(document).delegate('div.tidypics-lightbox-comments-container .elgg-menu-item-delete a', 'click', elgg.tidypics.lightbox.deleteCommentClick);

@@ -26,6 +26,38 @@ elgg.tidypics.init = function() {
 		});
 		$('input[name="guids"]').val(tidypics_guids.toString());
 	});
+
+	// Init move to album links
+	elgg.tidypics.initMoveToAlbum();
+
+	// Delegate click handler for move to album submit
+	$(document).delegate('#_tp-move-to-album-submit', 'click', function(event) {
+		var album_guid = $('#_tp-move-to-album-list input[name=select_album_guid]:checked').val();
+
+		if (!album_guid) {
+			elgg.register_error(elgg.echo('album:noselected'));
+			event.preventDefault();
+		} else {
+			// Set value and carry on
+			$(this).closest('form').find('input[name=album_guid]').val(album_guid);
+		}
+	});
+
+	// Make move to album pagination load in the container 
+	$(document).delegate('#tidypics-move-to-album-lightbox .elgg-pagination a','click', function(event) {
+		$container = $(this).closest('#_tp-move-to-album-list');
+
+		var height = $container.height();
+
+		$container.html("<div style='height: " + height + "px' class='elgg-ajax-loader'></div>").css({
+			'height': height,
+		}).load($(this).attr('href'), function() {
+			$(this).css({'height':'auto'});
+		});
+
+		event.stopPropagation(); // Don't propagate the click event.. this messes with popups, etc
+		event.preventDefault();
+	});
 };
 
 // Init history for photos filter links
@@ -321,4 +353,20 @@ elgg.tidypics.filterListings = function() {
 	elgg.tidypics.loadTabContent("?" + query_string);
 }
 
+elgg.tidypics.initMoveToAlbum = function() {
+	$('.tidypics-move-lightbox').fancybox({
+		'onComplete': function() {
+			elgg.trigger_hook('moveToAlbumOpened', 'tidypics');
+
+		},
+		'onClosed': function() {
+			elgg.trigger_hook('moveToAlbumClosed', 'tidypics');
+
+			// Rebind events for photo lightbox
+			$.fancybox2.bindEvents();
+		}
+	});
+}
+
 elgg.register_hook_handler('init', 'system', elgg.tidypics.init);
+elgg.register_hook_handler('photoLightboxAfterShow', 'tidypics', elgg.tidypics.initMoveToAlbum);

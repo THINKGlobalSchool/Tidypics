@@ -572,3 +572,39 @@ select.tidypics-upload-select-existing-album {
 	margin-bottom: 7px;
     margin-top: 3px;
 }
+
+/* ***************************************
+	Move to album lightbox
+*************************************** */
+
+#tidypics-move-to-album-lightbox {
+	width: 450px;
+	overflow: hidden;
+}
+
+#tidypics-move-to-album-lightbox .elgg-image-block {
+	border-bottom: 1px dotted #DDDDDD;
+	margin: 4px 0;
+}
+
+#tidypics-move-to-album-lightbox .elgg-image-block:first-child {
+	border-top: 1px dotted #DDDDDD;
+	padding-top: 5px;
+}
+
+#tidypics-move-to-album-lightbox .elgg-photo {
+	height: 40px;
+	padding: 2px;
+	width: 40px;
+}
+
+#tidypics-move-to-album-lightbox .elgg-image-block .elgg-body {
+	color: #444444;
+	font-size: 14px;
+	font-weight: bold;
+	padding-top: 15px;
+}
+
+#tidypics-move-to-album-lightbox .elgg-image-block .elgg-image {
+	padding-top: 14px;
+}

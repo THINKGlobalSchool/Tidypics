@@ -17,11 +17,11 @@ $subject_link = elgg_view('output/url', array(
 $image = $vars['item']->getObjectEntity();
 $attachments = elgg_view_entity_icon($image, 'tiny');
 
-$image_link = elgg_view('output/url', array(
-	'href' => $image->getURL(),
-	'text' => $image->getTitle(),
-	'is_trusted' => true,
-));
+// $image_link = elgg_view('output/url', array(
+// 	'href' => $image->getURL(),
+// 	'text' => $image->getTitle(),
+// 	'is_trusted' => true,
+// ));
 
 $album_link = elgg_view('output/url', array(
 	'href' => $image->getContainerEntity()->getURL(),
@@ -32,5 +32,5 @@ $album_link = elgg_view('output/url', array(
 echo elgg_view('river/elements/layout', array(
 	'item' => $vars['item'],
 	'attachments' => $attachments,
-	'summary' => elgg_echo('image:river:created', array($subject_link, $image_link, $album_link)),
+	'summary' => elgg_echo('image:river:created', array($subject_link, $album_link)),
 ));
