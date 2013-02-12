@@ -80,6 +80,10 @@ function tidypics_init() {
 	elgg_register_simplecache_view('css/fancybox2');
 	elgg_register_css('jquery-fancybox2', $css);
 
+	// Load lightbox JS/CSS
+	elgg_load_js('lightbox');
+	elgg_load_css('lightbox');
+
 	// Add photos link to owner block/hover menus
 	elgg_register_plugin_hook_handler('register', 'menu:owner_block', 'tidypics_owner_block_menu');
 
@@ -203,7 +207,7 @@ function tidypics_page_handler($page) {
 	$page_type = $page[0];
 	$page_base = elgg_get_plugins_path() . 'tidypics/pages/photos';
 
-	elgg_push_breadcrumb('photos', 'photos/all');
+	elgg_push_breadcrumb(elgg_echo('photos'), 'photos/all');
 
 	// Load content for XHR requests
 	if (elgg_is_xhr()) {

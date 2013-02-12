@@ -22,7 +22,7 @@ $entity_input = elgg_view('input/hidden', array('name' => 'entity_guid', 'value'
 $album_input = elgg_view('input/hidden', array('name' => 'album_guid'));
 
 $submit = elgg_view('input/submit', array(
-	'value' => elgg_echo('move'),
+	'value' => elgg_echo('tidypics:move'),
 	'id' => '_tp-move-to-album-submit',
 ));
 

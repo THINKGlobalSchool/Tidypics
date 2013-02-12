@@ -42,6 +42,8 @@ elgg.tidypics.upload.init = function() {
 
 		// Init lightbox
 		$('.elgg-module-tidypics-upload div._tp-uploader').fancybox({
+			'hideOnOverlayClick': false,
+			'hideOnContentClick': false,
 			'href': elgg.get_site_url() + 'ajax/view/photos/ajax_upload?' + encoded_params,
 			onComplete: function() {
 				var params = {
@@ -202,6 +204,12 @@ elgg.tidypics.upload.initEvents = function(hook, type, params, options) {
 		start: function(e) {
 			// Hide album menu inputs
 			var $album_menu = $(this).closest('form').find('#_tp-upload-album-menu');
+
+			// Hide close button
+			$('a#fancybox-close').remove();
+
+			// Disable escape			
+			$(document).unbind('keydown.fb').bind('keydown', function(event){event.preventDefault()});
 
 			var $active_input = $(this).closest('form').find('#_tp-upload-album-menu ._tp-upload-active-input');
 

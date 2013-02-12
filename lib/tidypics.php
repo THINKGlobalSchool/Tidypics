@@ -35,7 +35,6 @@ function tidypics_get_list_content($type, $page_type, $container_guid = NULL) {
 			elgg_push_breadcrumb($owner->name, "photos/owner/$owner->username");
 		}
 		elgg_push_breadcrumb(elgg_echo("{$type}"));
-
 	} else {
 		$params['title'] = elgg_echo("{$type}:allsite");
 		elgg_push_breadcrumb(elgg_echo("{$type}:all"));
@@ -237,7 +236,6 @@ function tidypics_get_photo_edit_content($photo_guid) {
 	$params['title'] = elgg_echo('image:edit');
 
 	// Set up breadcrumbs
-	elgg_push_breadcrumb(elgg_echo('photos'), "photos/all");
 	if (elgg_instanceof($owner, 'user')) {
 		elgg_push_breadcrumb($owner->name, "photos/owner/$owner->username");
 	} else {

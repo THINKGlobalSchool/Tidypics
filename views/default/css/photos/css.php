@@ -268,6 +268,10 @@ div.tidypics-upload-status {
 	font-size: 1.2em;
 }
 
+div.tidypics-upload-status .right {
+	float: right;
+}
+
 div.tidypics-upload-status-error {
 	color: red;
 }
@@ -295,7 +299,7 @@ div.tidypics-upload-image-element .tidypics-upload-image-progress {
 
 div.tidypics-upload-image-element .tidypics-upload-image-progress .tidypics-upload-image-progress-bar {
 	height: 16px;
-	background: darkred;
+	background: #0054A7;
 	width: 0px;
 }
 
@@ -397,6 +401,10 @@ select.tidypics-upload-select-existing-album {
 /* ***************************************
 	Photo lightbox
 *************************************** */
+
+.fancybox2-lock #fancybox-wrap {
+	z-index: 9002;
+}
 
 .tidypics-lightbox-wrap {
     height: 100% !important;
