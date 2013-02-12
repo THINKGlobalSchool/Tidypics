@@ -203,8 +203,14 @@ elgg.tidypics.lightbox.getFancyboxInit = function(href) {
 			},
 			buttons	: {
 				skipSingle: true,
-				appendTo: '.tidypics-lightbox-header',
+				position: 'bottom',
+				appendTo: '.tidypics-lightbox-footer',
 				tpl: '<div id="fancybox2-buttons"><ul><li><a class="btnPrev" title="Previous" href="javascript:;"></a></li><li><a class="btnPlay" title="Start slideshow" href="javascript:;"></a></li><li><a class="btnNext" title="Next" href="javascript:;"></a></li></ul></div>',
+				afterShowCallback: function () {
+					var prev_label = elgg.echo('image:back');
+					var next_label = elgg.echo('image:next');
+					$('.tidypics-lightbox-keys-legend span').prepend(prev_label + "&nbsp;<kbd>&#8592;</kbd>&nbsp;" + next_label + "&nbsp;<kbd>&#8594;</kbd>&nbsp;")
+				}
 			}
 		},
 		keys: {

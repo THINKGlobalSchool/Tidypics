@@ -260,7 +260,7 @@ $fb_helpers_path = elgg_get_site_url() . "mod/tidypics/vendors/jquery-fancybox2/
 
 /* Buttons helper */
 #fancybox2-buttons {
-	position: relative; /* Relative in tidypics-lightbox-header */
+	position: relative; /* Relative in tidypics-lightbox-footer */
 	left: 0;
 	width: 200px;
 	margin-left: auto;
@@ -273,7 +273,7 @@ $fb_helpers_path = elgg_get_site_url() . "mod/tidypics/vendors/jquery-fancybox2/
 }
 
 #fancybox2-buttons.bottom {
-	bottom: 10px;
+	bottom: 100px;
 }
 
 #fancybox2-buttons ul {

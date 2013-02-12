@@ -25,7 +25,8 @@
 			skipSingle : false, // disables if gallery contains single image
 			position   : 'top', // 'top' or 'bottom'
 			tpl        : '<div id="fancybox2-buttons"><ul><li><a class="btnPrev" title="Previous" href="javascript:;"></a></li><li><a class="btnPlay" title="Start slideshow" href="javascript:;"></a></li><li><a class="btnNext" title="Next" href="javascript:;"></a></li><li><a class="btnToggle" title="Toggle size" href="javascript:;"></a></li><li><a class="btnClose" title="Close" href="javascript:jQuery.fancybox2.close();"></a></li></ul></div>',
-			appendTo   : 'body'// Which element to append to
+			appendTo   : 'body',// Which element to append to
+			afterShowCallback   : function(){},
 		},
 
 		list : null,
@@ -97,6 +98,8 @@
 			this.buttons = buttons;
 
 			this.onUpdate(opts, obj);
+
+			opts.afterShowCallback();
 		},
 
 		onUpdate: function (opts, obj) {

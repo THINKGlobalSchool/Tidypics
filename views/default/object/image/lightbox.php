@@ -155,10 +155,15 @@ if (elgg_get_plugin_setting('view_count', 'tidypics')) {
 	$views_text = elgg_echo('tidypics:numviews', array((int)$view_info['total']));
 }
 
+$close_label = elgg_echo('tidypics:close');
+
 // Build content
 $content = <<<HTML
 	<div class='tidypics-lightbox-container'>
 		<div class='tidypics-lightbox-header'>
+			<div class='tidypics-lightbox-keys-legend'>
+				<span class="dark-keys">$close_label&nbsp;<kbd>esc</kbd></span>
+			</div>
 			<div class='tidypics-lightbox-header-metadata'>
 				$close_lightbox
 				$metadata

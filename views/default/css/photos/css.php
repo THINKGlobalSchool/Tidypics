@@ -436,6 +436,14 @@ select.tidypics-upload-select-existing-album {
 	height: 60px;
 }
 
+.tidypics-lightbox-container .tidypics-lightbox-header .tidypics-lightbox-keys-legend {
+	color: #CCCCCC;
+	float: left;
+	font-size: 13px;
+	padding: 16px 40px 15px 15px;
+	width: 350px;
+}
+
 .tidypics-lightbox-container .tidypics-lightbox-header .elgg-menu-entity > li > a {
 	color: #AAAAAA;
 }
@@ -607,4 +615,64 @@ select.tidypics-upload-select-existing-album {
 
 #tidypics-move-to-album-lightbox .elgg-image-block .elgg-image {
 	padding-top: 14px;
+}
+
+
+/* ***************************************
+	Keyboard cues
+*************************************** */
+
+#fancybox2-buttons .light-keys {
+	
+}
+
+/* ***************************************
+	Keys.css (see vendors)
+*************************************** */
+
+
+/* Base style, essential for every key. */
+kbd, .key {
+	display: inline;
+	display: inline-block;
+	min-width: 1em;
+	padding: .2em .3em;
+	font: normal .85em/1 "Lucida Grande", Lucida, Arial, sans-serif;
+	text-align: center;
+	text-decoration: none;
+	-moz-border-radius: .3em;
+	-webkit-border-radius: .3em;
+	border-radius: .3em;
+	border: none;
+	cursor: default;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	user-select: none;
+}
+kbd[title], .key[title] {
+	cursor: help;
+}
+
+/* Dark style for display on light background. This is the default style. */
+kbd, kbd.dark, .dark-keys kbd, .key, .key.dark, .dark-keys .key {
+	background: rgb(80, 80, 80);
+	background: -moz-linear-gradient(top, rgb(60, 60, 60), rgb(80, 80, 80));
+	background: -webkit-gradient(linear, left top, left bottom, from(rgb(60, 60, 60)), to(rgb(80, 80, 80)));
+	color: rgb(250, 250, 250);
+	text-shadow: -1px -1px 0 rgb(70, 70, 70);
+	-moz-box-shadow: inset 0 0 1px rgb(150, 150, 150), inset 0 -.05em .4em rgb(80, 80, 80), 0 .1em 0 rgb(30, 30, 30), 0 .1em .1em rgba(0, 0, 0, .3);
+	-webkit-box-shadow: inset 0 0 1px rgb(150, 150, 150), inset 0 -.05em .4em rgb(80, 80, 80), 0 .1em 0 rgb(30, 30, 30), 0 .1em .1em rgba(0, 0, 0, .3);
+	box-shadow: inset 0 0 1px rgb(150, 150, 150), inset 0 -.05em .4em rgb(80, 80, 80), 0 .1em 0 rgb(30, 30, 30), 0 .1em .1em rgba(0, 0, 0, .3);
+}
+
+/* Light style for display on dark background. */
+kbd.light, .light-keys kbd, .key.light, .light-keys .key {
+	background: rgb(250, 250, 250);
+	background: -moz-linear-gradient(top, rgb(210, 210, 210), rgb(255, 255, 255));
+	background: -webkit-gradient(linear, left top, left bottom, from(rgb(210, 210, 210)), to(rgb(255, 255, 255)));
+	color:  rgb(50, 50, 50);
+	text-shadow: 0 0 2px rgb(255, 255, 255);
+	-moz-box-shadow: inset 0 0 1px rgb(255, 255, 255), inset 0 0 .4em rgb(200, 200, 200), 0 .1em 0 rgb(130, 130, 130), 0 .11em 0 rgba(0, 0, 0, .4), 0 .1em .11em rgba(0, 0, 0, .9);
+	-webkit-box-shadow: inset 0 0 1px rgb(255, 255, 255), inset 0 0 .4em rgb(200, 200, 200), 0 .1em 0 rgb(130, 130, 130), 0 .11em 0 rgba(0, 0, 0, .4), 0 .1em .11em rgba(0, 0, 0, .9);
+	box-shadow: inset 0 0 1px rgb(255, 255, 255), inset 0 0 .4em rgb(200, 200, 200), 0 .1em 0 rgb(130, 130, 130), 0 .11em 0 rgba(0, 0, 0, .4), 0 .1em .11em rgba(0, 0, 0, .9);
 }

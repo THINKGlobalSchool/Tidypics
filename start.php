@@ -453,7 +453,7 @@ function tidypics_entity_menu_setup($hook, $type, $return, $params) {
 
 		$options = array(
 			'name' => 'album-info',
-			'text' => $album_label . $album->getTitle(),
+			'text' => $album_label . elgg_get_excerpt($album->getTitle(), 150),
 			'href' =>  $album->getURL(),
 			'priority' => 1,
 		);
