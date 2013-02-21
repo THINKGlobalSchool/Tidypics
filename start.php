@@ -223,6 +223,7 @@ function tidypics_page_handler($page) {
 				switch ($page[1]) {
 					case 'owner':
 						$user = get_user_by_username($page[2]);
+						elgg_set_page_owner_guid($user->guid);
 						$params = tidypics_get_list_content('albums', $page[1], $user->guid);
 						break;
 					case 'all':
@@ -257,8 +258,6 @@ function tidypics_page_handler($page) {
 				return TRUE;
 				break;
 		}
-		// Photos sidebar
-		$params['sidebar'] = elgg_view('photos/sidebar');
 
 		// Output special ajax view
 		echo elgg_view('photos/ajax_content', $params);
@@ -340,7 +339,7 @@ function tidypics_page_handler($page) {
 		}
 
 		// Photos sidebar
-		$params['sidebar'] = elgg_view('photos/sidebar');
+		$params['sidebar'] = ($params['sidebar'] ? $params['sidebar'] : elgg_view('photos/sidebar', array('page' => $page_type)));
 
 		// Photos filter menu
 		if (!$params['filter']) {
@@ -382,8 +381,8 @@ function tidypics_owner_block_menu($hook, $type, $return, $params) {
 function tidypics_profile_tab_hander($hook, $type, $value, $params) {
 	if (elgg_is_logged_in()) {
 		$value[] = 'photos_tagged';
-		return $value;
 	}
+	return $value;
 }
 
 /**

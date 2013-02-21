@@ -29,6 +29,25 @@ $params = array(
 
 $images = elgg_get_entities_from_metadata($params);
 
+// // Make sure all the images completed the save process
+// foreach($images as $idx => $image) {
+// 	if ($image->complete) {
+// 		$options = array(
+// 			'guid' => $image->guid,
+// 			'metadata_name' => 'complete'
+// 		);
+// 		// Remove incomplete metadata
+// 		elgg_delete_metadata($options);
+// 	} else {
+// 		// Try deleting incomplete image the usual way
+// 		if (!$image->delete()) {
+// 			// If not, it probably failed at ElggFile->delete() because no data was stored
+// 			delete_entity($image->guid, TRUE); // Force it to be gone
+// 		}
+// 		unset($images[$idx]);
+// 	}
+// }
+
 if ($images) {
 	// Create a new batch object to contain these photos
 	$batch = new ElggObject();
@@ -85,5 +104,8 @@ if ($album->new_album) {
 	}
 }
 
-echo json_encode(array('batch_guid' => $batch->getGUID()));
+echo json_encode(array(
+	'batch_guid' => $batch->getGUID(),
+	'forward_url' => $album->getURL(),
+));
 forward(REFERER);

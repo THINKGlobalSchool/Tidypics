@@ -237,6 +237,13 @@ $finish_input = elgg_view('input/submit', array(
 	'class' => 'elgg-button elgg-button-action right tidypics-upload-finish-input',
 ));
 
+// Cancel button
+$cancel_input = elgg_view('input/submit', array(
+	'name' => '_tp-upload-cancel',
+	'value' => elgg_echo('tidypics:upload:cancel'),
+	'class' => 'elgg-button elgg-button-action right tidypics-upload-cancel-input',
+));
+
 // Build form content
 $content = <<<HTML
 	<h2>$heading</h2>
@@ -251,7 +258,11 @@ $content = <<<HTML
 	<div class='elgg-foot'>
 	<!-- Hidden inputs -->
 	$file_input $batch_input
-		<div class='tidypics-upload-status'><span></span>$finish_input</div>
+		<div class='tidypics-upload-status'>
+			<span></span>
+			$finish_input
+			$cancel_input
+		</div>
 	</div>
 HTML;
 

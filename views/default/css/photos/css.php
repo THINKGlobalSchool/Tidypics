@@ -258,7 +258,8 @@ div.tidypics-upload-dropzone-inner {
 	text-align: center;
 }
 
-input.tidypics-upload-finish-input {
+input.tidypics-upload-finish-input,
+input.tidypics-upload-cancel-input {
 	display: none;
 }
 

@@ -119,7 +119,7 @@ elgg.tidypics.upload.initEvents = function(hook, type, params, options) {
 
 	// Finish uploading button
 	$upload_container.delegate('input[name="_tp-upload-finish"]', 'click', function(event) {
-		window.location = window.location.href;
+		window.location = $(this).data('forward_url');
 		event.preventDefault();
 	});
 
@@ -195,6 +195,17 @@ elgg.tidypics.upload.initEvents = function(hook, type, params, options) {
 					.complete(function (result, textStatus, jqXHR) {
 						// Complete
 					});
+
+				// // Cancel uploading button
+				// $('input[name="_tp-upload-cancel"]').click(function(event) {
+				// 	if (!$(this).is(':disabled')) {
+				// 		jqXHR.abort();
+				// 		$(this).attr('disabled', 'DISABLED');
+				// 		event.preventDefault();
+				// 		event.stopPropagation();
+				// 	}
+				// });
+
 			}
 		},
 		dragover: function (e, data) {
@@ -229,6 +240,7 @@ elgg.tidypics.upload.initEvents = function(hook, type, params, options) {
 			var $status_container = $(this).closest('form').find('div.tidypics-upload-status');
 
 			$status_container.addClass('elgg-ajax-loader');
+			//$status_container.find('input[name="_tp-upload-cancel"]').show();
 			$status_container.find('span').html(elgg.echo('tidypics:upload:started'));
 		},
 		stop: function (e) {
@@ -246,7 +258,8 @@ elgg.tidypics.upload.initEvents = function(hook, type, params, options) {
 					if (response.status == 0) {
 						// No errors
 						$status_container.find('span').html(elgg.echo('tidypics:upl_complete'));
-						$status_container.find('input[name="_tp-upload-finish"]').show();
+						$status_container.find('input[name="_tp-upload-finish"]').data('forward_url', response.output.forward_url).show();
+						//$status_container.find('input[name="_tp-upload-cancel"]').hide();
 						$status_container.removeClass('elgg-ajax-loader');
 					} else {
 						// There were errors
@@ -268,6 +281,10 @@ elgg.tidypics.upload.initEvents = function(hook, type, params, options) {
     	done: function(e, data) {
     		// Set progress for the context to 100%
     		data.context.find('.tidypics-upload-image-progress-bar').css('width','100%');
+    	},
+    	fail: function(e, data) {
+    		//console.log(data);
+    		//console.log(e);
     	}
     });
 }

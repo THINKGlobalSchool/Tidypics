@@ -82,8 +82,8 @@ $image->batch = $batch;
 
 try {
 	$image->save($file);
-	$album->prependImageList(array($image->guid));
 
+	$album->prependImageList(array($image->guid));
 	if (elgg_get_plugin_setting('img_river_view', 'tidypics') === "all") {
 		add_to_river('river/object/image/create', 'create', $image->getOwnerGUID(), $image->getGUID());
 	}
@@ -99,5 +99,7 @@ echo json_encode(array(
 	'image_guid' => $image->guid,
 	'batch' => $batch,
 ));
+
+// $image->complete = TRUE;
 
 forward(REFERER);

@@ -40,7 +40,7 @@ elgg.tidypics.lightbox.getFancyboxInit = function(href) {
 	}
 
 	// Get initial state href, trim off querystring to strip lightbox code if any
-	if (window.location.href.indexOf('?') !== -1) {
+	if (window.location.href.indexOf('?lb') !== -1) {
 		var initial_state = window.location.href.substring(0, window.location.href.indexOf('?'));
 	} else {
 		var initial_state = window.location.href;
@@ -246,6 +246,9 @@ elgg.tidypics.lightbox.initEvents = function() {
 
 	// Ajaxify likes in lightboxes
 	$(document).delegate('body.fancybox2-lock li.elgg-menu-item-likes a', 'click', elgg.tidypics.lightbox.likeClick);
+
+	// Ajaxify setting album cover
+	$(document).delegate('body.fancybox2-lock li.elgg-menu-item-set-cover a', 'click', elgg.tidypics.lightbox.makeCoverClick);
 }
 
 // Lightbox comments click handler
@@ -499,6 +502,23 @@ elgg.tidypics.lightbox.inlineEditClick = function(event) {
 elgg.tidypics.lightbox.likeClick = function(event) {
 	// Trigger a hook for like clicks
 	elgg.trigger_hook('photoLightboxLikeClick', 'tidypics', null, null);
+
+	elgg.action($(this).attr('href'), {data: {},
+		success: function(data) {
+			if (data.status == -1) {
+				// Error
+			} else {
+				// Success
+			}
+		}
+	});
+	event.preventDefault();
+}
+
+// Ajax post make cover clicks
+elgg.tidypics.lightbox.makeCoverClick = function(event) {
+	// Trigger a hook for like clicks
+	elgg.trigger_hook('photoLightboxMakeCoverClick', 'tidypics', null, null);
 
 	elgg.action($(this).attr('href'), {data: {},
 		success: function(data) {

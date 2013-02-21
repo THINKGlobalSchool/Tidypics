@@ -64,6 +64,9 @@ function tidypics_get_list_content($type, $page_type, $container_guid = NULL) {
 
 	$params['content'] .= $content;
 
+	// Photos sidebar
+	$params['sidebar'] = elgg_view('photos/sidebar', array('page' => $page_type, 'type' => $type));
+
 	return $params;
 }
 
@@ -176,6 +179,8 @@ function tidypics_get_view_image_content($photo_guid) {
 	}
 
 	$params['content'] = elgg_view_entity($photo, array('full_view' => TRUE));
+
+	$params['sidebar'] = elgg_view('photos/sidebar', array('page' => 'image', 'image' => $photo));
 
 	return $params;
 }

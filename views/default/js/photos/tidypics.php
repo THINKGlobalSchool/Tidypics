@@ -348,7 +348,20 @@ elgg.tidypics.filterListings = function() {
 	// Get sort order value
 	params['sort_order'] = $('li.elgg-menu-item-tidypics-list-sort-order a').data('current_value');
 
-	var query_string = $.param(params);
+	var push_params = {};
+
+	$.each(params, function(idx, value) {
+		// Ignore nulls and defaults
+		if (value && value != 0 && value != 'desc' && value != 'date') {
+			push_params[idx] = value;
+		}
+	});
+
+	var query_string = $.param(push_params);
+
+	var push_url = window.location.href.substring(0, window.location.href.indexOf('?')) + "?" + query_string;
+
+	history.pushState({from: 'filterListings'}, null, push_url);
 
 	elgg.tidypics.loadTabContent("?" + query_string);
 }
