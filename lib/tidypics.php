@@ -113,6 +113,10 @@ function tidypics_get_view_album_content($album_guid) {
 			$options['enable_upload'] = TRUE;
 		}
 
+		if (get_input('load_all')) {
+			$options['limit'] = 0;
+		}
+
 		$params['content'] = tidypics_view_photo_list($options);
 		
 	} else {

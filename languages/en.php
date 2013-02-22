@@ -68,6 +68,7 @@ $english = array(
 	'tidypics:asc' => 'Sort Ascending ▲',
 	'tidypics:desc' => 'Sort Descending ▼',
 	'tidypics:loadmore' => 'Load More',
+	'tidypics:loadall' => 'Load All',
 	'tidypics:filterby' => 'Filter %s by',
 	//'tidypics:select_album' => 'Select Album',
 

@@ -104,6 +104,11 @@ class TidypicsAlbum extends ElggObject {
 			return array();
 		}
 
+		// Allow for no limit
+		if ($limit == 0) {
+			$limit = NULL;
+		}
+
 		$imageList = array_slice($imageList, $offset, $limit);
 		
 		$images = array();

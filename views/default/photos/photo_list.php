@@ -74,7 +74,17 @@ if (count($items) && $next_offset < $count) {
 	if (!$container_guid) {
 		echo "<div id='_tp-waypoint-container'><a class='_tp-waypoint-more' href='" . $next_link  . "'></a></div>";
 	} else {
-		$next_label = elgg_echo('tidypics:loadmore');
-		echo "<a class='_tp-load-more tidypics-load-more elgg-button elgg-button-action' href='{$next_link}'>{$next_label}</a>";
+		//$next_label = elgg_echo('tidypics:loadmore');
+
+		// Loading all instead of more (@todo make this configurable?)
+		if (!get_input('load_all')) {
+			$next_link = elgg_http_add_url_query_elements(current_page_url(), array(
+				'offset' => $next_offset,
+				'load_all' => 1,
+			));
+
+			$next_label = elgg_echo('tidypics:loadall');
+			echo "<a class='_tp-load-more tidypics-load-more elgg-button elgg-button-action' href='{$next_link}'>{$next_label}</a>";
+		}
 	}
 }
