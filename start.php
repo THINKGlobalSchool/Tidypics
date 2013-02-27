@@ -15,7 +15,7 @@ elgg_register_event_handler('init', 'system', 'tidypics_init');
 /**
  * Tidypics plugin initialization
  */
-function tidypics_init() {
+function tidypics_init() {	
 
 	// Register libraries
 	$base_dir = elgg_get_plugins_path() . 'tidypics/lib';
@@ -154,6 +154,7 @@ function tidypics_init() {
 	// Ajax upload actions
 	elgg_register_action("photos/upload", "$base_dir/image/ajax_upload.php", 'logged_in');
 	elgg_register_action("photos/uploads_complete", "$base_dir/image/ajax_upload_complete.php", 'logged_in');
+	elgg_register_action("photos/album/create", "$base_dir/album/ajax_create.php", 'logged_in');
 
 	elgg_register_action("photos/image/tag", "$base_dir/image/tag.php");
 	elgg_register_action("photos/image/untag", "$base_dir/image/untag.php");

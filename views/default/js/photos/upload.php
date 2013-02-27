@@ -123,6 +123,9 @@ elgg.tidypics.upload.initEvents = function(hook, type, params, options) {
 		event.preventDefault();
 	});
 
+	// Start uploading button
+	$upload_container.delegate('input[name="_tp-upload-start"]', 'click', elgg.tidypics.upload.start);
+
 	/** SET UP FILEUPLOAD **/
 	$upload_container.delegate('input[name="_tp_upload_choose_submit"]', 'click', function(event) {
 		$upload_container.find('#_tp_upload-file-input').trigger('click');
@@ -140,19 +143,29 @@ elgg.tidypics.upload.initEvents = function(hook, type, params, options) {
 			$('#_tp-upload-dropzone').removeClass('tidypics-upload-dropzone-drag');
 		},
 		add: function (e, data) {
-			var $dropzone = $('#_tp-upload-dropzone');
-
 			// Get max size in bytes
 			var maxsizebytes = elgg.tidypics.upload.maxfilesize * 1024 * 1024;
 
+			// Get file
 			var file = data.files[0];
 
 			// Check file size
 			if (file.size > maxsizebytes) {
 				elgg.register_error(elgg.echo('tidypics:exceed_filesize', [file.name, elgg.tidypics.upload.maxfilesize]));
 			} else {
+				// Get status container
+				var $status_container = $(this).closest('form').find('div.tidypics-upload-status');
+
+				// Show start/cancel button 
+				$status_container.find('input[name="_tp-upload-start"]').show();
+				$status_container.find('input[name="_tp-upload-cancel"]').show();
+
+				// Get dropzone
+				var $dropzone = $('#_tp-upload-dropzone');
+
 				// Crear dropzone content
 				if ($dropzone.hasClass('tidypics-upload-dropzone-droppable')) {
+					$dropzone.data('original_content', $dropzone.html());
 					$dropzone.html('');
 					$dropzone.removeClass('tidypics-upload-dropzone-droppable');
 				}
@@ -168,43 +181,84 @@ elgg.tidypics.upload.initEvents = function(hook, type, params, options) {
 					data.form = $('form.elgg-form-photos-upload');
 				}
 
-				// Submit/upload this file
-				var jqXHR = data.submit()
-					.success(function (result, textStatus, jqXHR) {
-						// Successful post, check for errors/success
-						if (result.status == 0) {
-							// No errors uploading, display thumbnail in element context
-							elgg.tidypics.upload.displayThumbnail(data.context, result.output.image_guid);
-						} else {
-							// There were errors
-							if (result.system_messages.error.length) {
-								for (e in result.system_messages.error) {
-									// Display each error encountered
-									elgg.tidypics.upload.displayError(data.context, result.system_messages.error[e]);
-								}
-							} else {
-								// Not sure what happened here.. display unknown error
-								elgg.tidypics.upload.displayError(data.context, elgg.echo('tidypics:unk_error'));
-							}
-						}
-					})
-					.error(function (jqXHR, textStatus, errorThrown) {
-						// Error posting
-						elgg.register_error(errorThrown);
-					})
-					.complete(function (result, textStatus, jqXHR) {
-						// Complete
-					});
+				var jqXHR = false;
 
-				// // Cancel uploading button
-				// $('input[name="_tp-upload-cancel"]').click(function(event) {
-				// 	if (!$(this).is(':disabled')) {
-				// 		jqXHR.abort();
-				// 		$(this).attr('disabled', 'DISABLED');
-				// 		event.preventDefault();
-				// 		event.stopPropagation();
-				// 	}
-				// });
+				// Bind custom event to document
+				$(document).bind('tpstartupload', function(event) {
+					// Submit/upload this file
+					if (data.files.length > 0) { // Make sure file exists
+						jqXHR = data.submit()
+							.success(function (result, textStatus, jqXHR) {
+								// Successful post, check for errors/success
+								if (result.status == 0) {
+									// No errors uploading, display thumbnail in element context
+									elgg.tidypics.upload.displayThumbnail(data.context, result.output.image_guid);
+								} else {
+									// There were errors
+									if (result.system_messages.error.length) {
+										for (e in result.system_messages.error) {
+											// Display each error encountered
+											elgg.tidypics.upload.displayError(data.context, result.system_messages.error[e]);
+										}
+									} else {
+										// Not sure what happened here.. display unknown error
+										elgg.tidypics.upload.displayError(data.context, elgg.echo('tidypics:unk_error'));
+									}
+								}
+							})
+							.error(function (jqXHR, textStatus, errorThrown) {
+								// Error posting
+								if (errorThrown != 'abort') {
+									elgg.register_error(errorThrown);	
+								}	
+							})
+							.complete(function (result, textStatus, jqXHR) {
+								// Complete (always)
+							});
+					}
+
+					event.preventDefault();
+				});
+
+				// Bind click handler to allow users to remove this image from the queue
+				data.context.find('._tp-upload-image-remove').click(function(event) {
+					event.preventDefault();
+					
+					// Zero out the files (will be just the current image)
+					data.files.length = 0;
+
+					// Remove upload image element from dropzone
+					data.context.remove();
+
+					// Check if we've removed the last element
+					if (!$('._tp-upload-image-element ').length) {
+						// Reset dropzone
+						$dropzone.html($dropzone.data('original_content'));
+						$dropzone.addClass('tidypics-upload-dropzone-droppable');
+
+						// Hide buttons
+						$status_container.find('.elgg-button').hide();
+					}
+				});
+
+				// Cancel uploading button
+				$('input[name="_tp-upload-cancel"]').click(function(event) {
+					// If we've started uploading
+					if (jqXHR) {
+						jqXHR.abort();
+						$status_container.addClass('tidypics-upload-status-error');
+						$status_container.data('aborted', true);
+						$status_container.find('span').html(elgg.echo(elgg.echo('tidypics:abort_cancelled')));
+						$status_container.find('input[name="_tp-upload-finish"]').data('forward_url', window.location.href).show();
+						$status_container.find('input[name="_tp-upload-cancel"]').hide();
+						$status_container.removeClass('elgg-ajax-loader');
+					} else {
+						// Close the lightbox
+						$.fancybox.close();
+					}
+
+					event.preventDefault();
+				});
 
 			}
 		},
@@ -215,6 +269,9 @@ elgg.tidypics.upload.initEvents = function(hook, type, params, options) {
 		start: function(e) {
 			// Hide album menu inputs
 			var $album_menu = $(this).closest('form').find('#_tp-upload-album-menu');
+
+			// Get rid of remove links, need to cancel from here on in
+			$('._tp-upload-image-remove').remove();
 
 			// Hide close button
 			$('a#fancybox-close').remove();
@@ -240,8 +297,8 @@ elgg.tidypics.upload.initEvents = function(hook, type, params, options) {
 			var $status_container = $(this).closest('form').find('div.tidypics-upload-status');
 
 			$status_container.addClass('elgg-ajax-loader');
-			//$status_container.find('input[name="_tp-upload-cancel"]').show();
 			$status_container.find('span').html(elgg.echo('tidypics:upload:started'));
+			$status_container.find('input[name="_tp-upload-start"]').hide();
 		},
 		stop: function (e) {
 			// Get status container
@@ -250,29 +307,36 @@ elgg.tidypics.upload.initEvents = function(hook, type, params, options) {
 			// Get batch timestamp from upload form
 			var batch = $(this).closest('form').find('input[name="_tp-upload-batch"]').val();
 
+			var $album_guid_input = $('input[name="_tp-upload-album-guid"]');
+			
 			elgg.action('photos/uploads_complete', {
 				data: {
 					batch: batch,
+					album_guid: $album_guid_input.val(),
 				},
 				success: function(response) {
-					if (response.status == 0) {
-						// No errors
-						$status_container.find('span').html(elgg.echo('tidypics:upl_complete'));
-						$status_container.find('input[name="_tp-upload-finish"]').data('forward_url', response.output.forward_url).show();
-						//$status_container.find('input[name="_tp-upload-cancel"]').hide();
-						$status_container.removeClass('elgg-ajax-loader');
-					} else {
-						// There were errors
-						$status_container.find('span').html(response.output);
-						$status_container.addClass('tidypics-upload-status-error');
-						$status_container.removeClass('elgg-ajax-loader');
+					if (!$status_container.data('aborted')) {
+						if (response.status == 0) {
+							// No errors
+							$status_container.find('span').html(elgg.echo('tidypics:upl_complete'));
+							$status_container.find('input[name="_tp-upload-finish"]').data('forward_url', response.output.forward_url).show();
+							$status_container.find('input[name="_tp-upload-cancel"]').hide();
+							$status_container.removeClass('elgg-ajax-loader');
+						} else {
+							// There were errors
+							$status_container.find('span').html(response.output);
+							$status_container.addClass('tidypics-upload-status-error');
+							$status_container.removeClass('elgg-ajax-loader');
+						}
 					}
 				}
 			});
+	
 		},
 		progress: function (e, data) {
 			// Update progress for context
 			var progress = parseInt(data.loaded / data.total * 100, 10);
+			data.context.find('.tidypics-upload-image-progress span').remove();
 			data.context.find('.tidypics-upload-image-progress-bar').css(
 				'width',
 				progress + '%'
@@ -281,12 +345,58 @@ elgg.tidypics.upload.initEvents = function(hook, type, params, options) {
     	done: function(e, data) {
     		// Set progress for the context to 100%
     		data.context.find('.tidypics-upload-image-progress-bar').css('width','100%');
-    	},
-    	fail: function(e, data) {
-    		//console.log(data);
-    		//console.log(e);
     	}
-    });
+	});
+}
+
+/**
+ * Start upload
+ * 
+ * If a new album is needed, create it. Then fire uploads
+ */
+elgg.tidypics.upload.start = function(event) {
+	if (!$(this).attr('disabled')) {
+		$(this).attr('disabled', 'DISABLED');
+
+		// Determine if we're creating a new album or not
+		var $new_album_input = $('input[name="_tp_upload_new_album_title"]');
+		var $existing_album_input = $(':input[name="_tp_upload_select_existing_album"]');
+		var $album_guid_input = $('input[name="_tp-upload-album-guid"]');
+
+		// Existing album
+		if (!$new_album_input.hasClass('_tp-upload-active-input')) {
+			$album_guid_input.val($existing_album_input.val());
+
+			// Trigger custom start upload event
+			$(document).trigger('tpstartupload');
+		} else {
+			// New album, create it
+			var $form = $(this).closest('form');
+
+			elgg.action('photos/album/create', {
+				data: {
+					album_name: $form.find('input[name="_tp_upload_new_album_title"]').val(),
+					album_tags: $form.find('input[name="_tp_upload_album_tags"]').val(),
+					album_access: $form.find('select[name="_tp_upload_album_access_id"]').val(),
+					group_guid: $form.find('input[name="group_guid"]').val(),
+					container_guid: $form.find('input[name="container_guid"]').val()
+				},
+				success: function(response) {
+					if (response.status == 0) {
+						// Success
+						$album_guid_input.val(response.output.album_guid);
+
+						// Trigger custom start upload event
+						$(document).trigger('tpstartupload');
+					} else {
+						// Errors
+						$('input[name="_tp-upload-start"]').removeAttr('disabled');
+					}
+				}
+			});
+		}
+	}
+	event.preventDefault();
 }
 
 /**
@@ -300,6 +410,18 @@ elgg.tidypics.upload.createImageElement = function(data, file) {
 	var $div = $(document.createElement('div'));
 	$div.addClass('_tp-upload-image-element tidypics-upload-image-element');
 	$div.data('name', file.name);
+
+	var $remove = $(document.createElement('div'));
+	$remove.addClass('tidypics-upload-image-remove');
+	$remove.addClass('_tp-upload-image-remove');
+
+	var $remove_icon = $(document.createElement('span'));
+	$remove_icon.addClass('elgg-icon');
+	$remove_icon.addClass('elgg-icon-delete');
+
+	$remove.append($remove_icon);
+
+	$div.append($remove);
 	
 	var $name = $(document.createElement('div'));
 	$name.addClass('tidypics-upload-image-name');
@@ -308,6 +430,7 @@ elgg.tidypics.upload.createImageElement = function(data, file) {
 	$div.append($name);
 
 	var $progress = $(document.createElement('div'));
+	$progress.html("<span>" + elgg.echo('tidypics:upload:waiting') + "</span>");
 	$progress.addClass('tidypics-upload-image-progress');
 
 	var $bar = $(document.createElement('div'));

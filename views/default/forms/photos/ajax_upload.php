@@ -13,12 +13,19 @@ $group_guid = elgg_extract('group_guid', $vars); // For groups
 // Get container entity 
 $container = get_entity($container_guid);
 
+// Get group entity
+$group = get_entity($group_guid);
+
 // Default heading
 $heading = elgg_echo("tidypics:upload:{$context}");
 
 // Build heading based on context
 if (elgg_instanceof($container, 'group')) {
 	$heading .= elgg_echo('tidypics:upload:togroup', array($container->name));
+	$album_container = $container->guid;
+} else if (elgg_instanceof($group, 'group')) {
+	$heading .= elgg_echo('tidypics:upload:togroup', array($group->name));
+	$album_container = $group->guid;
 } else if (elgg_instanceof($container, 'object', 'album')) {
 	$heading .= elgg_echo('tidypics:upload:toalbum', array($container->title));
 	if (elgg_instanceof($container->getContainerEntity(), 'group')) {
@@ -65,13 +72,21 @@ if ($context == 'addphotos' || $context == 'addalbum') {
 			'class' => 'elgg-button elgg-button-action',
 		));
 
-		// Get list of existing albums
-		$albums = elgg_get_entities(array(
+		// Existing album options
+		$album_options = array(
 			'type' => 'object',
 			'subtype' => 'album',
 			'limit' => 30, // @todo could have a ton of albums, grabbing most 30 recent for now
-			'owner_guid' => elgg_get_logged_in_user_guid(),
-		));
+			'owner_guid' => elgg_get_logged_in_user_guid(), 
+		);
+
+		// If we're creating photos in a group, only show group albums
+		if ($album_container) {
+			$album_options['container_guid'] = $album_container;
+		}
+
+		// Get albums
+		$albums = elgg_get_entities($album_options);
 
 		$album_options = array();
 
@@ -217,6 +232,7 @@ $select_input = elgg_view('input/submit', array(
 	'value' => elgg_echo('tidypics:upload:browsephotos'),
 ));
 
+// File input
 $file_input = elgg_view('input/file', array(
 	'name' => '_tp_upload_file_input',
 	'id' => '_tp_upload-file-input',
@@ -230,6 +246,18 @@ $batch_input = elgg_view('input/hidden', array(
 	'value' => time(),
 ));
 
+// Album input
+$album_input = elgg_view('input/hidden', array(
+	'name' => '_tp-upload-album-guid',
+));
+
+// Finish button
+$start_input = elgg_view('input/submit', array(
+	'name' => '_tp-upload-start',
+	'value' => elgg_echo('tidypics:upload:start'),
+	'class' => 'elgg-button elgg-button-submit right tidypics-upload-start-input',
+));
+
 // Finish button
 $finish_input = elgg_view('input/submit', array(
 	'name' => '_tp-upload-finish',
@@ -241,7 +269,7 @@ $finish_input = elgg_view('input/submit', array(
 $cancel_input = elgg_view('input/submit', array(
 	'name' => '_tp-upload-cancel',
 	'value' => elgg_echo('tidypics:upload:cancel'),
-	'class' => 'elgg-button elgg-button-action right tidypics-upload-cancel-input',
+	'class' => 'elgg-button elgg-button-cancel right tidypics-upload-cancel-input',
 ));
 
 // Build form content
@@ -257,11 +285,12 @@ $content = <<<HTML
 	</div>
 	<div class='elgg-foot'>
 	<!-- Hidden inputs -->
-	$file_input $batch_input
+	$file_input $batch_input $album_input
 		<div class='tidypics-upload-status'>
 			<span></span>
 			$finish_input
 			$cancel_input
+			$start_input
 		</div>
 	</div>
 HTML;

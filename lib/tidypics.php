@@ -40,17 +40,14 @@ function tidypics_get_list_content($type, $page_type, $container_guid = NULL) {
 		elgg_push_breadcrumb(elgg_echo("{$type}:all"));
 	}
 
+	// Make sure we can create a new album here (check for group perms)
+	if ($logged_in_user_guid && (!elgg_instanceof($owner, 'group') || $owner->canWriteToContainer($logged_in_user_guid))) {
+		$options['enable_upload'] = TRUE;
+	}
+
 	if ($type == 'albums') {
-		// Make sure we can create a new album here (check for group perms)
-		if ($logged_in_user_guid && (!elgg_instanceof($owner, 'group') || $owner->canWriteToContainer($logged_in_user_guid))) {
-			$options['enable_upload'] = TRUE;
-		}
 		$content = tidypics_view_album_list($options);
 	} else {
-		if ($logged_in_user_guid) {
-			$options['enable_upload'] = TRUE;
-		}
-
 		$content = tidypics_view_photo_list($options);
  	}
 

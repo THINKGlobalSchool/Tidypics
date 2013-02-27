@@ -193,13 +193,17 @@ div.tidypics-none {
 	width: auto;
 }
 
+div.tidypics-none:only-child > div {
+	width: auto;
+}
+
 div.tidypics-none > div{
 	border: 5px solid #EEEEEE;
-    color: #999999;
-    font-weight: bold;
-    height: 152px;
-    line-height: 151px;
-    width: 510px;
+	color: #999999;
+	font-weight: bold;
+	height: 152px;
+	line-height: 151px;
+	width: 510px;
 }
 
 a.tidypics-load-more {
@@ -259,7 +263,9 @@ div.tidypics-upload-dropzone-inner {
 }
 
 input.tidypics-upload-finish-input,
-input.tidypics-upload-cancel-input {
+input.tidypics-upload-cancel-input,
+input.tidypics-upload-start-input {
+	margin-left: 8px;
 	display: none;
 }
 
@@ -289,13 +295,26 @@ div.tidypics-upload-image-element {
 	position: relative;
 }
 
+div.tidypics-upload-image-element .tidypics-upload-image-remove {
+	left: 5px;
+	top: 5px;
+	position: absolute;
+	cursor: pointer;
+}
+
 div.tidypics-upload-image-element .tidypics-upload-image-progress {
 	border: 1px solid #AAAAAA;
-	height: 16px;
-	width: 134px;
-	position: absolute;
 	bottom: 5px;
+	color: #AAAAAA;
+	font-size: 0.8em;
+	font-style: italic;
+	font-weight: bold;
+	height: 16px;
+	line-height: 16px;
 	padding: 1px;
+	position: absolute;
+	text-align: center;
+	width: 134px;
 }
 
 div.tidypics-upload-image-element .tidypics-upload-image-progress .tidypics-upload-image-progress-bar {

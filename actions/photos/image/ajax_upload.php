@@ -5,58 +5,34 @@
 
 elgg_load_library('tidypics:upload');
 
-if ($_SESSION['_tp_new_album_guid']) {
-	$album_guid = $_SESSION['_tp_new_album_guid'];
-} else {
-	$album_guid = get_input('_tp_upload_select_existing_album');
-	$new_album = get_input('_tp_upload_new_album_title', NULL);
-}
-
 $batch = get_input('_tp-upload-batch');
 
-if ($group_guid = get_input('group_guid')) {
-	$container_guid = $group_guid;
-} else {
-	$container_guid = get_input('container_guid', elgg_get_logged_in_user_guid());
-}
+$album_guid = get_input('_tp-upload-album-guid');
 
-$errors = array();
-$messages = array();
+$album = get_entity($album_guid);
 
-// Existing album
-if ($album_guid) {
-	$album = get_entity($album_guid);
-} else if ($new_album) { // New album
-	// Get tags
-	$tags = string_to_tag_array(get_input('_tp_upload_album_tags'));
-
-	// Get access id
-	$access_id = get_input('_tp_upload_album_access_id', ACCESS_DEFAULT);
-
-	$album = new TidypicsAlbum();
-	$album->container_guid = $container_guid;
-	$album->owner_guid = elgg_get_logged_in_user_guid();
-	$album->access_id = $access_id;
-	$album->title = $new_album;
-	$album->tags = $tags;
-	$album->save();
-
-	$_SESSION['_tp_new_album_guid'] = $album->guid;
-}
-
+// Make sure we have a valid album
 if (!elgg_instanceof($album, 'object', 'album')) {
 	register_error(elgg_echo('tidypics:baduploadform'));
 	forward(REFERER);
 }
 
+// Make sure we can write to the container (for groups)
 if (!$album->getContainerEntity()->canWriteToContainer(elgg_get_logged_in_user_guid())) {
 	register_error(elgg_echo('tidypics:nopermission'));
 	forward(REFERER);
 }
 
+$errors = array();
+$messages = array();
 
-// Set album guid in session for upload complete action
-$_SESSION['_tp_album_guid'] = $album->guid;
+$group_guid = get_input('group_guid');
+
+if ($group_guid) {
+	$container_guid = $group_guid;
+} else {
+	$container_guid = get_input('container_guid', elgg_get_logged_in_user_guid());
+}
 
 // probably POST limit exceeded
 if (empty($_FILES)) {
@@ -75,15 +51,16 @@ if ($mime == 'unknown') {
 
 $image = new TidypicsImage();
 $image->container_guid = $album->guid;
-$image->setMimeType($mime);
 $image->access_id = $album->access_id;
-$image->tags = $album->tags; // Set image tags from album tags
+$image->setMimeType($mime);
 $image->batch = $batch;
+$image->tags = $album->tags;
 
 try {
 	$image->save($file);
 
 	$album->prependImageList(array($image->guid));
+
 	if (elgg_get_plugin_setting('img_river_view', 'tidypics') === "all") {
 		add_to_river('river/object/image/create', 'create', $image->getOwnerGUID(), $image->getGUID());
 	}
@@ -95,11 +72,9 @@ try {
 }
 
 echo json_encode(array(
-	'album_guid' => $album->guid,
+	'album_guid' => $album_guid,
 	'image_guid' => $image->guid,
 	'batch' => $batch,
 ));
-
-// $image->complete = TRUE;
 
 forward(REFERER);

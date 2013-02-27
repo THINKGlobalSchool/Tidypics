@@ -3,20 +3,24 @@
  * Ajax batch upload complete
  */
 
-// Unset new album guid from previous uploads
-if (isset($_SESSION['_tp_new_album_guid'])) {
-	unset($_SESSION['_tp_new_album_guid']);
-}
-
 $batch = get_input('batch');
-$album_guid = (int) $_SESSION['_tp_album_guid'];
+
+$album_guid = get_input('album_guid', FALSE);
+
 $img_river_view = elgg_get_plugin_setting('img_river_view', 'tidypics');
 
+// Get the album
 $album = get_entity($album_guid);
 if (!elgg_instanceof($album, 'object', 'album')) {
 	register_error('');
 	echo elgg_echo('tidypics:baduploadform');
 	forward(REFERER);
+}
+
+// Check permissions on album container (for groups)
+if (!$album->getContainerEntity()->canWriteToContainer(elgg_get_logged_in_user_guid())) {
+ 	register_error(elgg_echo('tidypics:nopermission'));
+ 	forward(REFERER);
 }
 
 $params = array(
@@ -29,37 +33,20 @@ $params = array(
 
 $images = elgg_get_entities_from_metadata($params);
 
-// // Make sure all the images completed the save process
-// foreach($images as $idx => $image) {
-// 	if ($image->complete) {
-// 		$options = array(
-// 			'guid' => $image->guid,
-// 			'metadata_name' => 'complete'
-// 		);
-// 		// Remove incomplete metadata
-// 		elgg_delete_metadata($options);
-// 	} else {
-// 		// Try deleting incomplete image the usual way
-// 		if (!$image->delete()) {
-// 			// If not, it probably failed at ElggFile->delete() because no data was stored
-// 			delete_entity($image->guid, TRUE); // Force it to be gone
-// 		}
-// 		unset($images[$idx]);
-// 	}
-// }
-
-if ($images) {
+if ($images) {	
 	// Create a new batch object to contain these photos
 	$batch = new ElggObject();
 	$batch->subtype = "tidypics_batch";
 	$batch->access_id = $album->access_id;
 	$batch->container_guid = $album->guid;
-	
+
 	if ($batch->save()) {
 		foreach ($images as $image) {
+			// Add batch relationship
 			add_entity_relationship($image->guid, "belongs_to_batch", $batch->getGUID());
 		}
 	}
+
 } else {
 	// No images uploaded! Display an error. Delete the album if it's brand new
 	if ($album->new_album) {
@@ -108,4 +95,5 @@ echo json_encode(array(
 	'batch_guid' => $batch->getGUID(),
 	'forward_url' => $album->getURL(),
 ));
+
 forward(REFERER);

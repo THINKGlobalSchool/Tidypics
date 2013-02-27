@@ -48,20 +48,24 @@ class TidypicsImage extends ElggFile {
 		if (!parent::save()) {
 			return false;
 		}
-
+	
 		if ($data) {
 			// new image
 			$result = true;
 			$this->simpletype = "image";
+
 			$result &= $this->saveImageFile($data);
 			$result &= $this->autoOrient();
-			$result &= $this->saveThumbnails();
+			$result &= $this->saveThumbnails();	
 			$result &= $this->extractExifData();
 
 			// If any of the above fails
 			if (!$result) {
 				// Delete the image, we don't want incomplete entities everywhere
-				$this->delete();
+				if (!$this->delete()) {
+					// Parent delete was called but failed, force deletion
+					delete_entity($this->guid, TRUE);
+				}
 
 				// Throw an exception
 				throw new Exception(elgg_echo('tidypics:save_error'));
@@ -99,7 +103,7 @@ class TidypicsImage extends ElggFile {
 		}
 
 		$album = get_entity($this->container_guid);
-		if ($album) {
+		if (elgg_instanceof($album, 'object', 'album')) {
 			$album->removeImage($this->guid);
 		}
 
@@ -226,7 +230,11 @@ class TidypicsImage extends ElggFile {
 	 * @param array $data
 	 */
 	protected function saveImageFile($data) {
-		$this->checkUploadErrors($data);
+		try {
+			$this->checkUploadErrors($data);
+		} catch (Exception $e) {
+			return false;
+		}
 
 		// we need to make sure the directory for the album exists
 		// @note for group albums, the photos are distributed among the users
@@ -254,11 +262,15 @@ class TidypicsImage extends ElggFile {
 	 * @param type $data
 	 */
 	protected function checkUploadErrors($data) {
+
 		// check for upload errors
 		if ($data['error']) {
-			if ($data['error'] == 1) {
+			if ($data['error'] == UPLOAD_ERR_INI_SIZE) {
 				trigger_error('Tidypics warning: image exceeded server php upload limit', E_USER_WARNING);
 				throw new Exception(elgg_echo('tidypics:image_mem'));
+			} else if ($data['error'] == UPLOAD_ERR_PARTIAL) {
+				trigger_error('Tidypics warning: image partially uploaded');
+				throw new Exception(elgg_echo('tidypics:partial_upload'));
 			} else {
 				throw new Exception(elgg_echo('tidypics:unk_error'));
 			}
