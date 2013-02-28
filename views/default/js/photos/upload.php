@@ -152,7 +152,7 @@ elgg.tidypics.upload.initEvents = function(hook, type, params, options) {
 			// Check file size
 			if (file.size > maxsizebytes) {
 				elgg.register_error(elgg.echo('tidypics:exceed_filesize', [file.name, elgg.tidypics.upload.maxfilesize]));
-			} else {
+			} else if (file.type) { // ensure file has a type (will ignore unix hidden files)
 				// Get status container
 				var $status_container = $(this).closest('form').find('div.tidypics-upload-status');
 

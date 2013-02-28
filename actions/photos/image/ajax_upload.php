@@ -45,7 +45,7 @@ $file = $_FILES['_tp_upload_file_input'];
 
 $mime = tp_upload_get_mimetype($file['name']);
 if ($mime == 'unknown') {
-	register_error(elgg_echo('tidypics:not_image'));
+	register_error(elgg_echo('tidypics:not_image', array($file['name'])));
 	forward(REFERER);
 }
 
