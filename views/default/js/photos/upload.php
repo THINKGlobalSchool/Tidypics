@@ -128,14 +128,14 @@ elgg.tidypics.upload.initEvents = function(hook, type, params, options) {
 
 	/** SET UP FILEUPLOAD **/
 	$upload_container.delegate('input[name="_tp_upload_choose_submit"]', 'click', function(event) {
-		$upload_container.find('#_tp_upload-file-input').trigger('click');
+		$upload_container.find('#_tp-upload-file-input').trigger('click');
 		event.preventDefault();
 	});
 
-	$('#_tp_upload-file-input').fileupload({
+	$('#_tp-upload-file-input').fileupload({
         dataType: 'json',
 		dropZone: $('#_tp-upload-dropzone'),
-		fileInput: $('#_tp_upload-file-input'),
+		fileInput: $('#_tp-upload-file-input'),
 		url: elgg.get_site_url() + "action/photos/upload",
 		sequentialUploads: true,
 		drop: function (e, data) {

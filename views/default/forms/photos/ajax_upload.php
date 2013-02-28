@@ -235,7 +235,7 @@ $select_input = elgg_view('input/submit', array(
 // File input
 $file_input = elgg_view('input/file', array(
 	'name' => '_tp_upload_file_input',
-	'id' => '_tp_upload-file-input',
+	'id' => '_tp-upload-file-input',
 	'class' => 'hidden',
 	'multiple' => 'multiple',
 ));
