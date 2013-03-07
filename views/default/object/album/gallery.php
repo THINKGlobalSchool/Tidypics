@@ -9,8 +9,16 @@
  */
 
 $album = elgg_extract('entity', $vars);
+$enable_lightbox = elgg_extract('enable_lightbox', $vars);
 
-$album_cover = elgg_view_entity_icon($album, 'small', array('href' => $album->getURL()));
+$icon_options = array('href' => $album->getURL());
+
+if ($enable_lightbox) {
+	elgg_push_context('tidypics_view_album');
+	$icon_options['link_class'] = 'tidypics-album-lightbox';
+}
+
+$album_cover = elgg_view_entity_icon($album, 'small', $icon_options);
 
 // Album title beneath
 $footer = elgg_view('output/url', array(

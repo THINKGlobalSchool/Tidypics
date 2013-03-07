@@ -1,6 +1,6 @@
 <?php
 /**
- * Image icon view
+ * Album icon view
  *
  * @uses $vars['entity']     The entity the icon represents - uses getIconURL() method
  * @uses $vars['size']       tiny, small (default), large, master

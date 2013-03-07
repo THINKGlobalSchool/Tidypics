@@ -329,7 +329,7 @@ function tidypics_get_album_sort_content($album_guid) {
 		forward('');
 	}
 
-	// Make sure we can edit the photo
+	// Make sure we can edit the album
 	if (!$album->canEdit()) {
 		register_error(elgg_echo('tidypics:nopermission'));
 		forward($album->getURL());

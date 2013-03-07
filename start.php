@@ -171,6 +171,7 @@ function tidypics_init() {
 	elgg_register_ajax_view('photos/move_image');
 	elgg_register_ajax_view('forms/photos/album/list');
 	elgg_register_ajax_view('photos/tagging/tags');
+	elgg_register_ajax_view('photos/album_photos_lightbox');
 
 
 	/** BATCH COMMENTS/LIKING FIXES **/

@@ -16,10 +16,8 @@ elgg.tidypics.lightbox.enable_pushstate = true;
 
 // General init
 elgg.tidypics.lightbox.init = function() {
-	// Init fancybox2 lightbox
-	if ($(".tidypics-lightbox").length) {
-		$(".tidypics-lightbox").attr('rel', 'tidypics-lightbox').fancybox2(elgg.tidypics.lightbox.getFancyboxInit(null));
-	}
+	// Init lightboxes
+	elgg.tidypics.lightbox.initImages();
 
 	// If first init, init events
 	if (!elgg.tidypics.lightbox.events_initted) {
@@ -27,6 +25,13 @@ elgg.tidypics.lightbox.init = function() {
 		elgg.tidypics.lightbox.initEvents();
 		
 		elgg.tidypics.lightbox.events_initted = true;
+	}
+}
+
+// Init fancybox2 lightbox on images
+elgg.tidypics.lightbox.initImages = function() {
+	if ($(".tidypics-lightbox").length) {
+		$(".tidypics-lightbox").attr('rel', 'tidypics-lightbox').fancybox2(elgg.tidypics.lightbox.getFancyboxInit(null));
 	}
 }
 
@@ -58,6 +63,7 @@ elgg.tidypics.lightbox.getFancyboxInit = function(href) {
 		scrolling: 'no',
 		beforeShow: function() {
 			//console.log('beforeShow');
+
 			var new_state = this.href;
 
 			// Make sure pushstate is enabled
@@ -199,7 +205,24 @@ elgg.tidypics.lightbox.getFancyboxInit = function(href) {
 			thumbs	: {
 				width	: 50,
 				height	: 50,
-				appendTo: '.tidypics-lightbox-footer'
+				appendTo: '.tidypics-lightbox-footer',
+				source  : function (item) {  // function to obtain the URL of the thumbnail image
+					var href;
+
+					if (item.element) {
+						href = $(item.element).find('img').attr('src');
+					}
+
+					if (!href && item.type === 'image' && item.href) {
+						href = item.href;
+					}
+
+					if (!href && item.type === 'ajax' && item.thumbSource) {
+						href = item.thumbSource;
+					}
+
+					return href;
+				}
 			},
 			buttons	: {
 				skipSingle: true,
@@ -229,6 +252,9 @@ elgg.tidypics.lightbox.getFancyboxInit = function(href) {
 }
 
 elgg.tidypics.lightbox.initEvents = function() {
+	// Click event for album lightboxes
+	$(document).delegate(".tidypics-album-lightbox", 'click', elgg.tidypics.lightbox.openAlbum);	
+
 	// Unbind elgg confirmation from delete links
 	$('.elgg-requires-confirmation').die('click');
 
@@ -249,6 +275,31 @@ elgg.tidypics.lightbox.initEvents = function() {
 
 	// Ajaxify setting album cover
 	$(document).delegate('body.fancybox2-lock li.elgg-menu-item-set-cover a', 'click', elgg.tidypics.lightbox.makeCoverClick);
+}
+
+// Open album in a lightbox
+elgg.tidypics.lightbox.openAlbum = function(event) {
+	var album_json_endpoint = elgg.get_site_url() + 'ajax/view/photos/album_photos_lightbox';
+
+	var album_guid = $(this).data('album_guid');
+
+	var $_this = $(this);
+
+	elgg.getJSON(album_json_endpoint, {
+		data: {
+			'container_guid':  album_guid
+		},
+		success: function(data) {
+			if (data) {
+				$_this.fancybox2();
+				$.fancybox2.open(data,elgg.tidypics.lightbox.getFancyboxInit(null));
+			} else {
+				// No data, or empty album
+				window.location.href = $_this.attr('href');
+			}
+		}
+	});
+	event.preventDefault();
 }
 
 // Lightbox comments click handler
