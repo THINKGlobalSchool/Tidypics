@@ -28,6 +28,19 @@ $footer = elgg_view('output/url', array(
 	'class' => 'tidypics-heading',
 ));
 
+// Show album owner link if no page owner
+if (!elgg_get_page_owner_guid()) {
+	$owner = $album->getOwnerEntity();
+
+	$owner_link = elgg_view('output/url', array(
+		'href' => "photos/owner/$owner->username",
+		'text' => $owner->name,
+		'is_trusted' => true,
+	));
+
+	$footer .= '<div class="elgg-subtext">' . $owner_link . '</div>';
+}
+
 $footer .= '<div class="elgg-subtext">' . elgg_echo('album:num', array($album->getSize())) . '</div>';
 
 $params = array(
