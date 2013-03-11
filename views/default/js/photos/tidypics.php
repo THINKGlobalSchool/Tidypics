@@ -18,6 +18,11 @@ elgg.tidypics.init = function() {
 		scroll: true
 	});
 
+	// Implement popstate
+	window.addEventListener("popstate", function(e) {
+		elgg.tidypics.popState(e);
+	});
+
 	// Init sort submit
 	$('.elgg-form-photos-album-sort').submit(function() {
 		var tidypics_guids = [];
@@ -173,13 +178,13 @@ elgg.tidypics.setPageTitles = function(title) {
 
 // History popstate event
 elgg.tidypics.popState = function(event) {
+	// Trigger a hook for popState
+	elgg.trigger_hook('popState', 'tidypics', {'event' : event}, null);
+
 	// Fix chrome/safari page load popstate (need to supply a state in each pushState for this to work)
 	if (!event.state) {
 		return;
 	}
-
-	// Trigger a hook for popState
-	elgg.trigger_hook('popState', 'tidypics', {'event' : event}, null);
 
 	// If going back/forward to an image lightbox, call the lightbox jumpto event
 	if (location.href.indexOf('photos/image/') !== -1) {
@@ -193,12 +198,15 @@ elgg.tidypics.popState = function(event) {
 			$.fancybox2.close();
 			return;
 		}
-		// Load content at location
-		elgg.tidypics.loadTabContent(location.href);
 
-		// Select the proper tab
-		$('ul.elgg-menu-photos-filter > li').removeClass('elgg-state-selected');
-		$('a[href="' + location.href + '"]').parent().addClass('elgg-state-selected');
+		if (location.href.indexOf('photos/') !== -1) {
+			// Load content at location
+			elgg.tidypics.loadTabContent(location.href);
+
+			// Select the proper tab
+			$('ul.elgg-menu-photos-filter > li').removeClass('elgg-state-selected');
+			$('a[href="' + location.href + '"]').parent().addClass('elgg-state-selected');
+		}
 	}
 }
 

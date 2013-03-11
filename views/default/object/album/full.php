@@ -89,11 +89,6 @@ $js = <<<JAVASCRIPT
 			var initial_state = window.location.href.substring(0, window.location.href.indexOf('?'));
 			history.pushState({from: 'albumFull'}, null, initial_state);
 
-			// Implement popstate
-			window.addEventListener("popstate", function(e) {
-				elgg.tidypics.popState(e);
-			});
-
 			if (load_lightbox) {
 				var lightbox_url = '$lightbox_url';
 				$.fancybox2(elgg.tidypics.lightbox.getFancyboxInit(lightbox_url));
