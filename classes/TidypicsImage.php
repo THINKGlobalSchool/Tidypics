@@ -102,18 +102,24 @@ class TidypicsImage extends ElggFile {
 			}
 		}
 
+		$this->removeThumbnails();
+
+		$image_size = $this->size();
+
+		if (!parent::delete()) {
+			return false;
+		}
+
 		$album = get_entity($this->container_guid);
 		if (elgg_instanceof($album, 'object', 'album')) {
 			$album->removeImage($this->guid);
 		}
 
-		$this->removeThumbnails();
-
 		// update quota
 		$owner = $this->getOwnerEntity();
-		$owner->image_repo_size = (int)$owner->image_repo_size - $this->size();
+		$owner->image_repo_size = (int)$owner->image_repo_size - $image_size;
 
-		return parent::delete();
+		return true;
 	}
 
 	/**

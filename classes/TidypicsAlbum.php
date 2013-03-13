@@ -63,12 +63,15 @@ class TidypicsAlbum extends ElggObject {
 	 */
 	public function delete() {
 
-		$this->deleteImages();
+		if (!parent::delete()) {
+			return false;
+		}
+
 		$this->deleteAlbumDir();
 
 		elgg_trigger_event('delete', 'album', $this);
 		
-		return parent::delete();
+		return true;
 	}
 
 	/**
@@ -355,6 +358,7 @@ class TidypicsAlbum extends ElggObject {
 			"container_guid" => $this->guid,
 			"limit" => ELGG_ENTITIES_NO_VALUE,
 		));
+
 		if ($images) {
 			foreach ($images as $image) {
 				if ($image) {
@@ -371,7 +375,7 @@ class TidypicsAlbum extends ElggObject {
 		$tmpfile = new ElggFile();
 		$tmpfile->setFilename('image/' . $this->guid . '/._tmp_del_tidypics_album_');
 		$tmpfile->subtype = 'image';
-		$tmpfile->owner_guid = $this->owner_guid;
+		$tmpfile->owner_guid = $this->container_guid;
 		$tmpfile->container_guid = $this->guid;
 		$tmpfile->open("write");
 		$tmpfile->write('');

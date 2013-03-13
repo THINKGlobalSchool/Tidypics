@@ -662,7 +662,14 @@ function tidypics_photo_list_sort_menu_setup($hook, $type, $return, $params) {
  * @return mixed
  */
 function tidypics_group_permission_override($hook, $type, $result, $params) {
-	if (get_input('action') == 'photos/upload' || get_input('action') == 'photos/uploads_complete') {
+	// Set valid actions for permissions override
+	$valid_actions = array(
+		'photos/upload',
+		'photos/uploads_complete',
+		'photos/delete',
+	);
+
+	if (in_array(get_input('action'), $valid_actions)) {
 		if (isset($params['container'])) {
 			$album = $params['container'];
 		} else {
