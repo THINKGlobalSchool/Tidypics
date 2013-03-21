@@ -260,6 +260,8 @@ elgg.tidypics.upload.initEvents = function(hook, type, params, options) {
 					event.preventDefault();
 				});
 
+			} else {
+				elgg.register_error(elgg.echo('tidypics:not_image', [file.name]));
 			}
 		},
 		dragover: function (e, data) {
