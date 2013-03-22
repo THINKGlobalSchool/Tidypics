@@ -7,10 +7,6 @@
 
 $js_path = elgg_get_config('path');
 
-$widget_path = "{$js_path}mod/tidypics/vendors/jquery-file-upload/jquery.ui.widget.js";
-$transport_path = "{$js_path}mod/tidypics/vendors/jquery-file-upload/jquery.iframe-transport.js";
 $fileupload_path = "{$js_path}mod/tidypics/vendors/jquery-file-upload/jquery.fileupload.js";
 
-include $widget_path;
-include $transport_path;
 include $fileupload_path;
