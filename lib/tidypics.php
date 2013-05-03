@@ -695,7 +695,8 @@ function tp_guid_callback($row) {
  */
 function tp_get_img_dir() {
 	$file = new ElggFile();
-	return $file->getFilenameOnFilestore() . 'image/';
+	$file->setFilename('empty'); // Need a filename to get the directory
+	return dirname($file->getFilenameOnFilestore()) . '/image/';
 }
 
 /**
