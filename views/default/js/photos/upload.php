@@ -16,7 +16,7 @@ elgg.tidypics.upload.maxfilesize = '<?php echo $maxfilesize; ?>';
 
 elgg.tidypics.upload.init = function() {
 	// Get uploader entity
-	var $uploader = $('.elgg-module-tidypics-upload div._tp-uploader');
+	var $uploader = $('div._tp-uploader');
 
 	// Make sure it exists
 	if ($uploader.length) {
@@ -41,7 +41,7 @@ elgg.tidypics.upload.init = function() {
 		var encoded_params = $.param(params);
 
 		// Init lightbox
-		$('.elgg-module-tidypics-upload div._tp-uploader').fancybox({
+		$('div._tp-uploader').fancybox({
 			'hideOnOverlayClick': false,
 			'hideOnContentClick': false,
 			'href': elgg.get_site_url() + 'ajax/view/photos/ajax_upload?' + encoded_params,
