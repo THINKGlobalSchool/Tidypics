@@ -44,54 +44,27 @@ function tidypics_init() {
 
 	// Register JS Libs
 	$js = elgg_get_simplecache_url('js', 'photos/tidypics');
-	elgg_register_simplecache_view('js/photos/tidypics');
 	elgg_register_js('tidypics', $js, 'footer');
 
 	$js = elgg_get_simplecache_url('js', 'photos/tagging');
-	elgg_register_simplecache_view('js/photos/tagging');
 	elgg_register_js('tidypics:tagging', $js, 'footer');
 	
 	$js = elgg_get_simplecache_url('js', 'photos/upload');
-	elgg_register_simplecache_view('js/photos/upload');
 	elgg_register_js('tidypics:upload', $js, 'footer');
 
 	$js = elgg_get_simplecache_url('js', 'photos/lightbox');
-	elgg_register_simplecache_view('js/photos/lightbox');
 	elgg_register_js('tidypics:lightbox', $js, 'footer');
 
 	// Register jquery-waypoints js lib
 	$js = elgg_get_simplecache_url('js', 'waypoints');
-	elgg_register_simplecache_view('js/waypoints');
 	elgg_register_js('jquery-waypoints', $js);
-
-	// Register jquery ui widget (for jquery file upload)
-	$js = elgg_get_simplecache_url('js', 'jquery_ui_widget');
-	elgg_register_simplecache_view('js/jquery_ui_widget');
-	elgg_register_js('jquery.ui.widget', $js);
-
-	// Register jquery-file-upload js lib
-	$js = elgg_get_simplecache_url('js', 'jquery_file_upload');
-	elgg_register_simplecache_view('js/jquery_file_upload');
-	elgg_register_js('jquery-file-upload', $js);
-
-	// Register jquery iframe transport (for jquery file upload)'
-	$js = elgg_get_simplecache_url('js', 'jquery_iframe_transport');
-	elgg_register_simplecache_view('js/jquery_iframe_transport');
-	elgg_register_js('jquery.iframe-transport', $js);
-
-	// Load jquery-file-upload libs
-	elgg_load_js('jquery.ui.widget');
-	elgg_load_js('jquery-file-upload');
-	elgg_load_js('jquery.iframe-transport');
 
 	// Register jquery-fancybox2 js lib
 	$js = elgg_get_simplecache_url('js', 'fancybox2');
-	elgg_register_simplecache_view('js/fancybox2');
 	elgg_register_js('jquery-fancybox2', $js);
 
 	// Register jquery-fancybox2 css
 	$css = elgg_get_simplecache_url('css', 'fancybox2');
-	elgg_register_simplecache_view('css/fancybox2');
 	elgg_register_css('jquery-fancybox2', $css);
 
 	// Load lightbox JS/CSS
