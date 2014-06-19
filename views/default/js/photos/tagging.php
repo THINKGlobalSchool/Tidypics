@@ -69,7 +69,6 @@ elgg.tidypics.tagging.destroy = function() {
  * Start a tagging session
  */
 elgg.tidypics.tagging.start = function(event) {
-
 	// Trigger a tagging started hook
 	elgg.trigger_hook('peopleTagStarted', 'tidypics', null, null);
 
@@ -109,7 +108,7 @@ elgg.tidypics.tagging.start = function(event) {
 elgg.tidypics.tagging.stop = function() {
 	$('#tidypics-tagging-help').hide();
 	$('#tidypics-tagging-select').hide();
-	$('.tidypics-photo').imgAreaSelect({hide: true, disable: true});
+	$('.tidypics-photo').imgAreaSelect({remove: true});
 	$('.tidypics-photo').css({"cursor" : "pointer"});
 
 	elgg.tidypics.tagging.active = false;

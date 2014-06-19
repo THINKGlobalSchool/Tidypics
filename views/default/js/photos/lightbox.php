@@ -140,7 +140,10 @@ elgg.tidypics.lightbox.getFancyboxInit = function(href) {
 
 			// Clicking a photo opens the master image in a new window
 			$photo.parent().bind('click', function(event) {
-				window.open($(this).attr('href'));
+				// Don't open new window if tagging is active
+				if (!elgg.tidypics.tagging.active) {
+					window.open($(this).attr('href'));
+				}	
 				event.preventDefault();
 			});
 
