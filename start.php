@@ -128,6 +128,17 @@ function tidypics_init() {
 	elgg_register_widget_type('album_view', elgg_echo("tidypics:widget:albums"), elgg_echo("tidypics:widget:album_descr"), 'profile');
 	elgg_register_widget_type('latest_photos', elgg_echo("tidypics:widget:latest"), elgg_echo("tidypics:widget:latest_descr"), 'profile');
 
+	if (elgg_is_active_plugin('roles')) {
+		elgg_register_widget_type('profile_tagged', elgg_echo('tidypics:widget:tagged'), elgg_echo('tidypics:widget:tagged_desc'), 'roleprofilewidget');
+		elgg_register_widget_type('profile_albums', elgg_echo("tidypics:widget:albums"), elgg_echo("tidypics:widget:albums"), 'roleprofilewidget');
+		elgg_register_widget_type('profile_latest_photos', elgg_echo("tidypics:widget:latest"), elgg_echo("tidypics:widget:latest"), 'roleprofilewidget');
+		
+		// Register ajax views for widget content
+		elgg_register_ajax_view('widgets/profile_tagged/content');
+		elgg_register_ajax_view('widgets/profile_albums/content');
+		elgg_register_ajax_view('widgets/profile_latest_photos/content');
+	}
+
 	// RSS extensions for embedded media
 	elgg_extend_view('extensions/xmlns', 'extensions/photos/xmlns');
 
@@ -141,6 +152,9 @@ function tidypics_init() {
 	// @todo notifications
 	register_notification_object('object', 'album', elgg_echo('tidypics:newalbum_subject'));
 	elgg_register_plugin_hook_handler('notify:entity:message', 'object', 'tidypics_notify_message');
+
+	// Role profile widget integration
+	elgg_register_plugin_hook_handler('get_dynamic_handlers', 'role_widgets', 'tidypics_register_dynamic_widget_handlers');
 
 	// Register pagesetup event handler for menu items
 	elgg_register_event_handler('pagesetup', 'system', 'tidypics_pagesetup');
@@ -785,6 +799,22 @@ function tidypics_notify_message($hook, $type, $result, $params) {
 	}
 	
 	return null;
+}
+
+/**
+ * Register roleprofilewidgets as dynamic handlers to provide individual titles
+ * for user widgets
+ *
+ * @param string $hook
+ * @param string $type
+ * @param bool   $return
+ * @param array  $params
+ * @return mixed
+ */
+function tidypics_register_dynamic_widget_handlers($hook, $type, $return, $params) {
+	$user = $params['user'];
+	$return['profile_tagged'] = elgg_echo('tidypics:photosof', array($user->name));
+	return $return;
 }
 
 

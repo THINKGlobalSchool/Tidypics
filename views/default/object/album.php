@@ -13,7 +13,7 @@ $full_view = elgg_extract('full_view', $vars, false);
 if ($full_view) {
 	echo elgg_view('object/album/full', $vars);
 } else {
-	if (elgg_in_context('widgets')) {
+	if (elgg_in_context('widgets') || $vars['list_type'] == 'list') {
 		echo elgg_view('object/album/list', $vars);
 	} else {
 		echo elgg_view('object/album/gallery', $vars);
