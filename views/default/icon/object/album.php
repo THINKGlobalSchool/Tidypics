@@ -19,14 +19,27 @@ if ($cover_guid) {
 	$vars['title'] = $album->getTitle();
 	echo elgg_view_entity_icon(get_entity($cover_guid), $vars['size'], $vars);
 } else {
+	$image_sizes = unserialize(elgg_get_plugin_setting('image_sizes', 'tidypics'));
+
+	$width = $image_sizes["{$vars['size']}_image_width"];
+	$height = $image_sizes["{$vars['size']}_image_height"];
+
 	$url = "mod/tidypics/graphics/empty_album.png";
 	$url = elgg_normalize_url($url);
-	$img = elgg_view('output/img', array(
+
+	$img_params = array(
 		'src' => $url,
 		'class' => 'elgg-photo',
 		'title' => $album->getTitle(),
 		'alt' => $album->getTitle(),
-	));
+	);
+
+	if ($width && $height) {
+		$img_params['width'] = $width;
+		$img_params['height'] = $height;
+	}
+
+	$img = elgg_view('output/img', $img_params);
 
 	$params = array(
 		'href' => $vars['href'],

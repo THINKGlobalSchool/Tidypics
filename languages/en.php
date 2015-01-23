@@ -55,6 +55,7 @@ $english = array(
 	'tidypics:upgrade' => 'Upgrade',
 	'tidypics:sort' => 'Sorting the %s album',
 	'tidypics:none' => 'No photo albums',
+	'tidypics:photos:none' => 'No photos',
 	'tidypics:close' => 'Close',
 	'tidypics:no_description' => 'No Description',
 	'tidypics:taggedinphoto' => 'Tagged in this photo: ',
