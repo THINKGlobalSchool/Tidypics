@@ -4,7 +4,7 @@
  * 
  */
 
-$polish = array(
+return array(
 			
 		// Menu items and titles
 			'image' => "Obrazek",
@@ -92,5 +92,3 @@ $polish = array(
 			'album:deletefailed' => "Nie udało się usunąć twojego albumu.",
 			'album:blank' => "Please give this albumu a tytuł and opis."
 );
-					
-add_translation("pl", $polish);

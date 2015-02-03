@@ -5,7 +5,7 @@
 */
 
 
-$danish = array(
+return array(
 
 		// Menu items and titles
 			'image' => "Billede",
@@ -186,5 +186,3 @@ $danish = array(
 			'album:blank' => "Giv venligst dette album en titel samt beskrivelse",
 			'tidypics:upgrade:failed' => "Opgraderingen af Tidypics mislykkedes",
 );
-
-add_translation("da", $danish);

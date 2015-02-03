@@ -2,7 +2,7 @@
 
 // Generate By translationbrowser. 
 
-$hebrew = array( 
+return array( 
 	 'image'  =>  "תמונה" , 
 	 'images'  =>  "תמונות" , 
 	 'caption'  =>  "כיתוב" , 
@@ -143,5 +143,3 @@ $hebrew = array(
 	 'album:blank'  =>  "אנא קבע שם ותאור עבור אלבום זה" , 
 	 'tidypics:upgrade:failed'  =>  "שדרוג Tidypics נכשל"
 ); 
-
-add_translation('he', $hebrew); 

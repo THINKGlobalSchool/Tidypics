@@ -4,7 +4,7 @@
  * Italian language pack
  */
 
-$italian = array(
+return array(
 			
 		// Menu items and titles			 
 			'image' => "Immagine",
@@ -112,5 +112,3 @@ $italian = array(
 			'album:deletefailed' => "L'album non può essere cancellato.",
 			'album:blank' => "Dai a quest'album un titolo e una descrizione."
 );
-					
-add_translation("it", $italian);

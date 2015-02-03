@@ -1,6 +1,6 @@
 <?php
 
-$german = array(
+return array(
 		// hack for core bug
 			'untitled' => "Unbenannt",
 
@@ -273,5 +273,3 @@ Um das Bild zu sehen, folge diesem Link: %s",
 
 			'tidypics:upgrade:failed' => "Das Upgrade des Tidypics-Plugins ist gescheitert",
 	);
-
-	add_translation("de",$german);

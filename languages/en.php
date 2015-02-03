@@ -5,7 +5,7 @@
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2
  */
 
-$english = array(
+return array(
 	// hack for core bug
 	'untitled' => "untitled",
 
@@ -263,10 +263,14 @@ The photo can be viewed here: %s",
 	'river:comment:object:tidypics_batch' => '%s commented on the album %s',
 
 	// notifications
+	'tidypics:newalbum' => '%s created a new photo album: %s
+
+%s
+%s',
 	'tidypics:newalbum_subject' => 'New photo album',
 	'tidypics:newphotos' => 'New photos in album %s',
-	'tidypics:newalbum' => '%s created a new photo album',
-	'tidypics:updatealbum' => "%s uploaded new photos to the album %s",
+	'tidypics:updatealbum' => "%s uploaded new photos to the album %s: %s",
+	'tidypics:updatealbum_subject' => 'Updated the photo album %s',
 
 	//  Status messages
 	'tidypics:upl_success' => "Your images uploaded successfully.",
@@ -332,5 +336,3 @@ The photo can be viewed here: %s",
 
 	'tidypics:upgrade:failed' => "The upgrade of Tidypics failed", 
 );
-
-add_translation("en", $english);

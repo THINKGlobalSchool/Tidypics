@@ -4,7 +4,7 @@
  * Russian language pack
  */
 
-$russian = array(
+return array(
 			
 		// Menu items and titles			 
 			'image' => "Фотография",
@@ -97,5 +97,3 @@ $russian = array(
 			'album:deletefailed' => "В данный момент ваш Альбом стереть невозможно.",
 			'album:blank' => "Пожалуйста создайте заголовок и описание вашего Альбома.",
 );
-					
-add_translation("ru", $russian);

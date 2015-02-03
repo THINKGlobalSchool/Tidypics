@@ -1,7 +1,7 @@
 <?php
 /**TRADUCIDO POR ALIX SILVA, CARLOS SILVA Y LA COMUNIDAD ELGG**/
 
-$spanish = array(
+return array(
 		// hack for core bug
 			'untitled' => "sin titulo",
 
@@ -171,5 +171,3 @@ $spanish = array(
 			'album:blank' => "Por favor, dale a este &Aacute;lbum un titulo y una descripci&oacute;n.",
 			'tidypics:upgrade:failed' => "La actualizaci&oacute;n de Tidypics ha fallado",
 );
-
-add_translation("es", $spanish);

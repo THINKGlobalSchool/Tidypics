@@ -2,12 +2,12 @@
 /**
  * Tidypics Photo Gallery plugin
  *
- * @author Cash Costello
+ * @author Jeff Tilson, Cash Costello
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2
  *
  * @todo
- * - What to do with sidebar: Put back latest comments/tag cloud?
  * - Clean up old uploader (make sure it still works as a fallback
+ * - TidypicsAlbum & TidypicsImage classes override the entity url handler?
  */
 
 elgg_register_event_handler('init', 'system', 'tidypics_init');
@@ -44,39 +44,31 @@ function tidypics_init() {
 
 	// Register JS Libs
 	$js = elgg_get_simplecache_url('js', 'photos/tidypics');
-	elgg_register_simplecache_view('js/photos/tidypics');
 	elgg_register_js('tidypics', $js, 'footer');
 
 	$js = elgg_get_simplecache_url('js', 'photos/tagging');
-	elgg_register_simplecache_view('js/photos/tagging');
 	elgg_register_js('tidypics:tagging', $js, 'footer');
 	
 	$js = elgg_get_simplecache_url('js', 'photos/upload');
-	elgg_register_simplecache_view('js/photos/upload');
 	elgg_register_js('tidypics:upload', $js, 'footer');
 
 	$js = elgg_get_simplecache_url('js', 'photos/lightbox');
-	elgg_register_simplecache_view('js/photos/lightbox');
 	elgg_register_js('tidypics:lightbox', $js, 'footer');
 
 	// Register jquery-waypoints js lib
 	$js = elgg_get_simplecache_url('js', 'waypoints');
-	elgg_register_simplecache_view('js/waypoints');
 	elgg_register_js('jquery-waypoints', $js);
 
 	// Register jquery ui widget (for jquery file upload)
 	$js = elgg_get_simplecache_url('js', 'jquery_ui_widget');
-	elgg_register_simplecache_view('js/jquery_ui_widget');
 	elgg_register_js('jquery.ui.widget', $js);
 
 	// Register jquery-file-upload js lib
 	$js = elgg_get_simplecache_url('js', 'jquery_file_upload');
-	elgg_register_simplecache_view('js/jquery_file_upload');
 	elgg_register_js('jquery-file-upload', $js);
 
 	// Register jquery iframe transport (for jquery file upload)'
 	$js = elgg_get_simplecache_url('js', 'jquery_iframe_transport');
-	elgg_register_simplecache_view('js/jquery_iframe_transport');
 	elgg_register_js('jquery.iframe-transport', $js);
 
 	// Load jquery-file-upload libs
@@ -86,12 +78,10 @@ function tidypics_init() {
 
 	// Register jquery-fancybox2 js lib
 	$js = elgg_get_simplecache_url('js', 'fancybox2');
-	elgg_register_simplecache_view('js/fancybox2');
 	elgg_register_js('jquery-fancybox2', $js);
 
 	// Register jquery-fancybox2 css
 	$css = elgg_get_simplecache_url('css', 'fancybox2');
-	elgg_register_simplecache_view('css/fancybox2');
 	elgg_register_css('jquery-fancybox2', $css);
 
 	// Load lightbox JS/CSS
@@ -149,9 +139,9 @@ function tidypics_init() {
 	// Extend livesearch page handler
 	elgg_register_plugin_hook_handler('route', 'livesearch', 'tidypics_route_livesearch_handler', 50);
 
-	// @todo notifications
-	register_notification_object('object', 'album', elgg_echo('tidypics:newalbum_subject'));
-	elgg_register_plugin_hook_handler('notify:entity:message', 'object', 'tidypics_notify_message');
+	// Notifications
+	elgg_register_notification_event('object', 'album', array('create'));
+	elgg_register_plugin_hook_handler('prepare', 'notification:publish:object:album', 'tidypics_prepare_notifications');
 
 	// Role profile widget integration
 	elgg_register_plugin_hook_handler('get_dynamic_handlers', 'role_widgets', 'tidypics_register_dynamic_widget_handlers');
@@ -760,45 +750,50 @@ function tidypics_route_livesearch_handler($hook, $type, $return, $params) {
 }
 
 /**
- * Create the body of the notification message
+ * Prepare notification message(s) for tidypics entities
  *
- * Does not run if a new album without photos
- * 
- * @param string $hook
- * @param string $type
- * @param bool   $result
- * @param array  $params
- * @return mixed
+ * @param string                          $hook         Hook name
+ * @param string                          $type         Hook type
+ * @param Elgg_Notifications_Notification $notification The notification to prepare
+ * @param array                           $params       Hook parameters
+ * @return Elgg_Notifications_Notification
  */
-function tidypics_notify_message($hook, $type, $result, $params) {
-	$entity = $params['entity'];
-	$to_entity = $params['to_entity'];
+function tidypics_prepare_notifications($hook, $type, $notification, $params) {
+	$entity = $params['event']->getObject();
+	$owner = $params['event']->getActor();
+	$recipient = $params['recipient'];
+	$language = $params['language'];
 	$method = $params['method'];
-	
-	if (elgg_instanceof($entity, 'object', 'album')) {
-		if ($entity->new_album) {
-			// stops notification from being sent
-			return false;
-		}
-		
-		if ($entity->first_upload) {
-			$descr = $entity->description;
-			$title = $entity->getTitle();
-			$owner = $entity->getOwnerEntity();
-			return elgg_echo('tidypics:newalbum', array($owner->name))
-					. ': ' . $title . "\n\n" . $descr . "\n\n" . $entity->getURL();
-		} else {
-			if ($entity->shouldNotify()) {
-				$descr = $entity->description;
-				$title = $entity->getTitle();
-				$owner = $entity->getOwnerEntity();
 
-				return elgg_echo('tidypics:updatealbum', array($owner->name, $title)) . ":\n\n" . $entity->getURL();
-			}
-		}
+	// First upload
+	if ($entity->first_upload) {
+		$notification->subject = elgg_echo('tidypics:newalbum_subject');
+
+		$notification->body = elgg_echo('tidypics:newalbum', array(
+			$owner->name, 
+			$entity->title,
+			$entity->description,
+			$entity->getURL()
+		), $language);
+
+		$notification->summary = elgg_echo('tidypics:newalbum_subject', array($entity->title), $language);
+
+		return $notification;
+	} else if ($entity->shouldNotify()) { // Album update (if needed)
+		$notification->subject = elgg_echo('tidypics:updatealbum_subject');
+
+		$notification->body = elgg_echo('tidypics:updatealbum', array(
+			$owner->name, 
+			$entity->title,
+			$entity->getURL()
+		), $language);
+
+		$notification->summary = elgg_echo('tidypics:updatealbum_subject', array($entity->title), $language);
+
+		return $notification;
+	} else {
+		return FALSE;
 	}
-	
-	return null;
 }
 
 /**

@@ -7,7 +7,7 @@
  */ 
 	 
 
-$turkish = array( 
+return array( 
 	 'image'  =>  "Resim" , 
 	 'image:access:note'  =>  "Görüntüleme izni albümden tevarüs edildi." , 
 	 'images'  =>  "Resimler" , 
@@ -81,6 +81,4 @@ $turkish = array(
 	 'album:blank'  =>  "Lütfen albümünüze başlık ve tanım giriniz."
 
 
-); 
-
-add_translation('tr', $turkish); 
+);
