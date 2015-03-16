@@ -3,7 +3,7 @@
  * Tidypics Image class
  *
  * @package TidypicsImage
- * @author Cash Costello
+ * @author Jeff Tilson, Cash Costello
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2
  */
 
@@ -13,10 +13,6 @@ class TidypicsImage extends ElggFile {
 		parent::initializeAttributes();
 
 		$this->attributes['subtype'] = "image";
-	}
-
-	public function __construct($guid = null) {
-		parent::__construct($guid);
 	}
 
 	/* Override entity get to handle empty titles */
@@ -104,7 +100,7 @@ class TidypicsImage extends ElggFile {
 
 		$this->removeThumbnails();
 
-		$image_size = $this->size();
+		$image_size = $this->getSize();
 
 		if (!parent::delete()) {
 			return false;
@@ -133,6 +129,20 @@ class TidypicsImage extends ElggFile {
 		} else {
 			return $this->originalfilename;
 		}
+	}
+
+	/**
+	 * Get display name
+	 */
+	public function getDisplayName() {
+		return $this->getTitle();
+	}
+
+	/**
+	 * Set display name
+	 */
+	public function setDisplayName($displayName) {
+		$this->title = $displayName;
 	}
 
 	/**
@@ -258,7 +268,7 @@ class TidypicsImage extends ElggFile {
 		}
 
 		$owner = $this->getOwnerEntity();
-		$owner->image_repo_size = (int)$owner->image_repo_size + $this->size();
+		$owner->image_repo_size = (int)$owner->image_repo_size + $this->getSize();
 
 		return true;
 	}

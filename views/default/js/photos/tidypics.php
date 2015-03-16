@@ -36,7 +36,7 @@ elgg.tidypics.init = function() {
 	elgg.tidypics.initMoveToAlbum();
 
 	// Delegate click handler for move to album submit
-	$(document).delegate('#_tp-move-to-album-submit', 'click', function(event) {
+	$(document).on('click', '#_tp-move-to-album-submit', function(event) {
 		var album_guid = $('#_tp-move-to-album-list input[name=select_album_guid]:checked').val();
 
 		if (!album_guid) {
@@ -49,7 +49,7 @@ elgg.tidypics.init = function() {
 	});
 
 	// Make move to album pagination load in the container 
-	$(document).delegate('#tidypics-move-to-album-lightbox .elgg-pagination a','click', function(event) {
+	$(document).on('click', '#tidypics-move-to-album-lightbox .elgg-pagination a', function(event) {
 		$container = $(this).closest('#_tp-move-to-album-list');
 
 		var height = $container.height();
@@ -83,7 +83,7 @@ elgg.tidypics.initBreadcrumbLinks = function() {
 
 // Init history pushstate for given link
 elgg.tidypics.initHistoryLink = function($parent) {
-	$parent.delegate('a', 'click', function(event) {
+	$parent.on('click', 'a', function(event) {
 		history.pushState({from: 'navigation'}, null, $(this).attr('href'));
 
 		$('ul.elgg-menu-photos-filter > li').removeClass('elgg-state-selected');
@@ -215,7 +215,7 @@ elgg.tidypics.initLoadMore = function() {
 	// Ajax spinner
 	var $loading = $("<div id='_tp-loader' class='elgg-ajax-loader'></div>");
 
-	$(document).delegate('._tp-load-more', 'click', function(event) {
+	$(document).on('click', '._tp-load-more', function(event) {
 		event.preventDefault();
 
 		// Show ajax spinner
@@ -375,7 +375,7 @@ elgg.tidypics.filterListings = function() {
 }
 
 elgg.tidypics.initMoveToAlbum = function() {
-	$('.tidypics-move-lightbox').fancybox({
+	$('.tidypics-move-lightbox').colorbox({
 		'onComplete': function() {
 			elgg.trigger_hook('moveToAlbumOpened', 'tidypics');
 

@@ -14,4 +14,10 @@
 		<type>elgg_release</type>
 		<version>1.10</version>
 	</requires>
+	<requires>
+		<type>plugin</type>
+		<name>jqueryfileupload</name>
+		<version>1.10</version>
+		<comparison>ge</comparison>
+	</requires>
 </plugin_manifest>

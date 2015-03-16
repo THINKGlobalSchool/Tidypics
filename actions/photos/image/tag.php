@@ -51,11 +51,7 @@ if ($annotation_id) {
 	if ($tag->type === 'user') {
 		if (!check_entity_relationship($tag->value, 'phototag', $image_guid)) {
 			add_entity_relationship($tag->value, 'phototag', $image_guid);
-/*
-			// also add this to the river - subject is image, object is the tagged user
-			add_to_river('river/object/image/tag', 'tag', $tagger->guid, $user_id, $access_id, 0, $annotation_id);
- * 
- */
+
 			// notify user of tagging as long as not self
 			if ($owner_id != $user_id) {
 				notify_user(

@@ -12,10 +12,10 @@
 $full_view = elgg_extract('full_view', $vars, false);
 $lightbox = elgg_extract('lightbox', $vars, false);
 
-if ($full_view) {
-	echo elgg_view('object/image/full', $vars);
-} else if ($lightbox) {
+if ($full_view && $lightbox) {
 	echo elgg_view('object/image/lightbox', $vars);
+} else if ($full_view) {
+	echo elgg_view('object/image/full', $vars);
 } else {
 	echo elgg_view('object/image/summary', $vars);
 }

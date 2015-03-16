@@ -1,6 +1,6 @@
 <?php
 /**
- * Tidypics ajax comments view
+ * Tidypics ajax comment view
  * 
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2
  * 
@@ -10,23 +10,28 @@
 $entity_guid = get_input('entity_guid');
 $user_guid = elgg_get_logged_in_user_guid();
 
-// Get user's last annotation on given entity
-$annotations = elgg_get_annotations(array(
-	'annotation_names' => array('generic_comment'),
-	'annotation_owner_guid' => $user_guid,
-	'guid' => $entity_guid,
-	'reverse_order_by' => TRUE, // this is key
+// Get user's last comment
+$comments = elgg_get_entities(array(
+	'type' => 'object',
+	'subtype' => 'comment',
+	'container_guid' => $entity_guid,
+	'owner_guid' => $user_guid,
+	'reverse_order_by' => FALSE,
+	'full_view' => TRUE,
 	'limit' => 1,
+	'preload_owners' => TRUE,
+	'distinct' => FALSE,
 ));
 
-$anno_id = $annotations[0]->id;
+$comment_id = $comments[0]->guid;
 
-// View annotation
-$annotation_view = elgg_view_annotation($annotations[0]);
-$annotation_content = <<<HTML
-	<li id="item-annotation-$anno_id" class='elgg-item'>
-	 	$annotation_view
+// View comment
+$comment_view = elgg_view_entity($comments[0]);
+$comment_content = <<<HTML
+	<li class="elgg-item elgg-item-object elgg-item-object-comment" id="elgg-object-$comment_id">
+	 	$comment_view
 	</li>
 HTML;
 
-echo $annotation_content;
+echo $comment_content;
+

@@ -68,7 +68,12 @@ foreach ($_FILES['images']['name'] as $index => $value) {
 		array_push($uploaded_images, $image->getGUID());
 
 		if ($img_river_view == "all") {
-			add_to_river('river/object/image/create', 'create', $image->getOwnerGUID(), $image->getGUID());
+			elgg_create_river_item(array(
+				'view' => 'river/object/image/create',
+				'action_type' => 'create',
+				'subject_guid' => $image->getOwnerGUID(),
+				'object_guid' => $image->getGUID()
+			));
 		}
 	}
 }
@@ -89,7 +94,12 @@ if (count($uploaded_images)) {
 
 	// "added images to album" river
 	if ($img_river_view == "batch" && $album->new_album == false) {
-		add_to_river('river/object/tidypics_batch/create', 'create', $batch->getOwnerGUID(), $batch->getGUID());
+		elgg_create_river_item(array(
+			'view' => 'river/object/tidypics_batch/create',
+			'action_type' => 'create',
+			'subject_guid' => $batch->getOwnerGUID(),
+			'object_guid' => $batch->guid
+		));
 	}
 
 	// "created album" river
@@ -97,27 +107,23 @@ if (count($uploaded_images)) {
 		$album->new_album = false;
 		$album->first_upload = true;
 		
-		add_to_river('river/object/album/create', 'create', $album->getOwnerGUID(), $album->getGUID());
+		elgg_create_river_item(array(
+			'view' => 'river/object/album/create',
+			'action_type' => 'create',
+			'subject_guid' => $album->getOwnerGUID(),
+			'object_guid' => $album->guid
+		));
 
-		// "created album" notifications
-		// we throw the notification manually here so users are not told about the new album until
-		// there are at least a few photos in it
-		if ($album->shouldNotify()) {
-			object_notifications('create', 'object', $album);
-			$album->last_notified = time();
-		}
+
 	} else {
 		// "added image to album" notifications
 		if ($album->first_upload) {
 			$album->first_upload = false;
 		}
-
-		if ($album->shouldNotify()) {
-			object_notifications('create', 'object', $album);
-			$album->last_notified = time();
-		}
 	}
 }
+
+elgg_trigger_event('create', 'object', $album);
 
 if (count($not_uploaded) > 0) {
 	if (count($uploaded_images) > 0) {

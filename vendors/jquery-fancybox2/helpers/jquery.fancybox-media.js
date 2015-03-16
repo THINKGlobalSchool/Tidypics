@@ -65,7 +65,7 @@
 	"use strict";
 
 	//Shortcut for fancyBox object
-	var F = $.fancybox,
+	var F = $.fancybox2,
 		format = function( url, rez, params ) {
 			params = params || '';
 

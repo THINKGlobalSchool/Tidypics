@@ -6,7 +6,10 @@
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2
  */
 
+
 $album = $vars['item']->getObjectEntity();
+
+$album_guid = $vars['item']->getObjectEntity()->getGUID();
 
 $album_river_view = elgg_get_plugin_setting('album_river_view', 'tidypics');
 if ($album_river_view == "cover") {

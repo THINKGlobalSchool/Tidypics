@@ -19,14 +19,6 @@ class TidypicsAlbum extends ElggObject {
 	}
 
 	/**
-	 * Constructor
-	 * @param mixed $guid
-	 */
-	public function __construct($guid = null) {
-		parent::__construct($guid);
-	}
-
-	/**
 	 * Save an album
 	 *
 	 * @return bool
@@ -81,6 +73,20 @@ class TidypicsAlbum extends ElggObject {
 	 */
 	public function getTitle() {
 		return $this->title;
+	}
+
+	/**
+	 * Get display name
+	 */
+	public function getDisplayName() {
+		return $this->getTitle();
+	}
+
+	/**
+	 * Set display name
+	 */
+	public function setDisplayName($displayName) {
+		$this->title = $displayName;
 	}
 
 	/**

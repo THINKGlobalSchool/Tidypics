@@ -2,7 +2,7 @@
 /**
  * Tidypics CSS
  *
- * @author Cash Costello
+ * @author Jeff Tilson, Cash Costello
  * @license http://www.gnu.org/licenses/gpl-2.0.html GNU General Public License v2
  */
 ?>
@@ -13,15 +13,6 @@
 
 .elgg-system-messages {
 	z-index: 9010; /* Make sure system messages are visible */
-}
-
-/* Fix tinyMCE toolbar */
-.tidypics-lightbox-comments-container .mceToolbar * {
-    white-space: normal !important;
-}
-.tidypics-lightbox-comments-container .mceToolbar tr,
-.tidypics-lightbox-comments-container .mceToolbar td {
-    float:left !important;
 }
 
 /* ***************************************
@@ -122,10 +113,14 @@
 .tidypics-tagging-help {
 	position: absolute;
 	left: 50%;
-	top: -25px;
-	width: 300px;
+	width: auto;
 	margin-left: -150px;
 	text-align: center;
+	color: #FFF;
+}
+
+.tidypics-tagging-help #tidypics-tagging-quit {
+	margin-left: 15px;
 }
 
 .tidypics-tagging-select {
@@ -186,7 +181,7 @@ div.tidypics-albums-list-container > div.elgg-module-tidypics-album,
 div.tidypics-photos-list-container > div.elgg-module-tidypics-image, 
 div.tidypics-photos-list-container > div.elgg-module-tidypics-upload {
 	float: left;
-	padding: 0 10px;
+	padding: 0 8px;
 }
 
 div.tidypics-none {
@@ -201,9 +196,8 @@ div.tidypics-none > div{
 	border: 5px solid #EEEEEE;
 	color: #999999;
 	font-weight: bold;
-	height: 152px;
-	line-height: 151px;
-	width: 510px;
+	line-height: 144px;
+	width: 507px;
 }
 
 a.tidypics-load-more {
@@ -222,9 +216,11 @@ a.tidypics-load-more {
 	overflow: hidden;
 	color: #777777;
 	font-weight: bold;
-	line-height: 159px;
+	line-height: 150px;
+	width: 150px;
 	text-align: center;
 	cursor: pointer;
+	margin-left: 4px;
 }
 
 div#tidypics-upload-container {
@@ -426,6 +422,10 @@ select.tidypics-upload-select-existing-album {
 	z-index: 9002;
 }
 
+.fancybox2-lock .ui-autocomplete {
+	z-index: 9005;
+}
+
 .tidypics-lightbox-wrap {
     height: 100% !important;
     left: 0 !important;
@@ -443,7 +443,7 @@ select.tidypics-upload-select-existing-album {
 }
 
 .tidypics-lightbox-wrap .fancybox2-outer {
-	background: #000000;
+	background: #333;
 	height: 100%;
 }
 
@@ -479,6 +479,11 @@ select.tidypics-upload-select-existing-album {
 .tidypics-lightbox-container .tidypics-lightbox-header .tidypics-lightbox-header-metadata {
 	float: right;
     padding: 16px 40px 15px 15px;
+    max-width: 65%;
+}
+
+.tidypics-lightbox-container .tidypics-lightbox-header .tidypics-lightbox-header-metadata .elgg-menu-entity li.hidden {
+	display: none;
 }
 
 .tidypics-lightbox-container .tidypics-lightbox-header a.tidypics-lightbox-close {
@@ -552,6 +557,7 @@ select.tidypics-upload-select-existing-album {
 .tidypics-lightbox-container .tidypics-photo {
 	display: none;
 	min-height: 50px;
+	box-shadow: 0px 0px 20px #000;
 }
 
 .tidypics-lightbox-container .tidypics-photo-wrapper {
@@ -561,9 +567,7 @@ select.tidypics-upload-select-existing-album {
 
 .tidypics-lightbox-container .tidypics-lightbox-sidebar-content {
 	background: none repeat scroll 0 0 #FFFFFF;
-	-moz-border-radius: 5px 5px 5px 5px;
-	-webkit-border-radius: 5px 5px 5px 5px;
-    border-radius: 5px 5px 5px 5px;
+	box-shadow: 0px 0px 20px #000;
     margin: 10px;
     padding: 5px;
     width: 435px;

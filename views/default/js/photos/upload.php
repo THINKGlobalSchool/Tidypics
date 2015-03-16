@@ -41,9 +41,9 @@ elgg.tidypics.upload.init = function() {
 		var encoded_params = $.param(params);
 
 		// Init lightbox
-		$('div._tp-uploader').fancybox({
-			'hideOnOverlayClick': false,
-			'hideOnContentClick': false,
+		$('div._tp-uploader').colorbox({
+			'overlayClose': false,
+			'escKey': false,
 			'href': elgg.get_site_url() + 'ajax/view/photos/ajax_upload?' + encoded_params,
 			onComplete: function() {
 				var params = {
@@ -68,7 +68,7 @@ elgg.tidypics.upload.initEvents = function(hook, type, params, options) {
 	var $upload_container = params.upload_container;
 
 	// Switch to existing album selection
-	$upload_container.delegate('input[name="_tp_upload_choose_existing_album"]', 'click', function(event) {
+	$upload_container.on('click', 'input[name="_tp_upload_choose_existing_album"]', function(event) {
 		$upload_container
 			.find('input[name="_tp_upload_new_album_title"]')
 			.addClass('hidden')
@@ -93,7 +93,7 @@ elgg.tidypics.upload.initEvents = function(hook, type, params, options) {
 	});
 
 	// Switch to new album selection
-	$upload_container.delegate('input[name="_tp_upload_create_new_album"]', 'click', function(event) {
+	$upload_container.on('click', 'input[name="_tp_upload_create_new_album"]', function(event) {
 		$upload_container
 			.find('select[name="_tp_upload_select_existing_album"]')
 			.addClass('hidden')
@@ -118,16 +118,16 @@ elgg.tidypics.upload.initEvents = function(hook, type, params, options) {
 	});
 
 	// Finish uploading button
-	$upload_container.delegate('input[name="_tp-upload-finish"]', 'click', function(event) {
+	$upload_container.on('click', 'input[name="_tp-upload-finish"]', function(event) {
 		window.location = $(this).data('forward_url');
 		event.preventDefault();
 	});
 
 	// Start uploading button
-	$upload_container.delegate('input[name="_tp-upload-start"]', 'click', elgg.tidypics.upload.start);
+	$upload_container.on('click', 'input[name="_tp-upload-start"]', elgg.tidypics.upload.start);
 
 	/** SET UP FILEUPLOAD **/
-	$upload_container.delegate('input[name="_tp_upload_choose_submit"]', 'click', function(event) {
+	$upload_container.on('click', 'input[name="_tp_upload_choose_submit"]', function(event) {
 		$upload_container.find('#_tp-upload-file-input').trigger('click');
 		event.preventDefault();
 	});
@@ -254,7 +254,7 @@ elgg.tidypics.upload.initEvents = function(hook, type, params, options) {
 						$status_container.removeClass('elgg-ajax-loader');
 					} else {
 						// Close the lightbox
-						$.fancybox.close();
+						$.colorbox.close();
 					}
 
 					event.preventDefault();

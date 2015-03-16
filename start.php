@@ -59,18 +59,6 @@ function tidypics_init() {
 	$js = elgg_get_simplecache_url('js', 'waypoints');
 	elgg_register_js('jquery-waypoints', $js);
 
-	// Register jquery ui widget (for jquery file upload)
-	$js = elgg_get_simplecache_url('js', 'jquery_ui_widget');
-	elgg_register_js('jquery.ui.widget', $js);
-
-	// Register jquery-file-upload js lib
-	$js = elgg_get_simplecache_url('js', 'jquery_file_upload');
-	elgg_register_js('jquery-file-upload', $js);
-
-	// Register jquery iframe transport (for jquery file upload)'
-	$js = elgg_get_simplecache_url('js', 'jquery_iframe_transport');
-	elgg_register_js('jquery.iframe-transport', $js);
-
 	// Load jquery-file-upload libs
 	elgg_load_js('jquery.ui.widget');
 	elgg_load_js('jquery-file-upload');
@@ -115,13 +103,13 @@ function tidypics_init() {
 	elgg_extend_view('groups/tool_latest', 'photos/group_module');
 
 	// Register widgets
-	elgg_register_widget_type('album_view', elgg_echo("tidypics:widget:albums"), elgg_echo("tidypics:widget:album_descr"), 'profile');
-	elgg_register_widget_type('latest_photos', elgg_echo("tidypics:widget:latest"), elgg_echo("tidypics:widget:latest_descr"), 'profile');
+	elgg_register_widget_type('album_view', elgg_echo("tidypics:widget:albums"), elgg_echo("tidypics:widget:album_descr"), array('profile'));
+	elgg_register_widget_type('latest_photos', elgg_echo("tidypics:widget:latest"), elgg_echo("tidypics:widget:latest_descr"), array('profile'));
 
 	if (elgg_is_active_plugin('roles')) {
-		elgg_register_widget_type('profile_tagged', elgg_echo('tidypics:widget:tagged'), elgg_echo('tidypics:widget:tagged_desc'), 'roleprofilewidget');
-		elgg_register_widget_type('profile_albums', elgg_echo("tidypics:widget:albums"), elgg_echo("tidypics:widget:albums"), 'roleprofilewidget');
-		elgg_register_widget_type('profile_latest_photos', elgg_echo("tidypics:widget:latest"), elgg_echo("tidypics:widget:latest"), 'roleprofilewidget');
+		elgg_register_widget_type('profile_tagged', elgg_echo('tidypics:widget:tagged'), elgg_echo('tidypics:widget:tagged_desc'), array('roleprofilewidget'));
+		elgg_register_widget_type('profile_albums', elgg_echo("tidypics:widget:albums"), elgg_echo("tidypics:widget:albums"), array('roleprofilewidget'));
+		elgg_register_widget_type('profile_latest_photos', elgg_echo("tidypics:widget:latest"), elgg_echo("tidypics:widget:latest"), array('roleprofilewidget'));
 		
 		// Register ajax views for widget content
 		elgg_register_ajax_view('widgets/profile_tagged/content');
@@ -141,7 +129,7 @@ function tidypics_init() {
 
 	// Notifications
 	elgg_register_notification_event('object', 'album', array('create'));
-	elgg_register_plugin_hook_handler('prepare', 'notification:publish:object:album', 'tidypics_prepare_notifications');
+	elgg_register_plugin_hook_handler('prepare', 'notification:create:object:album', 'tidypics_prepare_notifications');
 
 	// Role profile widget integration
 	elgg_register_plugin_hook_handler('get_dynamic_handlers', 'role_widgets', 'tidypics_register_dynamic_widget_handlers');
@@ -195,7 +183,7 @@ function tidypics_init() {
 	/** BATCH COMMENTS/LIKING FIXES **/
 
 	// Extend batch comment river view
-	elgg_extend_view('river/elements/layout', 'photos/batch_comment', 1);
+	//elgg_extend_view('river/elements/layout', 'photos/batch_comment', 1);
 
 	// Hook into annotation create event
 	elgg_register_event_handler('annotate', 'object', 'tidypics_batch_create_annotate_handler');
@@ -224,6 +212,7 @@ function tidypics_init() {
  * @return bool
  */
 function tidypics_page_handler($page) {
+
 	$page_type = $page[0];
 	$page_base = elgg_get_plugins_path() . 'tidypics/pages/photos';
 
@@ -297,8 +286,6 @@ function tidypics_page_handler($page) {
 		elgg_load_js('jquery.imgareaselect');
 		elgg_load_js('elgg.autocomplete');
 		elgg_load_js('jquery.ui.autocomplete.html');
-		elgg_load_js('tinymce');
-    	elgg_load_js('elgg.tinymce');
     	elgg_load_js('elgg.autocomplete');
 		elgg_load_js('jquery.ui.autocomplete.html');
 
@@ -446,7 +433,7 @@ function tidypics_entity_menu_setup($hook, $type, $return, $params) {
 				'is_trusted' => true,
 				'confirm' => elgg_echo('album:cover')
 			);
-			$text = elgg_view('output/confirmlink', $params);
+			$text = elgg_view('output/url', $params);
 
 			$options = array(
 				'name' => 'set_cover',
@@ -765,35 +752,37 @@ function tidypics_prepare_notifications($hook, $type, $notification, $params) {
 	$language = $params['language'];
 	$method = $params['method'];
 
-	// First upload
-	if ($entity->first_upload) {
-		$notification->subject = elgg_echo('tidypics:newalbum_subject');
+	// Album notifications
+	if (elgg_instanceof($object, 'object', 'album')) {
+		// First upload
+		if ($entity->first_upload) {
+			$notification->subject = elgg_echo('tidypics:newalbum_subject');
 
-		$notification->body = elgg_echo('tidypics:newalbum', array(
-			$owner->name, 
-			$entity->title,
-			$entity->description,
-			$entity->getURL()
-		), $language);
+			$notification->body = elgg_echo('tidypics:newalbum', array(
+				$owner->name, 
+				$entity->title,
+				$entity->description,
+				$entity->getURL()
+			), $language);
 
-		$notification->summary = elgg_echo('tidypics:newalbum_subject', array($entity->title), $language);
+			$notification->summary = elgg_echo('tidypics:newalbum_subject', array($entity->title), $language);
 
-		return $notification;
-	} else if ($entity->shouldNotify()) { // Album update (if needed)
-		$notification->subject = elgg_echo('tidypics:updatealbum_subject');
+			return $notification;
+		} else if ($entity->shouldNotify()) { // Album update (if needed)
+			$notification->subject = elgg_echo('tidypics:updatealbum_subject');
 
-		$notification->body = elgg_echo('tidypics:updatealbum', array(
-			$owner->name, 
-			$entity->title,
-			$entity->getURL()
-		), $language);
+			$notification->body = elgg_echo('tidypics:updatealbum', array(
+				$owner->name, 
+				$entity->title,
+				$entity->getURL()
+			), $language);
 
-		$notification->summary = elgg_echo('tidypics:updatealbum_subject', array($entity->title), $language);
+			$notification->summary = elgg_echo('tidypics:updatealbum_subject', array($entity->title), $language);
 
-		return $notification;
-	} else {
-		return FALSE;
+			return $notification;
+		}
 	}
+	return FALSE;
 }
 
 /**

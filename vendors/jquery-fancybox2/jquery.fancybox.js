@@ -15,7 +15,7 @@
 
 	var W = $(window),
 		D = $(document),
-		F = $.fancybox = function () {
+		F = $.fancybox2 = function () {
 			F.open.apply( this, arguments );
 		},
 		didUpdate = null,
@@ -420,9 +420,9 @@
 		},
 
 		// Manage slideshow:
-		//   $.fancybox.play(); - toggle slideshow
-		//   $.fancybox.play( true ); - start
-		//   $.fancybox.play( false ); - stop
+		//   $.fancybox2.play(); - toggle slideshow
+		//   $.fancybox2.play( true ); - start
+		//   $.fancybox2.play( false ); - stop
 		play: function ( action ) {
 			var clear = function () {
 					clearTimeout(F.player.timer);
@@ -1903,7 +1903,7 @@
 	};
 
 	// jQuery plugin initialization
-	$.fn.fancybox = function (options) {
+	$.fn.fancybox2 = function (options) {
 		var index,
 			that     = $(this),
 			selector = this.selector || '',

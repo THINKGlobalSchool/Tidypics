@@ -190,7 +190,7 @@ elgg.tidypics.lightbox.getFancyboxInit = function(href) {
 			}
 
 			// Close any other lightboxes
-			$.fancybox.close();
+			$.colorbox.close();
 
 			elgg.trigger_hook('photoLightboxBeforeClose', 'tidypics', params, null);
 		},
@@ -256,28 +256,26 @@ elgg.tidypics.lightbox.getFancyboxInit = function(href) {
 
 elgg.tidypics.lightbox.initEvents = function() {
 	// Click event for album lightboxes
-	$(document).delegate(".tidypics-album-lightbox", 'click', elgg.tidypics.lightbox.openAlbum);	
-
-	// Unbind elgg confirmation from delete links
-	$('.elgg-requires-confirmation').die('click');
+	$(document).on('click', ".tidypics-album-lightbox", elgg.tidypics.lightbox.openAlbum);	
 
 	// Bind click handler for ajax comments
-	$(document).delegate('.tidypics-lightbox-comments-container form.elgg-form-comments-add input[type=submit]', 'click', elgg.tidypics.lightbox.submitCommentClick);
+	$(document).on('click', '.tidypics-lightbox-comments-container form.elgg-form-comment-save input[type=submit]', elgg.tidypics.lightbox.submitCommentClick);
 
 	// Bind click handler for ajax comment delete
-	$(document).delegate('div.tidypics-lightbox-comments-container .elgg-menu-item-delete a', 'click', elgg.tidypics.lightbox.deleteCommentClick);
+	$(document).on('click', 'div.tidypics-lightbox-comments-container .elgg-menu-item-delete a', elgg.tidypics.lightbox.deleteCommentClick);
 
 	// Bind lightbox close
-	$(document).delegate('a.tidypics-lightbox-close', 'click', function(event) {
+	$(document).on('click', 'a.tidypics-lightbox-close', function(event) {
 		$.fancybox2.close();
 		event.preventDefault();
 	});
 
 	// Ajaxify likes in lightboxes
-	$(document).delegate('body.fancybox2-lock li.elgg-menu-item-likes a', 'click', elgg.tidypics.lightbox.likeClick);
+	$('.elgg-menu-item-unlike a').die('click');
+	$(document).on('click', 'body.fancybox2-lock li.elgg-menu-item-likes a, body.fancybox2-lock li.elgg-menu-item-unlike a', elgg.tidypics.lightbox.likeClick);
 
 	// Ajaxify setting album cover
-	$(document).delegate('body.fancybox2-lock li.elgg-menu-item-set-cover a', 'click', elgg.tidypics.lightbox.makeCoverClick);
+	$(document).on('click', 'body.fancybox2-lock li.elgg-menu-item-set-cover a', elgg.tidypics.lightbox.makeCoverClick);
 }
 
 // Open album in a lightbox
@@ -322,20 +320,11 @@ elgg.tidypics.lightbox.submitCommentClick = function(event) {
 	// Get entity guid
 	var entity_guid = $form.find('input[name="entity_guid"]').val();
 	
-	// Get comment, may not be tinyMCE 
-	if (typeof(tinyMCE) !== 'undefined') {
-		try {
-			var comment = tinyMCE.get(comment_id).getContent();
-			$("#" + comment_id).val(comment);
-		} catch (err) {
-			var comment = $("#" + comment_id).val();
-		}
-	} else {
-		var comment = $("#" + comment_id).val();
-	}
+	// Get comment
+	var comment = $("#" + comment_id).val();
 
 	// Post comment with a regular elgg action
-	elgg.action('comments/add', {
+	elgg.action('comment/save', {
 		data: {
 			entity_guid: entity_guid, 
 			generic_comment: comment,
@@ -357,11 +346,7 @@ elgg.tidypics.lightbox.submitCommentClick = function(event) {
 				}); 
 
 				// Clear comment text field
-				if (typeof(tinyMCE) !== 'undefined') {
-					tinyMCE.get(comment_id).setContent('')
-				} else {
-					$('#' + comment_id).val('');
-				}
+				$('#' + comment_id).val('');
 
 				$('._tp-ajax-comment-loader').replaceWith($_original);
 			}
@@ -373,22 +358,12 @@ elgg.tidypics.lightbox.submitCommentClick = function(event) {
 
 // Click handler for comment delete click
 elgg.tidypics.lightbox.deleteCommentClick = function(event) {
-	if (!$(this).hasClass('disabled') && confirm($(this).attr('rel'))) {
+	if (!$(this).hasClass('disabled')) {
 		$(this).addClass('disabled');
 		$_this = $(this);
 
-		// Extract annotation ID from the href
-		var string = $(this).attr('href');
-
-		var search = "annotation_id=";
-
-		var annotation_id = string.substring(string.indexOf(search) + search.length);
-
 		// Delete comment
-		elgg.action('comments/delete', {
-			data: {
-				annotation_id: annotation_id,
-			}, 
+		elgg.action($(this).attr('href'), {
 			success: function(data) {
 				// Check for bad status 
 				if (data.status == -1) {
@@ -397,7 +372,12 @@ elgg.tidypics.lightbox.deleteCommentClick = function(event) {
 				} else {
 					// Remove the comment from the DOM
 					$_this.closest('li.elgg-item').fadeOut(function(){
-						$(this).remove();
+						console.log($_this.closest('ul.elgg-list-entity').children().length === 1);
+						if ($_this.closest('ul.elgg-list-entity').children().length === 1) {
+							$_this.remove();
+						} else {
+							$(this).remove();
+						}
 					});
 				}
 			}
@@ -412,28 +392,23 @@ elgg.tidypics.lightbox.pushComment = function(content) {
 	var $new_comment = $(content);
 	$new_comment.hide(); // Hide it for special fx
 
-	// Grab annotation
-	var $annotation_list = $('.tidypics-lightbox-comments-container ul.elgg-annotation-list');
+	// Grab comment list
+	var $comment_list = $('.tidypics-lightbox-comments-container ul.elgg-list-entity');
 	
-	// Check for the annotation list, if we dont have one, create it
-	if ($annotation_list.length == 0) {
+	// Check for the comment list, if we dont have one, create it
+	if ($comment_list.length == 0) {
 		// Create the annotation list
 		var $ul = $(document.createElement('ul'));
-		$ul.attr('class', 'elgg-list elgg-list-annotation elgg-annotation-list');
-
-		// Create heading
-		var $h3 = $(document.createElement('h3'));
-		$h3.html(elgg.echo('comments'));
+		$ul.attr('class', 'elgg-list elgg-list-entity');
 
 		// Prepend the container with the new contents
 		$('.tidypics-lightbox-comments-container > .elgg-comments').prepend($ul);
-		$('.tidypics-lightbox-comments-container > .elgg-comments').prepend($h3);
 		
-		var $annotation_list = $('.tidypics-lightbox-comments-container ul.elgg-annotation-list');
+		var $comment_list = $('.tidypics-lightbox-comments-container ul.elgg-list-entity');
 	}
 
 	// Append to the annotation list
-	$annotation_list.append($new_comment);
+	$comment_list.append($new_comment);
 
 	// Slide it in
 	$new_comment.slideDown();
@@ -555,18 +530,29 @@ elgg.tidypics.lightbox.inlineEditClick = function(event) {
 // Ajax post like clicks
 elgg.tidypics.lightbox.likeClick = function(event) {
 	// Trigger a hook for like clicks
-	elgg.trigger_hook('photoLightboxLikeClick', 'tidypics', null, null);
+	elgg.trigger_hook('photoLightboxLikeClick', 'tidypics', $(this), null);
+
+	var $_this = $(this);
 
 	elgg.action($(this).attr('href'), {data: {},
 		success: function(data) {
 			if (data.status == -1) {
 				// Error
 			} else {
-				// Success
+				// Hide the like button that was clicked
+				$_this.parent().hide();
+
+				// Show the like/unlike accoringly
+				if ($_this.parent().is('.elgg-menu-item-likes')) {
+					$_this.parent().siblings('.elgg-menu-item-unlike').show();
+				} else {
+					$_this.parent().siblings('.elgg-menu-item-likes').show();
+				}
 			}
 		}
 	});
 	event.preventDefault();
+	event.stopPropagation();
 }
 
 // Ajax post make cover clicks
@@ -612,30 +598,9 @@ elgg.tidypics.lightbox.peopleTagRemoved = function(hook, type, params, value) {
 	return value;
 }
 
-// Helper to add tinyMCE controls where necessary
-elgg.tidypics.lightbox.addTinyMCE = function() {
-	// Init tinymce control for comments
-	var id = $('.tidypics-lightbox-comments-container').find('.elgg-input-longtext').attr('id');
-	if (typeof(tinyMCE) !== 'undefined' && id) {
-		tinyMCE.EditorManager.execCommand('mceAddControl', false, id);
-	}
-}
-
-// Helper to remove tinyMCE controls where necessary
-elgg.tidypics.lightbox.removeTinyMCE = function() {
-	// Remove tinymce control for commments
-	var id = $('.tidypics-lightbox-comments-container').find('.elgg-input-longtext').attr('id');
-	if (typeof(tinyMCE) !== 'undefined' && id) {
-		tinyMCE.EditorManager.execCommand('mceRemoveControl', false, id);
-	}	
-}
-
 // Register hooks
 elgg.register_hook_handler('init', 'system', elgg.tidypics.lightbox.init);
 elgg.register_hook_handler('loadTabContentComplete', 'tidypics', elgg.tidypics.lightbox.init);
 elgg.register_hook_handler('infiniteWayPointLoaded', 'tidypics', elgg.tidypics.lightbox.init);
 elgg.register_hook_handler('peopleTagAdded', 'tidypics', elgg.tidypics.lightbox.peopleTagAdded);
 elgg.register_hook_handler('peopleTagRemoved', 'tidypics', elgg.tidypics.lightbox.peopleTagRemoved);
-elgg.register_hook_handler('photoLightboxAfterShow', 'tidypics', elgg.tidypics.lightbox.addTinyMCE);
-elgg.register_hook_handler('photoLightboxBeforeShow', 'tidypics', elgg.tidypics.lightbox.removeTinyMCE);
-elgg.register_hook_handler('photoLightboxBeforeClose', 'tidypics', elgg.tidypics.lightbox.removeTinyMCE);
