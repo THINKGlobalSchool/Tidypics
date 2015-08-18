@@ -484,5 +484,9 @@ elgg.tidypics.upload.displayThumbnail = function(context, guid) {
 }
 
 elgg.register_hook_handler('init', 'system', elgg.tidypics.upload.init);
-elgg.register_hook_handler('uploadFormLoaded', 'tidypics', elgg.tidypics.upload.initEvents);
 elgg.register_hook_handler('loadTabContentComplete', 'tidypics', elgg.tidypics.upload.init);
+
+// Wrap upload form events in require block
+require(['jquery.iframe-transport', 'jquery.fileupload'], function() {
+	elgg.register_hook_handler('uploadFormLoaded', 'tidypics', elgg.tidypics.upload.initEvents);
+});
