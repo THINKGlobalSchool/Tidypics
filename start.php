@@ -665,25 +665,18 @@ function tidypics_photo_list_sort_menu_setup($hook, $type, $return, $params) {
  * @param array  $params
  * @return mixed
  */
-function tidypics_group_permission_override($hook, $type, $result, $params) {
-	// Set valid actions for permissions override
-	$valid_actions = array(
-		'photos/upload',
-		'photos/uploads_complete',
-		'photos/delete',
-	);
-
-	if (in_array(get_input('action'), $valid_actions)) {
-		if (isset($params['container'])) {
-			$album = $params['container'];
-		} else {
-			$album = $params['entity'];
-		}
-
-		if (elgg_instanceof($album, 'object', 'album')) {
-			return $album->getContainerEntity()->canWriteToContainer();
-		}
+function tidypics_group_permission_override($hook, $type, $result, $params) {	
+	if (isset($params['container'])) {
+		$album = $params['container'];
+	} else {
+		$album = $params['entity'];
 	}
+
+	if (elgg_instanceof($album, 'object', 'album')) {
+		return $album->getContainerEntity()->canWriteToContainer();
+	}
+
+	return $return;
 }
 
 /**

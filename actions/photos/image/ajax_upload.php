@@ -23,9 +23,6 @@ if (!$album->getContainerEntity()->canWriteToContainer(elgg_get_logged_in_user_g
 	forward(REFERER);
 }
 
-$errors = array();
-$messages = array();
-
 $group_guid = get_input('group_guid');
 
 if ($group_guid) {
