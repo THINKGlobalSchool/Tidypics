@@ -47,6 +47,7 @@ if ($mime == 'unknown') {
 }
 
 $image = new TidypicsImage();
+$image->title = pathinfo($file['name'], PATHINFO_FILENAME); // Strip extension and set filename
 $image->container_guid = $album->guid;
 $image->access_id = $album->access_id;
 $image->setMimeType($mime);
