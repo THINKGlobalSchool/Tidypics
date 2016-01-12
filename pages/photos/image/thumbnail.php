@@ -9,8 +9,9 @@
 $guid = (int) get_input('guid');
 $size = get_input('size');
 $image = get_entity($guid);
+
 if (!$image) {
-	// @todo
+	exit;
 }
 
 if ($size == 'master') {
