@@ -426,6 +426,10 @@ select.tidypics-upload-select-existing-album {
 	z-index: 9005;
 }
 
+.fancybox2-lock #colorbox {
+	z-index: 9005;
+}
+
 .tidypics-lightbox-wrap {
     height: 100% !important;
     left: 0 !important;
